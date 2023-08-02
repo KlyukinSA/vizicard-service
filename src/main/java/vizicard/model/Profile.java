@@ -46,7 +46,7 @@ public class Profile {
   @Column(length = 50)
   private String city;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  List<AppUserRole> appUserRoles;
+//  @ElementCollection(fetch = FetchType.EAGER)
+//  List<AppUserRole> appUserRoles;
 
 }

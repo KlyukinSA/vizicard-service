@@ -20,6 +20,7 @@ import vizicard.security.JwtTokenProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +34,18 @@ public class UserService {
   public String signin(String username, String password) {
     try {
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      return jwtTokenProvider.createToken(username, profileRepository.findByUsername(username).getAppUserRoles());
+      return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } catch (AuthenticationException e) {
       throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
 
   public String signup(Profile profile) {
-    profile.setAppUserRoles(new ArrayList<>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
+//    profile.setAppUserRoles(new ArrayList<>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
       profileRepository.save(profile);
-      return jwtTokenProvider.createToken(profile.getUsername(), profile.getAppUserRoles());
+      return jwtTokenProvider.createToken(profile.getUsername(), Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } else {
       throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -67,7 +68,7 @@ public class UserService {
   }
 
   public String refresh(String username) {
-    return jwtTokenProvider.createToken(username, profileRepository.findByUsername(username).getAppUserRoles());
+    return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
   }
 
   public Profile update(Profile mask) {

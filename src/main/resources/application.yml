@@ -1,8 +1,10 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: root
-    password: root
+    url: jdbc:mysql://vizicard.ru:3306/dev
+    username: vizicard
+    password: sdvsdDFVDFdfvdfvDSV
+
+    driver-class-name: com.mysql.cj.jdbc.Driver
   tomcat:
     max-wait: 20000
     max-active: 50
@@ -13,7 +15,6 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         id:
           new_generator_mappings: false

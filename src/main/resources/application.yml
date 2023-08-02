@@ -33,3 +33,4 @@ UserController:
   delete: Deletes specific user by username
   search: Returns specific user by username
   me: Returns current user's data
+  update: Updates most user's fields

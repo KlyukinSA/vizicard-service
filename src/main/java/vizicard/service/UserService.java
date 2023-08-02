@@ -74,11 +74,12 @@ public class UserService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Profile base = profileRepository.findByUsername(authentication.getName());
 
-    mask.setId(base.getId());
-    mask.setUsername(base.getUsername());
-    mask.setPassword(base.getPassword());
-    mask.setAppUserRoles(base.getAppUserRoles());
+    base.setName(mask.getName());
+    base.setPosition(mask.getPosition());
+    base.setDescription(mask.getDescription());
+    base.setCompany(mask.getCompany());
+    base.setCity(mask.getCity());
 
-    return profileRepository.save(mask);
+    return profileRepository.save(base);
   }
 }

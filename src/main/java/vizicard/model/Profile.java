@@ -23,15 +23,31 @@ public class Profile {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Size(min = 4, max = 255, message = "Minimum username length: 4 characters")
-  @Column(unique = true, nullable = false)
+//  @Size(min = 4, max = 255, message = "Minimum username length: 4 characters")
+  @Column(unique = true, nullable = false, length = 50)
   private String username;
 
-  @Column(unique = true, nullable = false)
-  private String email;
+//  @Column(unique = true, nullable = false)
+//  private String email;
 
-  @Size(min = 8, message = "Minimum password length: 8 characters")
+//  @Size(min = 8, message = "Minimum password length: 8 characters")
+  @Column(nullable = false, length = 70)
   private String password;
+
+  @Column(nullable = false, length = 50)
+  private String name;
+
+  @Column(length = 140)
+  private String position;
+
+  @Column(columnDefinition = "TEXT")
+  private String description;
+
+  @Column(length = 50)
+  private String company;
+
+  @Column(length = 50)
+  private String city;
 
   @ElementCollection(fetch = FetchType.EAGER)
   List<AppUserRole> appUserRoles;

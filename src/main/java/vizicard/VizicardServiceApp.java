@@ -34,7 +34,8 @@ public class VizicardServiceApp implements CommandLineRunner {
     Profile admin = new Profile();
     admin.setUsername("admin");
     admin.setPassword("admin");
-    admin.setEmail("admin@email.com");
+    admin.setName("ad name");
+//    admin.setEmail("admin@email.com");
     admin.setAppUserRoles(new ArrayList<AppUserRole>(Arrays.asList(AppUserRole.ROLE_ADMIN)));
 
     userService.signup(admin);
@@ -42,7 +43,8 @@ public class VizicardServiceApp implements CommandLineRunner {
     Profile client = new Profile();
     client.setUsername("client");
     client.setPassword("client");
-    client.setEmail("client@email.com");
+    client.setName("cl name");
+//    client.setEmail("client@email.com");
     client.setAppUserRoles(new ArrayList<AppUserRole>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
 
     userService.signup(client);

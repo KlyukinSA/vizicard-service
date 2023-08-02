@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Data // Create getters and setters
 @NoArgsConstructor
-public class AppUser {
+public class Profile {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

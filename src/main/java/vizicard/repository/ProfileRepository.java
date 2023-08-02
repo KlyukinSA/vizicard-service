@@ -4,13 +4,13 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import vizicard.model.AppUser;
+import vizicard.model.Profile;
 
-public interface UserRepository extends JpaRepository<AppUser, Integer> {
+public interface ProfileRepository extends JpaRepository<Profile, Integer> {
 
   boolean existsByUsername(String username);
 
-  AppUser findByUsername(String username);
+  Profile findByUsername(String username);
 
   @Transactional
   void deleteByUsername(String username);

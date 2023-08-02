@@ -1,32 +1,32 @@
 package vizicard.security;
 
 import lombok.RequiredArgsConstructor;
-import vizicard.model.AppUser;
+import vizicard.model.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import vizicard.repository.UserRepository;
+import vizicard.repository.ProfileRepository;
 
 @Service
 @RequiredArgsConstructor
 public class MyUserDetails implements UserDetailsService {
 
-  private final UserRepository userRepository;
+  private final ProfileRepository profileRepository;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    final AppUser appUser = userRepository.findByUsername(username);
+    final Profile profile = profileRepository.findByUsername(username);
 
-    if (appUser == null) {
+    if (profile == null) {
       throw new UsernameNotFoundException("User '" + username + "' not found");
     }
 
     return org.springframework.security.core.userdetails.User//
         .withUsername(username)//
-        .password(appUser.getPassword())//
-        .authorities(appUser.getAppUserRoles())//
+        .password(profile.getPassword())//
+        .authorities(profile.getAppUserRoles())//
         .accountExpired(false)//
         .accountLocked(false)//
         .credentialsExpired(false)//

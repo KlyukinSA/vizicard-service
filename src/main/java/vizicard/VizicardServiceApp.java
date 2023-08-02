@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
-import vizicard.model.AppUser;
+import vizicard.model.Profile;
 import vizicard.model.AppUserRole;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +31,7 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   @Override
   public void run(String... params) throws Exception {
-    AppUser admin = new AppUser();
+    Profile admin = new Profile();
     admin.setUsername("admin");
     admin.setPassword("admin");
     admin.setEmail("admin@email.com");
@@ -39,7 +39,7 @@ public class VizicardServiceApp implements CommandLineRunner {
 
     userService.signup(admin);
 
-    AppUser client = new AppUser();
+    Profile client = new Profile();
     client.setUsername("client");
     client.setPassword("client");
     client.setEmail("client@email.com");

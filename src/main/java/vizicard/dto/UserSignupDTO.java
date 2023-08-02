@@ -1,15 +1,12 @@
 package vizicard.dto;
 
-import java.util.List;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.AppUserRole;
 
 @Data
 @NoArgsConstructor
-public class UserDataDTO {
+public class UserSignupDTO {
   // При регистрации человек отправляет username, пароль, имя и должность
   @ApiModelProperty(position = 0)
   private String username;

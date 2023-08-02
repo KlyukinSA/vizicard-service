@@ -2,12 +2,13 @@ package vizicard.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,6 @@ import vizicard.security.JwtTokenProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -70,4 +70,15 @@ public class UserService {
     return jwtTokenProvider.createToken(username, profileRepository.findByUsername(username).getAppUserRoles());
   }
 
+  public Profile update(Profile mask) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Profile base = profileRepository.findByUsername(authentication.getName());
+
+    mask.setId(base.getId());
+    mask.setUsername(base.getUsername());
+    mask.setPassword(base.getPassword());
+    mask.setAppUserRoles(base.getAppUserRoles());
+
+    return profileRepository.save(mask);
+  }
 }

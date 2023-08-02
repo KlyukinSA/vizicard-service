@@ -3,6 +3,7 @@ package vizicard.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
+import vizicard.dto.UserUpdateDTO;
 import vizicard.model.Profile;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import vizicard.dto.UserDataDTO;
+import vizicard.dto.UserSignupDTO;
 import vizicard.dto.UserResponseDTO;
 import vizicard.service.UserService;
 
@@ -51,7 +52,7 @@ public class UserController {
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 422, message = "Username is already in use")})
-  public String signup(@ApiParam("Signup User") @RequestBody UserDataDTO user) {
+  public String signup(@ApiParam("Signup User") @RequestBody UserSignupDTO user) {
     return userService.signup(modelMapper.map(user, Profile.class));
   }
 
@@ -95,6 +96,16 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
   public String refresh(HttpServletRequest req) {
     return userService.refresh(req.getRemoteUser());
+  }
+
+  @PostMapping("/me")
+  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
+  @ApiOperation(value = "${UserController.update}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  @ApiResponses(value = {//
+          @ApiResponse(code = 400, message = "Something went wrong"), //
+          @ApiResponse(code = 403, message = "Access denied")})
+  public UserResponseDTO update(@ApiParam("Update User") @RequestBody UserUpdateDTO user) {
+    return modelMapper.map(userService.update(modelMapper.map(user, Profile.class)), UserResponseDTO.class);
   }
 
 }

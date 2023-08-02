@@ -27,9 +27,6 @@ public class Profile {
   @Column(unique = true, nullable = false, length = 50)
   private String username;
 
-//  @Column(unique = true, nullable = false)
-//  private String email;
-
 //  @Size(min = 8, message = "Minimum password length: 8 characters")
   @Column(nullable = false, length = 70)
   private String password;

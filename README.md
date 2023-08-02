@@ -14,6 +14,8 @@ mvn install
 ```bash
 mvn spring-boot:run
 
+firefox http://localhost:8080/swagger-ui.html
+
 curl -X POST 'http://localhost:8080/users/signin?username=admin&password=admin'
 curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer <JWT_TOKEN>'
 ```

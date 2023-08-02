@@ -10,16 +10,14 @@ import vizicard.model.AppUserRole;
 @Data
 @NoArgsConstructor
 public class UserDataDTO {
-  
+  // При регистрации человек отправляет username, пароль, имя и должность
   @ApiModelProperty(position = 0)
   private String username;
-//  @ApiModelProperty(position = 1)
-//  private String email;
-  @ApiModelProperty(position = 2)
+  @ApiModelProperty(position = 1)
   private String password;
-  @ApiModelProperty(position = 3)
+  @ApiModelProperty(position = 2)
   private String name;
-  @ApiModelProperty(position = 4)
-  List<AppUserRole> appUserRoles;
+  @ApiModelProperty(position = 3)
+  private String position;
 
 }

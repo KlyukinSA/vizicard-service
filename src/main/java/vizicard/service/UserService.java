@@ -2,6 +2,7 @@ package vizicard.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +12,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.exception.CustomException;
+import vizicard.model.AppUserRole;
 import vizicard.model.Profile;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +40,7 @@ public class UserService {
   }
 
   public String signup(Profile profile) {
+    profile.setAppUserRoles(new ArrayList<>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
       profileRepository.save(profile);

@@ -1,0 +1,5 @@
+package vizicard.model;
+
+public enum Type {
+    PHONE, MAIL, SITE, FACEBOOK, INSTAGRAM, LINKEDIN, YOUTUBE, VK, TIKTOK, OK, TELEGRAM, WHATSAPP, VIBER;
+}

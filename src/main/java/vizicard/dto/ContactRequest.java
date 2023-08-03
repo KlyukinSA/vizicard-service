@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ContactRequest {
-    ContactDTO[] contacts;
+    private ContactDTO[] contacts;
 }

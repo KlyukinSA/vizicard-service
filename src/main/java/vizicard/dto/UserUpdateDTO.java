@@ -9,8 +9,7 @@ import javax.persistence.Column;
 @Data
 @NoArgsConstructor
 public class UserUpdateDTO {
-    // Пользователь может обновить свой профиль, изменяя необходимые поля, такие как
-    // имя, должность, город, описание или компания
+
     @ApiModelProperty(position = 0)
     private String name;
     @ApiModelProperty(position = 1)
@@ -21,5 +20,8 @@ public class UserUpdateDTO {
     private String company;
     @ApiModelProperty(position = 4)
     private String city;
+
+    @ApiModelProperty(position = 5)
+    private ContactDTO[] contacts;
 
 }

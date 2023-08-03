@@ -24,4 +24,7 @@ public class UserResponseDTO {
   @ApiModelProperty(position = 6)
   private String city;
 
+  @ApiModelProperty(position = 7)
+  private ContactDTO[] contacts;
+
 }

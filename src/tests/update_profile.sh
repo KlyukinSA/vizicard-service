@@ -1,0 +1,2 @@
+curl -X PUT "http://localhost:8080/users/me" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"name\": \"string\",  \"position\": \"string\",  \"description\": \"string\",  \"company\": \"string\",  \"city\": \"string\",  \"contacts\": [    {      \"contact\": \"string\",      \"contactEnum\": \"PHONE\"    }  ]}"  -H 'Authorization: Bearer '$1
+echo

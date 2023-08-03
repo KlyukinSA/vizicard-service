@@ -3,6 +3,7 @@ package vizicard.service;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.ContactDTO;
-import vizicard.dto.ContactRequest;
+import vizicard.dto.UserResponseDTO;
+import vizicard.dto.UserUpdateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.AppUserRole;
 import vizicard.model.Contact;
@@ -24,10 +26,9 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,24 +81,31 @@ public class UserService {
     return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
   }
 
-  public Profile update(Profile mask) {
+  public UserResponseDTO update(UserUpdateDTO dto, ModelMapper modelMapper) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Profile base = profileRepository.findByUsername(authentication.getName());
+    Profile user = profileRepository.findByUsername(authentication.getName());
 
-    base.setName(mask.getName());
-    base.setPosition(mask.getPosition());
-    base.setDescription(mask.getDescription());
-    base.setCompany(mask.getCompany());
-    base.setCity(mask.getCity());
+    user.setName(dto.getName());
+    user.setPosition(dto.getPosition());
+    user.setDescription(dto.getDescription());
+    user.setCompany(dto.getCompany());
+    user.setCity(dto.getCity());
 
-    return profileRepository.save(base);
+    updateContacts(user, dto.getContacts());
+
+    profileRepository.save(user);
+
+    UserResponseDTO res = modelMapper.map(user, UserResponseDTO.class);
+    res.setContacts(getUserContacts(user));
+    return res;
   }
 
-  public void updateContacts(ContactRequest request) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Profile owner = profileRepository.findByUsername(authentication.getName());
+  private ContactDTO[] getUserContacts(Profile user) {
+    Contact[] a = contactRepository.findByOwner(user);
+    return Arrays.stream(a).map((val) -> new ContactDTO(val.getContactType().getContactEnum(), val.getContact())).toArray(ContactDTO[]::new);
+  }
 
-    ContactDTO[] list = request.getContacts();
+  private void updateContacts(Profile owner, ContactDTO[] list) {
     for (ContactDTO dto : list) {
       ContactType contactType = contactTypeRepository.findByContactEnum(dto.getContactEnum());
       Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);

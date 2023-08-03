@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserSignupDTO {
-  // При регистрации человек отправляет username, пароль, имя и должность
+
   @ApiModelProperty(position = 0)
   private String username;
   @ApiModelProperty(position = 1)

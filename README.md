@@ -2,23 +2,33 @@
 
 based on https://github.com/murraco/spring-boot-jwt
 
-# Start
+# Taste
 
+prepare
 ```bash
 sudo apt install openjdk-8-jdk
 sudo apt install maven
 
 mvn install
 ```
-
+run
 ```bash
 mvn spring-boot:run
 
 firefox http://localhost:8080/swagger-ui.html
-
-curl -X POST 'http://localhost:8080/users/signin?username=admin&password=admin'
-curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer <JWT_TOKEN>'
+# open swagger in browser to see API
+curl -X POST 'http://localhost:8080/users/signin?username=client&password=client'
+# should return token like eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbGllbnQiLCJhdXRoIjpbeyJhdXRob3JpdHkiOiJST0xFX0NMSUVOVCJ9XSwiaWF0IjoxNjkxMDUzNDMzLCJleHAiOjE2OTEwNTM3MzN9.aAbl7ymm59YTPDOKvjL75D6Qgmm3YmoJwiH6Vr1qD4E
+curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer '$(curl -X POST 'http://localhost:8080/users/signin?username=client&password=client')
+# should return {"id":1,"username":"client","name":"cl name","position":null, ...
 ```
+
+# Prod
+
+1. in `application.yml` set datasource ~~dev~~ prod
+2. set ddl-auto: [not create-drop](https://docs.jboss.org/hibernate/orm/5.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
+3. remove VizicardServiceApp::run with mock data
+4. fill vizicard.ru:3306/prod ContactType table
 
 # Stack
 

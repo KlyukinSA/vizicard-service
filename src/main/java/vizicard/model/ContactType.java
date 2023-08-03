@@ -14,9 +14,9 @@ public class ContactType {
     private Integer id;
 
     @Column(nullable = false)
-    private Type type;
+    private ContactEnum contactEnum;
 
     @Column(nullable = false)
-    private Integer logo_id;
+    private Integer logoId;
 
 }

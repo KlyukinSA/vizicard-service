@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
-import vizicard.model.Profile;
-import vizicard.model.AppUserRole;
+import vizicard.model.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import vizicard.repository.ContactTypeRepository;
 import vizicard.service.UserService;
 
 @SpringBootApplication
@@ -19,6 +19,7 @@ import vizicard.service.UserService;
 public class VizicardServiceApp implements CommandLineRunner {
 
   final UserService userService;
+  final ContactTypeRepository contactTypeRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
@@ -35,8 +36,12 @@ public class VizicardServiceApp implements CommandLineRunner {
     client.setUsername("client");
     client.setPassword("client");
     client.setName("cl name");
-
     userService.signup(client);
+
+    ContactType contactType = new ContactType();
+    contactType.setContactEnum(ContactEnum.PHONE);
+    contactType.setLogoId(55);
+    contactTypeRepository.save(contactType);
   }
 
 }

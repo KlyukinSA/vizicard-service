@@ -12,21 +12,30 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import vizicard.dto.ContactDTO;
+import vizicard.dto.ContactRequest;
 import vizicard.exception.CustomException;
 import vizicard.model.AppUserRole;
+import vizicard.model.Contact;
+import vizicard.model.ContactType;
 import vizicard.model.Profile;
+import vizicard.repository.ContactRepository;
+import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
   private final ProfileRepository profileRepository;
+  private final ContactRepository contactRepository;
+  private final ContactTypeRepository contactTypeRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
@@ -82,5 +91,28 @@ public class UserService {
     base.setCity(mask.getCity());
 
     return profileRepository.save(base);
+  }
+
+  public void updateContacts(ContactRequest request) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Profile owner = profileRepository.findByUsername(authentication.getName());
+
+    ContactDTO[] list = request.getContacts();
+    for (ContactDTO dto : list) {
+      ContactType contactType = contactTypeRepository.findById(dto.getContactTypeId()).get(); // TODO
+      System.out.printf(contactType.toString() + "\n\n");
+      Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
+      if (contact != null) {
+        contact.setContact(dto.getContact());
+        System.out.printf(contact.toString() + "\n\n");
+      } else {
+        System.out.printf("no contact" + "\n\n");
+        contact = new Contact();
+        contact.setContactType(contactType);
+        contact.setOwner(owner);
+        contact.setContact(dto.getContact());
+      }
+      contactRepository.save(contact);
+    }
   }
 }

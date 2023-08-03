@@ -13,7 +13,7 @@ public class ContactType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false) // TODO make as id
     private ContactEnum contactEnum;
 
     @Column(nullable = false)

@@ -13,7 +13,7 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor
 public class ContactDTO {
 
-    private Integer contactTypeId;
+    private ContactEnum contactEnum;
     private String contact;
 
 }

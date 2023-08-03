@@ -99,20 +99,19 @@ public class UserService {
 
     ContactDTO[] list = request.getContacts();
     for (ContactDTO dto : list) {
-      ContactType contactType = contactTypeRepository.findById(dto.getContactTypeId()).get(); // TODO
-      System.out.printf(contactType.toString() + "\n\n");
+      ContactType contactType = contactTypeRepository.findByContactEnum(dto.getContactEnum());
       Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
       if (contact != null) {
         contact.setContact(dto.getContact());
-        System.out.printf(contact.toString() + "\n\n");
       } else {
-        System.out.printf("no contact" + "\n\n");
+        System.out.printf("no contact" + "\n");
         contact = new Contact();
         contact.setContactType(contactType);
         contact.setOwner(owner);
         contact.setContact(dto.getContact());
       }
       contactRepository.save(contact);
+      System.out.printf(contact.toString() + "\n\n");
     }
   }
 }

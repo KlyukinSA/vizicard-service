@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -70,6 +71,11 @@ public class SwaggerConfig {
     AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
     authorizationScopes[0] = authorizationScope;
     return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
+  }
+
+  @Bean // TODO should be not in SwaggerConfig and not in VizicardServiceApp
+  public ModelMapper modelMapper() {
+    return new ModelMapper();
   }
 
 }

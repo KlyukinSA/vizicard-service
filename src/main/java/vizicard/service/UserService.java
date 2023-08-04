@@ -1,7 +1,5 @@
 package vizicard.service;
 
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import vizicard.dto.ContactDTO;
 import vizicard.dto.UserResponseDTO;
+import vizicard.dto.UserSignupDTO;
 import vizicard.dto.UserUpdateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.AppUserRole;
@@ -28,7 +27,6 @@ import vizicard.security.JwtTokenProvider;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +38,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
+  private final ModelMapper modelMapper;
 
   public String signin(String username, String password) {
     try {
@@ -50,8 +49,9 @@ public class UserService {
     }
   }
 
-  public String signup(Profile profile) {
+  public String signup(UserSignupDTO dto) {
 //    profile.setAppUserRoles(new ArrayList<>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
+    Profile profile = modelMapper.map(dto, Profile.class);
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
       profileRepository.save(profile);
@@ -65,36 +65,54 @@ public class UserService {
     profileRepository.deleteByUsername(username);
   }
 
-  public Profile search(String username) {
+  public UserResponseDTO search(String username) {
     Profile profile = profileRepository.findByUsername(username);
     if (profile == null) {
       throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
     }
-    return profile;
+
+    return getUserResponseDTO(profile);
   }
 
-  public Profile whoami(HttpServletRequest req) {
-    return profileRepository.findByUsername(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+  public UserResponseDTO whoami() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Profile user = profileRepository.findByUsername(authentication.getName());
+
+    return getUserResponseDTO(user);
   }
 
   public String refresh(String username) {
     return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
   }
 
-  public UserResponseDTO update(UserUpdateDTO dto, ModelMapper modelMapper) {
+  public UserResponseDTO update(UserUpdateDTO dto) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     Profile user = profileRepository.findByUsername(authentication.getName());
 
-    user.setName(dto.getName());
-    user.setPosition(dto.getPosition());
-    user.setDescription(dto.getDescription());
-    user.setCompany(dto.getCompany());
-    user.setCity(dto.getCity());
+    if (dto.getName() != null) {
+      user.setName(dto.getName());
+    }
+    if (dto.getPosition() != null) {
+      user.setPosition(dto.getPosition());
+    }
+    if (dto.getDescription() != null) {
+      user.setDescription(dto.getDescription());
+    }
+    if (dto.getCompany() != null) {
+      user.setCompany(dto.getCompany());
+    }
+    if (dto.getCity() != null) {
+      user.setCity(dto.getCity());
+    }
 
     updateContacts(user, dto.getContacts());
 
     profileRepository.save(user);
 
+    return getUserResponseDTO(user);
+  }
+
+  private UserResponseDTO getUserResponseDTO(Profile user) {
     UserResponseDTO res = modelMapper.map(user, UserResponseDTO.class);
     res.setContacts(getUserContacts(user));
     return res;
@@ -112,14 +130,12 @@ public class UserService {
       if (contact != null) {
         contact.setContact(dto.getContact());
       } else {
-        System.out.printf("no contact" + "\n");
         contact = new Contact();
         contact.setContactType(contactType);
         contact.setOwner(owner);
         contact.setContact(dto.getContact());
       }
       contactRepository.save(contact);
-      System.out.printf(contact.toString() + "\n\n");
     }
   }
 }

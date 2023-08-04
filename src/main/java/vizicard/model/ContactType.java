@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-public class ContactType {
+public class ContactType { // TODO GET all
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

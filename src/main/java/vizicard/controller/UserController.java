@@ -27,7 +27,6 @@ import java.util.List;
 public class UserController {
 
   private final UserService userService;
-  private final ModelMapper modelMapper;
 
   @PostMapping("/signin")
   @ApiOperation(value = "${UserController.signin}")
@@ -47,7 +46,7 @@ public class UserController {
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 422, message = "Username is already in use")})
   public String signup(@ApiParam("Signup User") @RequestBody UserSignupDTO user) {
-    return userService.signup(modelMapper.map(user, Profile.class));
+    return userService.signup(user);
   }
 
   @DeleteMapping(value = "/{username}")
@@ -72,7 +71,7 @@ public class UserController {
       @ApiResponse(code = 404, message = "The user doesn't exist"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
   public UserResponseDTO search(@ApiParam("Username") @PathVariable String username) {
-    return modelMapper.map(userService.search(username), UserResponseDTO.class);
+    return userService.search(username);
   }
 
   @GetMapping(value = "/me")
@@ -82,8 +81,8 @@ public class UserController {
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public UserResponseDTO whoami(HttpServletRequest req) {
-    return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
+  public UserResponseDTO whoami() {
+    return userService.whoami();
   }
 
   @GetMapping("/refresh")
@@ -99,7 +98,7 @@ public class UserController {
           @ApiResponse(code = 400, message = "Something went wrong"), //
           @ApiResponse(code = 403, message = "Access denied")})
   public UserResponseDTO update(@ApiParam("Update User") @RequestBody UserUpdateDTO dto) {
-    return userService.update(dto, modelMapper);
+    return userService.update(dto);
   }
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
+import vizicard.dto.UserSignupDTO;
 import vizicard.model.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
@@ -25,14 +26,9 @@ public class VizicardServiceApp implements CommandLineRunner {
     SpringApplication.run(VizicardServiceApp.class, args);
   }
 
-  @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
-
   @Override
   public void run(String... params) throws Exception {
-    Profile client = new Profile();
+    UserSignupDTO client = new UserSignupDTO();
     client.setUsername("client");
     client.setPassword("client");
     client.setName("cl name");

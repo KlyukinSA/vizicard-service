@@ -27,6 +27,7 @@ import vizicard.security.JwtTokenProvider;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,17 +62,13 @@ public class UserService {
     }
   }
 
-  public void delete(String username) {
-    profileRepository.deleteByUsername(username);
-  }
-
-  public UserResponseDTO search(String username) {
-    Profile profile = profileRepository.findByUsername(username);
-    if (profile == null) {
+  public UserResponseDTO search(Integer id) {
+    Optional<Profile> profile = profileRepository.findById(id);
+    if (!profile.isPresent()) {
       throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
     }
 
-    return getUserResponseDTO(profile);
+    return getUserResponseDTO(profile.get());
   }
 
   public UserResponseDTO whoami() {

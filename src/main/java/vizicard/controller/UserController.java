@@ -50,7 +50,6 @@ public class UserController {
   }
 
   @GetMapping(value = "/{id}")
-//  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
   @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -62,7 +61,7 @@ public class UserController {
   }
 
   @GetMapping(value = "/me")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
+  @PreAuthorize("isAuthenticated()")
   @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -79,7 +78,7 @@ public class UserController {
   }
 
   @PutMapping("/me")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
+  @PreAuthorize("isAuthenticated()")
   @ApiOperation(value = "${UserController.update}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
           @ApiResponse(code = 400, message = "Something went wrong"), //

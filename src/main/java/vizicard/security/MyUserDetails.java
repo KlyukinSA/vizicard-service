@@ -1,5 +1,6 @@
 package vizicard.security;
 
+import com.mysql.cj.x.protobuf.MysqlxCursor;
 import lombok.RequiredArgsConstructor;
 import vizicard.model.AppUserRole;
 import vizicard.model.Profile;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import vizicard.repository.ProfileRepository;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,15 +22,16 @@ public class MyUserDetails implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    final Profile profile = profileRepository.findByUsername(username);
+//    final Profile profile = profileRepository.findByUsername(username);
+    Optional<Profile> profile = profileRepository.findById(Integer.valueOf(username));
 
-    if (profile == null) {
+    if (!profile.isPresent()) {
       throw new UsernameNotFoundException("User '" + username + "' not found");
     }
 
     return org.springframework.security.core.userdetails.User//
         .withUsername(username)//
-        .password(profile.getPassword())//
+        .password(profile.get().getPassword())//
         .authorities(Collections.singletonList(AppUserRole.ROLE_CLIENT))//
         .accountExpired(false)//
         .accountLocked(false)//

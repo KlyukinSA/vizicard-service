@@ -37,14 +37,17 @@ public class UserService {
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
   private final PasswordEncoder passwordEncoder;
+
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
+
   private final ModelMapper modelMapper;
 
   public String signin(String username, String password) {
+    String idAsUsername = String.valueOf(profileRepository.findByUsername(username).getId());
     try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(idAsUsername, password));
+      return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } catch (AuthenticationException e) {
       throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -55,8 +58,8 @@ public class UserService {
     Profile profile = modelMapper.map(dto, Profile.class);
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-      profileRepository.save(profile);
-      return jwtTokenProvider.createToken(profile.getUsername(), Collections.singletonList(AppUserRole.ROLE_CLIENT));
+      String idAsUsername = String.valueOf(profileRepository.save(profile).getId());
+      return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } else {
       throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -72,10 +75,7 @@ public class UserService {
   }
 
   public UserResponseDTO whoami() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Profile user = profileRepository.findByUsername(authentication.getName());
-
-    return getUserResponseDTO(user);
+    return getUserResponseDTO(getUserFromAuth());
   }
 
   public String refresh(String username) {
@@ -83,8 +83,7 @@ public class UserService {
   }
 
   public UserResponseDTO update(UserUpdateDTO dto) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Profile user = profileRepository.findByUsername(authentication.getName());
+    Profile user = getUserFromAuth();
 
     if (dto.getName() != null) {
       user.setName(dto.getName());
@@ -107,6 +106,11 @@ public class UserService {
     profileRepository.save(user);
 
     return getUserResponseDTO(user);
+  }
+
+  private Profile getUserFromAuth() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
   }
 
   private UserResponseDTO getUserResponseDTO(Profile user) {

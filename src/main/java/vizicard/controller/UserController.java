@@ -49,7 +49,7 @@ public class UserController {
     return userService.signup(user);
   }
 
-  @GetMapping(value = "/search/{id}")
+  @GetMapping(value = "/{id}")
 //  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
   @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//

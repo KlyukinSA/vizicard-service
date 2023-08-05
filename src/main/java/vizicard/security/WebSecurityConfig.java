@@ -31,13 +31,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
     // Entry points
-    http.authorizeRequests()//
-        .antMatchers("/users/signin").permitAll()//
-        .antMatchers("/users/signup").permitAll()//
-        .antMatchers("/users/{id}").permitAll()//
-//        .antMatchers("/h2-console/**/**").permitAll()
-        // Disallow everything else..
-        .anyRequest().authenticated();
+//    http.authorizeRequests()//
+//        .antMatchers("/users/signin").permitAll()//
+//        .antMatchers("/users/signup").permitAll()//
+//        .antMatchers("/users/{id}").permitAll()//
+////        .antMatchers("/h2-console/**/**").permitAll()
+//        // Disallow everything else..
+//        .anyRequest().authenticated();
 
     // If a user try to access a resource without having enough permissions
 //    http.exceptionHandling().accessDeniedPage("/login");

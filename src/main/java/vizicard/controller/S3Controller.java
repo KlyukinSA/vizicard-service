@@ -23,13 +23,9 @@ public class S3Controller {
     private final S3Service service;
 
     @PostMapping("upload")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
-    public ResponseEntity<?> uploadFile(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("fileName") String fileName
-    ) throws IOException {
-        service.uploadFile(fileName, file.getSize(), file.getContentType(), file.getInputStream());
-        return ResponseEntity.ok().build();
+//    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok().body(service.uploadFile(file));
     }
 
 }

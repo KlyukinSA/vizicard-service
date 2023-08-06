@@ -3,6 +3,7 @@ package vizicard.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,9 +33,12 @@ public class S3Service {
         s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
 
         URL url = s3Client.getUrl(bucketName, keyName);
-        System.out.println(url);
+//        System.out.println(url);
 
         return cloudFileRepository.save(new CloudFile(url.toString()));
     }
 
+    public String getUrlById(Integer id) {
+        return cloudFileRepository.getById(id).getUrl();
+    }
 }

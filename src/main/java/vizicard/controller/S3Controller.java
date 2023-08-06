@@ -17,15 +17,18 @@ import java.io.IOException;
 @Api(tags = "files")
 @RequiredArgsConstructor
 public class S3Controller {
-    // https://www.baeldung.com/aws-s3-java
-    // https://github.com/davidarchanjo/spring-boot-aws-s3/blob/main/src/main/java/br/com/example/davidarchanjo/controller/S3BucketStorageController.java
 
     private final S3Service service;
 
-    @PostMapping("upload")
-//    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok().body(service.uploadFile(file));
+//    @PostMapping("upload")
+////    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
+//        return ResponseEntity.ok().body(service.uploadFile(file));
+//    }
+
+    @GetMapping("{id}")
+    public String getUrlById(@RequestParam("id") Integer id) {
+        return service.getUrlById(id);
     }
 
 }

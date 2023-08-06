@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
 import vizicard.model.ContactEnum;
 import vizicard.model.Profile;
@@ -18,6 +19,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import vizicard.service.UserService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -85,6 +87,20 @@ public class UserController {
           @ApiResponse(code = 403, message = "Access denied")})
   public UserResponseDTO update(@ApiParam("Update User") @RequestBody UserUpdateDTO dto) {
     return userService.update(dto);
+  }
+
+  @PostMapping("/me/avatar")
+  @PreAuthorize("isAuthenticated()")
+  @ApiOperation(value = "${UserController.updateAvatar}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  public UserResponseDTO updateAvatar(@RequestPart("file") MultipartFile file) throws IOException {
+    return userService.updateAvatar(file);
+  }
+
+  @PostMapping("/me/background")
+  @PreAuthorize("isAuthenticated()")
+  @ApiOperation(value = "${UserController.updateAvatar}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  public UserResponseDTO updateBackground(@RequestPart("file") MultipartFile file) throws IOException {
+    return userService.updateBackground(file);
   }
 
 }

@@ -5,13 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -45,6 +39,14 @@ public class Profile {
 
   @Column(length = 50)
   private String city;
+
+// Добавление полей avatar_id и background_id в таблицу profiles, ссылающиеся на таблицу files
+
+  @OneToOne
+  private CloudFile avatar;
+
+  @OneToOne
+  private CloudFile background;
 
 //  @ElementCollection(fetch = FetchType.EAGER)
 //  List<AppUserRole> appUserRoles;

@@ -1,0 +1,1 @@
+curl -X POST "http://localhost:8080/files/upload" -H  "accept: */*" -H  "Content-Type: multipart/form-data" -F "file=@/home/stepan/test.txt;type=text/plain" -F "fileName=test.txtName" -H 'Authorization: Bearer '$1 -v

@@ -5,6 +5,7 @@ import java.util.List;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import vizicard.model.AppUserRole;
+import vizicard.model.CloudFile;
 
 @Data
 public class UserResponseDTO {
@@ -26,5 +27,10 @@ public class UserResponseDTO {
 
   @ApiModelProperty(position = 7)
   private ContactDTO[] contacts;
+
+  @ApiModelProperty(position = 8)
+  private CloudFile avatar;
+  @ApiModelProperty(position = 9)
+  private CloudFile background;
 
 }

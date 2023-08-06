@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.ContactDTO;
 import vizicard.dto.UserResponseDTO;
 import vizicard.dto.UserSignupDTO;
@@ -25,6 +26,7 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -42,6 +44,8 @@ public class UserService {
   private final AuthenticationManager authenticationManager;
 
   private final ModelMapper modelMapper;
+
+  private final S3Service s3Service;
 
   public String signin(String username, String password) {
     String idAsUsername = String.valueOf(profileRepository.findByUsername(username).getId());
@@ -138,5 +142,17 @@ public class UserService {
       }
       contactRepository.save(contact);
     }
+  }
+
+  public UserResponseDTO updateAvatar(MultipartFile file) throws IOException {
+    Profile user = getUserFromAuth();
+    user.setAvatar(s3Service.uploadFile(file));
+    return getUserResponseDTO(user);
+  }
+
+  public UserResponseDTO updateBackground(MultipartFile file) throws IOException {
+    Profile user = getUserFromAuth();
+    user.setBackground(s3Service.uploadFile(file));
+    return getUserResponseDTO(user);
   }
 }

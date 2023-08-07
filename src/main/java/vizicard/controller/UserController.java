@@ -3,12 +3,12 @@ package vizicard.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
-import vizicard.model.ContactEnum;
-import vizicard.model.Profile;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import io.swagger.annotations.Api;
@@ -19,8 +19,8 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import vizicard.service.UserService;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -101,6 +101,16 @@ public class UserController {
   @ApiOperation(value = "${UserController.updateAvatar}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   public UserResponseDTO updateBackground(@RequestPart("file") MultipartFile file) throws IOException {
     return userService.updateBackground(file);
+  }
+
+  @GetMapping(value = "/{id}/vcard")
+  public ResponseEntity<?> vcard(@ApiParam("Username") @PathVariable Integer id) throws IOException {
+    byte[] bytes = userService.getVcardBytes(id);
+
+    return ResponseEntity.ok()
+            .contentType(MediaType.valueOf("text/vcard"))
+            .contentLength(bytes.length)
+            .body(new InputStreamResource(new ByteArrayInputStream(bytes)));
   }
 
 }

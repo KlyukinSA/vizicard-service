@@ -106,9 +106,11 @@ public class UserController {
   @GetMapping(value = "/{id}/vcard")
   public ResponseEntity<?> vcard(@ApiParam("Username") @PathVariable Integer id) throws IOException {
     byte[] bytes = userService.getVcardBytes(id);
+    UserResponseDTO userResponseDTO = userService.search(id); // TODO
 
     return ResponseEntity.ok()
             .contentType(MediaType.valueOf("text/vcard"))
+            .header("Content-Disposition", "attachment; filename=\"" + userResponseDTO.getName() + ".pdf\"")
             .contentLength(bytes.length)
             .body(new InputStreamResource(new ByteArrayInputStream(bytes)));
   }

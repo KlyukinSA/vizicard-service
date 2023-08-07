@@ -18,6 +18,13 @@ spring:
         format_sql: true
         id:
           new_generator_mappings: false
+  mail:
+    host: vizicard.ru
+    port: 587
+    username: info@vizicard.ru
+    password: dgdfgDFgdfbgd
+    properties:
+      starttls.enable: true
 
 server:
    port: 8080 # This is the default port anyway, but you can change it here
@@ -26,8 +33,10 @@ security:
   jwt:
     token:
       secret-key: secret-key
-      expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
-      
+#      expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
+
+#  spring.mail.properties.mail.smtp.auth=true
+
 #UserController:
 #  signin: Authenticates user and returns its JWT token.
 #  signup: Creates user and returns its JWT token

@@ -1,5 +1,12 @@
 package vizicard.service;
 
+import ezvcard.VCard;
+import ezvcard.VCardVersion;
+import ezvcard.io.StreamWriter;
+import ezvcard.io.text.VCardWriter;
+import ezvcard.parameter.ImageType;
+import ezvcard.property.Address;
+import ezvcard.property.Photo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -17,16 +24,13 @@ import vizicard.dto.UserResponseDTO;
 import vizicard.dto.UserSignupDTO;
 import vizicard.dto.UserUpdateDTO;
 import vizicard.exception.CustomException;
-import vizicard.model.AppUserRole;
-import vizicard.model.Contact;
-import vizicard.model.ContactType;
-import vizicard.model.Profile;
+import vizicard.model.*;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -74,7 +78,6 @@ public class UserService {
     if (!profile.isPresent()) {
       throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
     }
-
     return getUserResponseDTO(profile.get());
   }
 
@@ -154,5 +157,48 @@ public class UserService {
     Profile user = getUserFromAuth();
     user.setBackground(s3Service.uploadFile(file));
     return getUserResponseDTO(user);
+  }
+
+  public byte[] getVcardBytes(Integer id) throws IOException {
+    Profile profile = profileRepository.getById(id);
+    VCard vcard = getVcard(profile);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    StreamWriter writer = new VCardWriter(outputStream, VCardVersion.V4_0);
+    writer.write(vcard);
+    writer.close();
+    return outputStream.toByteArray();
+  }
+
+  private VCard getVcard(Profile user) {
+    VCard vcard = new VCard();
+    vcard.setFormattedName(user.getName());
+    vcard.setCategories(user.getPosition());
+    vcard.addNote(user.getDescription());
+    vcard.setOrganization(user.getCompany());
+
+    Address address = new Address();
+    address.setLocality(user.getCity());
+    vcard.addAddress(address);
+
+    ContactDTO[] contacts = getUserContacts(user);
+    for (ContactDTO contact : contacts) {
+      ContactEnum contactEnum = contact.getContactEnum();
+      String string = contact.getContact();
+      if (contactEnum == ContactEnum.PHONE) {
+        vcard.addTelephoneNumber(string);
+      } else if (contactEnum == ContactEnum.MAIL) {
+        vcard.addEmail(string);
+      } else if (contactEnum == ContactEnum.SITE) {
+        vcard.addUrl(string);
+      } // TODO social media
+    }
+
+    if (user.getAvatar() != null) {
+      Photo photo = new Photo(user.getAvatar().getUrl(), ImageType.JPEG);
+      vcard.addPhoto(photo); // TODO url or byte[]?
+    }
+
+    return vcard;
   }
 }

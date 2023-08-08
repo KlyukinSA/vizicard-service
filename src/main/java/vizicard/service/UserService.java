@@ -7,6 +7,7 @@ import ezvcard.io.text.VCardWriter;
 import ezvcard.parameter.ImageType;
 import ezvcard.property.Address;
 import ezvcard.property.Photo;
+import io.netty.util.Signal;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
-import vizicard.dto.ContactDTO;
-import vizicard.dto.UserResponseDTO;
-import vizicard.dto.UserSignupDTO;
-import vizicard.dto.UserUpdateDTO;
+import vizicard.dto.*;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.ContactRepository;
@@ -51,12 +49,13 @@ public class UserService {
 
   private final S3Service s3Service;
 
-  public String signin(String username, String password) {
-    String idAsUsername = String.valueOf(profileRepository.findByUsername(username).getId());
+  public String signin(SigninDTO dto) {
     try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(idAsUsername, password));
+      Profile profile = profileRepository.findByUsername(dto.getUsername());
+      String idAsUsername = String.valueOf(profile.getId());
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(idAsUsername, dto.getPassword()));
       return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
-    } catch (AuthenticationException e) {
+    } catch (Exception e) {
       throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }

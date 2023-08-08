@@ -61,11 +61,12 @@ public class UserService {
   }
 
   public String signup(UserSignupDTO dto) {
-//    profile.setAppUserRoles(new ArrayList<>(Arrays.asList(AppUserRole.ROLE_CLIENT)));
     Profile profile = modelMapper.map(dto, Profile.class);
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-      String idAsUsername = String.valueOf(profileRepository.save(profile).getId());
+      Profile profile1 = profileRepository.save(profile);
+      updateContacts(profile1, new ContactDTO[] {new ContactDTO(ContactEnum.MAIL, profile.getUsername())});
+      String idAsUsername = String.valueOf(profile1.getId());
       return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } else {
       throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -127,7 +128,10 @@ public class UserService {
 
   private ContactDTO[] getUserContacts(Profile user) {
     Contact[] a = contactRepository.findByOwner(user);
-    return Arrays.stream(a).map((val) -> new ContactDTO(val.getContactType().getContactEnum(), val.getContact())).toArray(ContactDTO[]::new);
+    return Arrays.stream(a).map((val) -> new ContactDTO(
+            val.getContactType().getContactEnum(),
+            val.getContact())
+    ).toArray(ContactDTO[]::new);
   }
 
   private void updateContacts(Profile owner, ContactDTO[] list) {

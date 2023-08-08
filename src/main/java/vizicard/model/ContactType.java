@@ -13,6 +13,7 @@ public class ContactType { // TODO GET all
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false) // TODO make as id
     private ContactEnum contactEnum;
 

@@ -65,7 +65,8 @@ public class UserService {
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
       Profile profile1 = profileRepository.save(profile);
-      updateContacts(profile1, new ContactDTO[] {new ContactDTO(ContactEnum.MAIL, profile.getUsername())});
+      ContactType contactType = contactTypeRepository.findByContactEnum(ContactEnum.MAIL);
+      updateContacts(profile1, new ContactDTO[] {new ContactDTO(contactType.getContactEnum(), profile.getUsername(), contactType.getLogo().getUrl())});
       String idAsUsername = String.valueOf(profile1.getId());
       return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
     } else {
@@ -130,13 +131,14 @@ public class UserService {
     Contact[] a = contactRepository.findByOwner(user);
     return Arrays.stream(a).map((val) -> new ContactDTO(
             val.getContactType().getContactEnum(),
-            val.getContact())
+            val.getContact(),
+            val.getContactType().getLogo().getUrl())
     ).toArray(ContactDTO[]::new);
   }
 
   private void updateContacts(Profile owner, ContactDTO[] list) {
     for (ContactDTO dto : list) {
-      ContactType contactType = contactTypeRepository.findByContactEnum(dto.getContactEnum());
+      ContactType contactType = contactTypeRepository.findByContactEnum(dto.getType());
       Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
       if (contact != null) {
         contact.setContact(dto.getContact());
@@ -186,7 +188,7 @@ public class UserService {
 
     ContactDTO[] contacts = getUserContacts(user);
     for (ContactDTO contact : contacts) {
-      ContactEnum contactEnum = contact.getContactEnum();
+      ContactEnum contactEnum = contact.getType();
       String string = contact.getContact();
       if (contactEnum == ContactEnum.PHONE) {
         vcard.addTelephoneNumber(string);

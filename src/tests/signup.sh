@@ -1,0 +1,1 @@
+curl -X POST "http://localhost:8080/users/signup" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"username\": \"string\",  \"password\": \"string\",  \"name\": \"string\",  \"position\": \"string\"}"

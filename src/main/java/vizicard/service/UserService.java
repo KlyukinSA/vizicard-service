@@ -52,9 +52,9 @@ public class UserService {
   public String signin(SigninDTO dto) {
     try {
       Profile profile = profileRepository.findByUsername(dto.getUsername());
-      String idAsUsername = String.valueOf(profile.getId());
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(idAsUsername, dto.getPassword()));
-      return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
+      String id = String.valueOf(profile.getId());
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
+      return jwtTokenProvider.createToken(id);
     } catch (Exception e) {
       throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -67,8 +67,8 @@ public class UserService {
       Profile profile1 = profileRepository.save(profile);
       ContactType contactType = contactTypeRepository.findByContactEnum(ContactEnum.MAIL);
       updateContacts(profile1, new ContactDTO[] {new ContactDTO(contactType.getContactEnum(), profile.getUsername(), contactType.getLogo().getUrl())});
-      String idAsUsername = String.valueOf(profile1.getId());
-      return jwtTokenProvider.createToken(idAsUsername, Collections.singletonList(AppUserRole.ROLE_CLIENT));
+      String id = String.valueOf(profile1.getId());
+      return jwtTokenProvider.createToken(id);
     } else {
       throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -84,10 +84,6 @@ public class UserService {
 
   public UserResponseDTO whoami() {
     return getUserResponseDTO(getUserFromAuth());
-  }
-
-  public String refresh(String username) {
-    return jwtTokenProvider.createToken(username, Collections.singletonList(AppUserRole.ROLE_CLIENT));
   }
 
   public UserResponseDTO update(UserUpdateDTO dto) {

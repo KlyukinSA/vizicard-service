@@ -72,12 +72,6 @@ public class UserController {
     return userService.whoami();
   }
 
-  @GetMapping("/refresh")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CLIENT')")
-  public String refresh(HttpServletRequest req) {
-    return userService.refresh(req.getRemoteUser());
-  }
-
   @PutMapping("/me")
   @PreAuthorize("isAuthenticated()")
   @ApiOperation(value = "${UserController.update}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })

@@ -28,14 +28,8 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   @Override
   public void run(String... params) throws Exception {
-    UserSignupDTO client = new UserSignupDTO();
-    client.setUsername("client");
-    client.setPassword("client");
-    client.setName("cl name");
-    userService.signup(client);
-
     ContactType contactType = new ContactType();
-    contactType.setContactEnum(ContactEnum.PHONE);
+    contactType.setContactEnum(ContactEnum.MAIL);
     contactType.setLogoId(55);
     contactTypeRepository.save(contactType);
   }

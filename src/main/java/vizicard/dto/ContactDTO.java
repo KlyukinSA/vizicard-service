@@ -15,7 +15,8 @@ import javax.persistence.OneToOne;
 @AllArgsConstructor
 public class ContactDTO {
 
-    private ContactEnum contactEnum;
+    private ContactEnum type;
     private String contact;
+    private String logoUrl;
 
 }

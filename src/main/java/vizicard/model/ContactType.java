@@ -16,7 +16,7 @@ public class ContactType { // TODO GET all
     @Column(unique = true, nullable = false) // TODO make as id
     private ContactEnum contactEnum;
 
-    @Column(nullable = false)
-    private Integer logoId;
+    @OneToOne
+    private CloudFile logo;
 
 }

@@ -28,7 +28,10 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
+import javax.sql.DataSource;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;

@@ -71,7 +71,7 @@ public class UserService {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
       Profile profile1 = profileRepository.save(profile);
       ContactType contactType = contactTypeRepository.findByContactEnum(ContactEnum.MAIL);
-      updateContacts(profile1, new ContactDTO[] {new ContactDTO(contactType.getContactEnum(), profile.getUsername(), contactType.getLogo().getUrl())});
+      updateContacts(profile1, new ContactRequest[] {new ContactRequest(contactType.getContactEnum(), profile.getUsername())});
       String id = String.valueOf(profile1.getId());
       return jwtTokenProvider.createToken(id);
     } else {
@@ -137,8 +137,8 @@ public class UserService {
     ).toArray(ContactDTO[]::new);
   }
 
-  private void updateContacts(Profile owner, ContactDTO[] list) {
-    for (ContactDTO dto : list) {
+  private void updateContacts(Profile owner, ContactRequest[] list) {
+    for (ContactRequest dto : list) {
       ContactType contactType = contactTypeRepository.findByContactEnum(dto.getType());
       Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
       if (contact != null) {

@@ -22,6 +22,6 @@ public class UserUpdateDTO {
     private String city;
 
     @ApiModelProperty(position = 5)
-    private ContactDTO[] contacts;
+    private ContactRequest[] contacts;
 
 }

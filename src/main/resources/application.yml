@@ -11,7 +11,7 @@ spring:
     min-idle: 15
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
@@ -31,9 +31,6 @@ security:
   jwt:
     token:
       secret-key: hJKnai8ah2
-#      expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
-
-#  spring.mail.properties.mail.smtp.auth=true
 
 #UserController:
 #  signin: Authenticates user and returns its JWT token.

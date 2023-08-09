@@ -110,7 +110,7 @@ public class UserController {
 
   @PostMapping("/me/devices")
   @PreAuthorize("isAuthenticated()")
-  public boolean addDevice(@RequestBody String word) throws IOException {
+  public boolean addDevice(String word) throws IOException {
     return userService.addDevice(word);
   }
 

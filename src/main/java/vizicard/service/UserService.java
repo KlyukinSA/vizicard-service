@@ -25,6 +25,7 @@ import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.ContactTypeRepository;
+import vizicard.repository.DeviceRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
@@ -43,8 +44,9 @@ public class UserService {
   private final ProfileRepository profileRepository;
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final DeviceRepository deviceRepository;
 
+  private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
 
@@ -204,5 +206,18 @@ public class UserService {
     }
 
     return vcard;
+  }
+  //Добавление девайса. Пользователь отправляет 8 значное слово, которое является url,
+  // после чего если такого слова еще нет среди девайсов, то оно добавляется и присваивается к пользователю.
+  public boolean addDevice(String word) {
+    Device device = deviceRepository.findByUrl(word);
+    if (device == null) {
+      device = new Device();
+      device.setUrl(word);
+      device.setOwner(getUserFromAuth());
+      deviceRepository.save(device);
+      return true;
+    }
+    return false;
   }
 }

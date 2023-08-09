@@ -3,7 +3,6 @@ spring:
     urlBase: jdbc:mysql://vizicard.ru:3306/
     username: vizicard
     password: sdvsdDFVDFdfvdfvDSV
-
     driver-class-name: com.mysql.cj.jdbc.Driver
   tomcat:
     max-wait: 20000
@@ -25,7 +24,9 @@ spring:
     password: dgdfgDFgdfbgd
     properties:
       starttls.enable: true
-
+server:
+  servlet:
+    context-path: /api
 security:
   jwt:
     token:

@@ -26,9 +26,6 @@ spring:
     properties:
       starttls.enable: true
 
-server:
-   port: 8080 # This is the default port anyway, but you can change it here
-
 security:
   jwt:
     token:

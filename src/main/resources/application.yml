@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://vizicard.ru:3306/dev
+    urlBase: jdbc:mysql://vizicard.ru:3306/
     username: vizicard
     password: sdvsdDFVDFdfvdfvDSV
 

@@ -108,4 +108,10 @@ public class UserController {
             .body(new InputStreamResource(new ByteArrayInputStream(bytes)));
   }
 
+  @PostMapping("/me/devices")
+  @PreAuthorize("isAuthenticated()")
+  public boolean addDevice(@RequestBody String word) throws IOException {
+    return userService.addDevice(word);
+  }
+
 }

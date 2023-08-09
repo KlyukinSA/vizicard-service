@@ -29,11 +29,11 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   @Override
   public void run(String... params) throws Exception {
-    ContactType contactType = new ContactType();
-    contactType.setContactEnum(ContactEnum.MAIL);
-    CloudFile cloudFile = cloudFileRepository.save(new CloudFile("https://2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2.s3.timeweb.com/test.txtName"));
-    contactType.setLogo(cloudFile);
-    contactTypeRepository.save(contactType);
+//    ContactType contactType = new ContactType();
+//    contactType.setContactEnum(ContactEnum.MAIL);
+//    CloudFile cloudFile = cloudFileRepository.save(new CloudFile("https://2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2.s3.timeweb.com/test.txtName"));
+//    contactType.setLogo(cloudFile);
+//    contactTypeRepository.save(contactType);
   }
 
 }

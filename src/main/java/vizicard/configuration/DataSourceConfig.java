@@ -1,13 +1,14 @@
 package vizicard.configuration;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import javax.xml.crypto.Data;
 
 @Configuration
 public class DataSourceConfig {
@@ -21,15 +22,15 @@ public class DataSourceConfig {
     @Value("${spring.datasource.password}")
     private String databasePassword;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     @Bean
-    public DataSource dataSource() throws UnknownHostException {
-        String path;
-        if (InetAddress.getLocalHost().getHostName().equals("1560161-cj20879")) {
-            path = "prod";
-        } else {
-            path = "dev";
+    DataSource dataSource() {
+        if (activeProfile.equals("prod")) {
+            return getDataSourceWithPath("prod");
         }
-        return getDataSourceWithPath(path);
+        return getDataSourceWithPath("dev");
     }
 
     DataSource getDataSourceWithPath(String path) {

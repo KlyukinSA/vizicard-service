@@ -15,9 +15,11 @@ public class Contact {
     private Integer id;
 
     @OneToOne
+    @JoinColumn(nullable = false)
     private Profile owner;
 
     @OneToOne
+    @JoinColumn(nullable = false)
     private ContactType contactType;
 
     @Column(nullable = false, length = 200)

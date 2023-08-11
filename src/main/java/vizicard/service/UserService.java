@@ -161,12 +161,14 @@ public class UserService {
   public UserResponseDTO updateAvatar(MultipartFile file) throws IOException {
     Profile user = getUserFromAuth();
     user.setAvatar(s3Service.uploadFile(file));
+    profileRepository.save(user);
     return getUserResponseDTO(user);
   }
 
   public UserResponseDTO updateBackground(MultipartFile file) throws IOException {
     Profile user = getUserFromAuth();
     user.setBackground(s3Service.uploadFile(file));
+    profileRepository.save(user);
     return getUserResponseDTO(user);
   }
 

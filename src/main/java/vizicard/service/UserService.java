@@ -7,6 +7,7 @@ import ezvcard.io.text.VCardWriter;
 import ezvcard.parameter.ImageType;
 import ezvcard.property.Address;
 import ezvcard.property.Photo;
+import ezvcard.property.RawProperty;
 import io.netty.util.Signal;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -185,14 +186,23 @@ public class UserService {
 
   private VCard getVcard(Profile user) {
     VCard vcard = new VCard();
-    vcard.setFormattedName(user.getName());
-    vcard.setCategories(user.getPosition());
-    vcard.addNote(user.getDescription());
-    vcard.setOrganization(user.getCompany());
-
-    Address address = new Address();
-    address.setLocality(user.getCity());
-    vcard.addAddress(address);
+    if (user.getName() != null) {
+      vcard.setFormattedName(user.getName());
+    }
+    if (user.getPosition() != null) {
+      vcard.setCategories(user.getPosition());
+    }
+    if (user.getDescription() != null) {
+      vcard.addNote(user.getDescription());
+    }
+    if (user.getCompany() != null) {
+      vcard.setOrganization(user.getCompany());
+    }
+    if (user.getCity() != null) {
+      Address address = new Address();
+      address.setLocality(user.getCity());
+      vcard.addAddress(address);
+    }
 
     ContactDTO[] contacts = getUserContacts(user);
     for (ContactDTO contact : contacts) {
@@ -204,7 +214,11 @@ public class UserService {
         vcard.addEmail(string);
       } else if (contactEnum == ContactEnum.SITE) {
         vcard.addUrl(string);
-      } // TODO social media
+      } else {
+        String type = contactEnum.toString();
+        RawProperty property = vcard.addExtendedProperty("SOCIALPROFILE", string);
+        property.addParameter("TYPE", type);
+      }
     }
 
     if (user.getAvatar() != null) {
@@ -214,8 +228,7 @@ public class UserService {
 
     return vcard;
   }
-  //Добавление девайса. Пользователь отправляет 8 значное слово, которое является url,
-  // после чего если такого слова еще нет среди девайсов, то оно добавляется и присваивается к пользователю.
+
   public boolean addDevice(String word) {
     Device device = deviceRepository.findByUrl(word);
     if (device == null) {

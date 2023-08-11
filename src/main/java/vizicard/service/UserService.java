@@ -8,6 +8,7 @@ import ezvcard.parameter.ImageType;
 import ezvcard.property.Address;
 import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
+import ezvcard.property.Url;
 import io.netty.util.Signal;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -190,7 +191,7 @@ public class UserService {
       vcard.setFormattedName(user.getName());
     }
     if (user.getPosition() != null) {
-      vcard.setCategories(user.getPosition());
+      vcard.addTitle(user.getPosition());
     }
     if (user.getDescription() != null) {
       vcard.addNote(user.getDescription());
@@ -204,6 +205,7 @@ public class UserService {
       vcard.addAddress(address);
     }
 
+    int group = 0;
     ContactDTO[] contacts = getUserContacts(user);
     for (ContactDTO contact : contacts) {
       ContactEnum contactEnum = contact.getType();
@@ -215,15 +217,19 @@ public class UserService {
       } else if (contactEnum == ContactEnum.SITE) {
         vcard.addUrl(string);
       } else {
+        group++;
+        String groupName = "item" + group;
         String type = contactEnum.toString();
-        RawProperty property = vcard.addExtendedProperty("SOCIALPROFILE", string);
-        property.addParameter("TYPE", type);
+        RawProperty property = vcard.addExtendedProperty("X-ABLABEL", type);
+        property.setGroup(groupName);
+        Url url = vcard.addUrl(string);
+        url.setGroup(groupName);
       }
     }
 
     if (user.getAvatar() != null) {
       Photo photo = new Photo(user.getAvatar().getUrl(), ImageType.JPEG);
-      vcard.addPhoto(photo); // TODO url or byte[]?
+      vcard.addPhoto(photo); // TODO url or byte[]
     }
 
     return vcard;

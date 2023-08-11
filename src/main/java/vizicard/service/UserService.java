@@ -34,6 +34,8 @@ import vizicard.security.JwtTokenProvider;
 import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -179,13 +181,15 @@ public class UserService {
     VCard vcard = getVcard(profile);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    StreamWriter writer = new VCardWriter(outputStream, VCardVersion.V4_0);
+    VCardWriter writer = new VCardWriter(outputStream, VCardVersion.V3_0);
+    writer.getVObjectWriter().getFoldedLineWriter().setLineLength(null);
     writer.write(vcard);
     writer.close();
+
     return outputStream.toByteArray();
   }
 
-  private VCard getVcard(Profile user) {
+  private VCard getVcard(Profile user) throws IOException {
     VCard vcard = new VCard();
     if (user.getName() != null) {
       vcard.setFormattedName(user.getName());
@@ -228,8 +232,10 @@ public class UserService {
     }
 
     if (user.getAvatar() != null) {
-      Photo photo = new Photo(user.getAvatar().getUrl(), ImageType.JPEG);
-      vcard.addPhoto(photo); // TODO url or byte[]
+      String url = user.getAvatar().getUrl();
+      InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
+      Photo photo = new Photo(inputStream, ImageType.JPEG);
+      vcard.addPhoto(photo); // TODO image types
     }
 
     return vcard;

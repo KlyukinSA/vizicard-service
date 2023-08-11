@@ -24,9 +24,9 @@ spring:
     password: dgdfgDFgdfbgd
     properties:
       starttls.enable: true
-server:
-  servlet:
-    context-path: /api
+#server:
+#  servlet:
+#    context-path: /api
 security:
   jwt:
     token:

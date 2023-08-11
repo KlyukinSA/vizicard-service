@@ -1,6 +1,7 @@
 package vizicard;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import vizicard.model.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -8,21 +9,29 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactTypeRepository;
-import vizicard.service.UserService;
 
 @SpringBootApplication
 @RequiredArgsConstructor
 public class VizicardServiceApp implements CommandLineRunner {
+  @Value("${spring.profiles.active}")
+  private String activeProfile;
 
-  final UserService userService;
-  final ContactTypeRepository contactTypeRepository;
-  final CloudFileRepository cloudFileRepository;
+  private final ContactTypeRepository contactTypeRepository;
+  private final CloudFileRepository cloudFileRepository;
+
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
   }
 
   @Override
   public void run(String... params) throws Exception {
+    if (contactTypeRepository.findAll().size() < ContactEnum.class.getEnumConstants().length) {
+      System.out.println("WHERE ARE CONTACT TYPES?");
+      if (activeProfile.equals("dev")) {
+        System.out.println("adding...");
+        fillContactTypes();
+      }
+    }
   }
 
   void fillContactTypes() {

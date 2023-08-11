@@ -1,2 +1,2 @@
-curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer '$1
+curl -X GET http://localhost:8081/api/users/me -H 'Authorization: Bearer '$1
 echo

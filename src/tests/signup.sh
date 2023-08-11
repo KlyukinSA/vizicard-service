@@ -1,1 +1,1 @@
-curl -X POST "http://localhost:8080/users/signup" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"username\": \"string\",  \"password\": \"string\",  \"name\": \"string\",  \"position\": \"string\"}"
+curl -X POST "http://localhost:8081/api/users/signup" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"username\": \"$1\",  \"password\": \"string\",  \"name\": \"string\",  \"position\": \"string\"}"

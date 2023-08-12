@@ -2,21 +2,18 @@ package vizicard.service;
 
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
-import ezvcard.io.StreamWriter;
 import ezvcard.io.text.VCardWriter;
 import ezvcard.parameter.ImageType;
 import ezvcard.property.Address;
 import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
-import io.netty.util.Signal;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,14 +28,9 @@ import vizicard.repository.DeviceRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.security.JwtTokenProvider;
 
-import javax.sql.DataSource;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -193,19 +185,19 @@ public class UserService {
 
   private VCard getVcard(Profile user) throws IOException {
     VCard vcard = new VCard();
-    if (user.getName() != null) {
+    if (isGoodForVcard(user.getName())) {
       vcard.setFormattedName(user.getName());
     }
-    if (user.getPosition() != null) {
+    if (isGoodForVcard(user.getPosition())) {
       vcard.addTitle(user.getPosition());
     }
-    if (user.getDescription() != null) {
+    if (isGoodForVcard(user.getDescription())) {
       vcard.addNote(user.getDescription());
     }
-    if (user.getCompany() != null) {
+    if (isGoodForVcard(user.getCompany())) {
       vcard.setOrganization(user.getCompany());
     }
-    if (user.getCity() != null) {
+    if (isGoodForVcard(user.getCity())) {
       Address address = new Address();
       address.setLocality(user.getCity());
       vcard.addAddress(address);
@@ -216,20 +208,22 @@ public class UserService {
     for (ContactDTO contact : contacts) {
       ContactEnum contactEnum = contact.getType();
       String string = contact.getContact();
-      if (contactEnum == ContactEnum.PHONE) {
-        vcard.addTelephoneNumber(string);
-      } else if (contactEnum == ContactEnum.MAIL) {
-        vcard.addEmail(string);
-      } else if (contactEnum == ContactEnum.SITE) {
-        vcard.addUrl(string);
-      } else {
-        group++;
-        String groupName = "item" + group;
-        String type = contactEnum.toString();
-        RawProperty property = vcard.addExtendedProperty("X-ABLABEL", type);
-        property.setGroup(groupName);
-        Url url = vcard.addUrl(string);
-        url.setGroup(groupName);
+      if (isGoodForVcard(string)) {
+        if (contactEnum == ContactEnum.PHONE) {
+          vcard.addTelephoneNumber(string);
+        } else if (contactEnum == ContactEnum.MAIL) {
+          vcard.addEmail(string);
+        } else if (contactEnum == ContactEnum.SITE) {
+          vcard.addUrl(string);
+        } else {
+          group++;
+          String groupName = "item" + group;
+          String type = contactEnum.toString();
+          RawProperty property = vcard.addExtendedProperty("X-ABLABEL", type);
+          property.setGroup(groupName);
+          Url url = vcard.addUrl(string);
+          url.setGroup(groupName);
+        }
       }
     }
 
@@ -241,6 +235,10 @@ public class UserService {
     }
 
     return vcard;
+  }
+
+  private boolean isGoodForVcard(String string) {
+    return string != null && string.length() > 0;
   }
 
   public boolean addDevice(String word) {

@@ -113,7 +113,9 @@ public class UserService {
       user.setCity(dto.getCity());
     }
 
-    updateContacts(user, dto.getContacts());
+    if (dto.getContacts() != null) {
+      updateContacts(user, dto.getContacts());
+    }
 
     profileRepository.save(user);
 
@@ -142,7 +144,7 @@ public class UserService {
 
   private void updateContacts(Profile owner, ContactRequest[] list) {
     for (ContactRequest dto : list) {
-      if (dto.getType() != ContactEnum.MAIL) {
+      if (dto.getType() != null && dto.getType() != ContactEnum.MAIL && dto.getContact() != null) {
         updateContact(owner, dto);
       }
     }

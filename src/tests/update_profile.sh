@@ -1,1 +1,2 @@
-curl -X PUT "http://localhost:8081/api/users/me" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"contacts\": [    {      \"contact\": \"prhone\",      \"type\": \"PHONE\"    },{      \"contact\": \"\",      \"type\": \"VK\"    }  ]}" -H 'Authorization: Bearer '$1
+curl -X PUT "http://localhost:8081/users/me" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"position\": \"asfas\",  \"company\": null}" -H 'Authorization: Bearer '$1
+echo

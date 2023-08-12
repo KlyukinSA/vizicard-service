@@ -23,12 +23,30 @@ curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer '$(curl -X 
 # should return {"id":1,"username":"client","name":"cl name","position":null, ...
 ```
 
-# Prod
+# Deploy
 
-1. in `application.yml` set datasource ~~dev~~ prod
-2. set ddl-auto: [not create-drop](https://docs.jboss.org/hibernate/orm/5.4/userguide/html_single/Hibernate_User_Guide.html#configurations-hbmddl)
-3. remove VizicardServiceApp::run with mock data
-4. fill vizicard.ru:3306/prod ContactType table
+1. build jar if you need
+```
+mvn package
+```
+
+2. copy jar to server and ssh to server
+```
+scp target/vizicard-1.0.0.jar root@vizicard.ru:/root/back && 
+ssh root@vizicard.ru
+```
+
+3. kill prev. jar and launch new jar (`/root/back/deploy.sh`)
+```
+kill $(jps | grep vizicard-1.0.0.jar | awk '{print $1;}') &&
+java -jar -Dspring.profiles.active=prod /root/back/vizicard-1.0.0.jar &
+```
+
+All in one:
+```
+mvn package && scp target/vizicard-1.0.0.jar root@vizicard.ru:/root/back && ssh root@vizicard.ru "bash /root/back/deploy.sh" &
+```
+
 
 # Stack
 

@@ -13,7 +13,7 @@ public class EmailService {
 
     public void send(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("info@vizicard.ru");
+        message.setFrom("myadress@gmail.com");
         message.setTo(to);
         message.setSubject("meet");
         message.setText("person");

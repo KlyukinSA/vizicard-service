@@ -276,4 +276,15 @@ public class UserService {
     }
     return false;
   }
+
+  public void unrelate(Integer targetProfileId) {
+    Profile target = profileRepository.findById(targetProfileId)
+            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile owner = getUserFromAuth();
+    Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
+    if (relation == null) {
+      throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
+    }
+    relationRepository.delete(relation);
+  }
 }

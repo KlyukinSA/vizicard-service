@@ -102,6 +102,12 @@ public class UserController {
     return userService.relate(id);
   }
 
+  @DeleteMapping("/me/relations/{id}")
+  @PreAuthorize("isAuthenticated()")
+  public void unrelate(@PathVariable("id") Integer id) {
+    userService.unrelate(id);
+  }
+
   @PostMapping("/me/devices")
   @PreAuthorize("isAuthenticated()")
   public boolean addDevice(@RequestParam String url) {

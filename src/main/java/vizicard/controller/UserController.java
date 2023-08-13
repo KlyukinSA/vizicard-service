@@ -50,7 +50,7 @@ public class UserController {
     return userService.signup(user);
   }
 
-  @GetMapping(value = "/{id}")
+  @GetMapping("/{id}")
   @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
@@ -61,7 +61,7 @@ public class UserController {
     return userService.search(id);
   }
 
-  @GetMapping(value = "/me")
+  @GetMapping("/me")
   @PreAuthorize("isAuthenticated()")
   @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
@@ -97,15 +97,15 @@ public class UserController {
   }
 
 //  @GetMapping(value = "/{id}/vcard")
-  @PostMapping(value = "/{id}/relations")
-  public ResponseEntity<?> vcard(@ApiParam("Username") @PathVariable Integer id) throws Exception {
+  @PostMapping("/me/relations")
+  public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
     return userService.relate(id);
   }
 
   @PostMapping("/me/devices")
   @PreAuthorize("isAuthenticated()")
-  public boolean addDevice(String word) throws IOException {
-    return userService.addDevice(word);
+  public boolean addDevice(@RequestParam String url) {
+    return userService.addDevice(url);
   }
 
 }

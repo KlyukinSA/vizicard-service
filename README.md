@@ -13,15 +13,18 @@ mvn install
 ```
 run
 ```bash
-mvn spring-boot:run
-
-firefox http://localhost:8080/swagger-ui.html
+mvn package && java -jar -Dspring.profiles.active=dev target/vizicard-1.0.0.jar
 # open swagger in browser to see API
-curl -X POST 'http://localhost:8080/users/signin?username=client&password=client'
-# should return token like eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbGllbnQiLCJhdXRoIjpbeyJhdXRob3JpdHkiOiJST0xFX0NMSUVOVCJ9XSwiaWF0IjoxNjkxMDUzNDMzLCJleHAiOjE2OTEwNTM3MzN9.aAbl7ymm59YTPDOKvjL75D6Qgmm3YmoJwiH6Vr1qD4E
-curl -X GET http://localhost:8080/users/me -H 'Authorization: Bearer '$(curl -X POST 'http://localhost:8080/users/signin?username=client&password=client')
-# should return {"id":1,"username":"client","name":"cl name","position":null, ...
+firefox http://localhost:8081/swagger-ui.html
+# get curl requests from swagger. e.g. to sign in user with username (email adress) "email" and password "string":
+curl -X POST "http://localhost:8081/users/signin" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"username\": \"email\",  \"password\": \"string\"}"
+# should return token like eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEwIiwiaWF0IjoxNjkxOTE0MjA3fQ.f2vkUNajwQUVrHvI-roqFnYUNPjHQSLvssilGGFY5MU
+# all authenticated requests are built so:
+curl -X GET http://localhost:8081/users/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEwIiwiaWF0IjoxNjkxOTE0MjA3fQ.f2vkUNajwQUVrHvI-roqFnYUNPjHQSLvssilGGFY5MU'
+# should return {"id":10,"name":"name","position":"","description":"description", ...
 ```
+
+see src/tests
 
 # Deploy
 

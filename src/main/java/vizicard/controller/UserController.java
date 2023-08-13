@@ -17,10 +17,12 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import vizicard.model.Relation;
 import vizicard.service.UserService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -106,6 +108,12 @@ public class UserController {
   @PreAuthorize("isAuthenticated()")
   public void unrelate(@PathVariable("id") Integer id) {
     userService.unrelate(id);
+  }
+
+  @GetMapping("/me/relations")
+  @PreAuthorize("isAuthenticated()")
+  public List<RelationResponseDTO> getRelations() {
+    return userService.getRelations();
   }
 
   @PostMapping("/me/devices")

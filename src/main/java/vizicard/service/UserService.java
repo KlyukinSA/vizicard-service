@@ -33,8 +33,10 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -286,5 +288,11 @@ public class UserService {
       throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
     }
     relationRepository.delete(relation);
+  }
+
+  public List<RelationResponseDTO> getRelations() {
+    Profile owner = getUserFromAuth();
+    return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
+            .stream().map((val) -> modelMapper.map(val, RelationResponseDTO.class)).collect(Collectors.toList());
   }
 }

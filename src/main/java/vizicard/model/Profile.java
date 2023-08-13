@@ -9,7 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 @Entity
-@Data // Create getters and setters
+@Data
 @NoArgsConstructor
 public class Profile {
 
@@ -17,11 +17,9 @@ public class Profile {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-//  @Size(min = 4, max = 255, message = "Minimum username length: 4 characters")
   @Column(unique = true, nullable = false, length = 50)
   private String username;
 
-//  @Size(min = 8, message = "Minimum password length: 8 characters")
   @Column(nullable = false, length = 70)
   private String password;
 
@@ -40,15 +38,10 @@ public class Profile {
   @Column(length = 50)
   private String city;
 
-// Добавление полей avatar_id и background_id в таблицу profiles, ссылающиеся на таблицу files
-
   @OneToOne
   private CloudFile avatar;
 
   @OneToOne
   private CloudFile background;
-
-//  @ElementCollection(fetch = FetchType.EAGER)
-//  List<AppUserRole> appUserRoles;
 
 }

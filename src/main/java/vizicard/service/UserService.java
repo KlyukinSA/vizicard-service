@@ -22,16 +22,16 @@ import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.repository.ContactRepository;
-import vizicard.repository.ContactTypeRepository;
-import vizicard.repository.DeviceRepository;
-import vizicard.repository.ProfileRepository;
+import vizicard.repository.*;
 import vizicard.security.JwtTokenProvider;
 
 import java.io.*;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +41,7 @@ public class UserService {
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
   private final DeviceRepository deviceRepository;
+  private final RelationRepository relationRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
@@ -170,8 +171,19 @@ public class UserService {
     return getUserResponseDTO(user);
   }
 
+  public void relate(Integer id) {
+
+  }
+
   public byte[] getVcardBytes(Integer id) throws IOException {
     Profile profile = profileRepository.getById(id);
+
+    Relation relation = new Relation();
+    relation.setProfile(profile);
+    relation.setOwner(profileRepository.getById(1));
+    relationRepository.save(relation);
+    System.out.println(relation);
+
     VCard vcard = getVcard(profile);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

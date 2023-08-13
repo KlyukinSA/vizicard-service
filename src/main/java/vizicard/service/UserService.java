@@ -79,11 +79,9 @@ public class UserService {
   }
 
   public UserResponseDTO search(Integer id) {
-    Optional<Profile> profile = profileRepository.findById(id);
-    if (!profile.isPresent()) {
-      throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
-    }
-    return getUserResponseDTO(profile.get());
+    Profile profile = profileRepository.findById(id)
+            .orElseThrow(() -> new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND));
+    return getUserResponseDTO(profile);
   }
 
   public UserResponseDTO whoami() {
@@ -177,18 +175,14 @@ public class UserService {
   }
 
   public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
-    Profile target = profileRepository.getById(targetProfileId);
-    if (target == null) {
-      throw new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND);
-    }
+    Profile target = profileRepository.findById(targetProfileId)
+            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
 
     Profile owner = getUserFromAuth();
     if (owner != null) {
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null) {
         relationRepository.save(new Relation(owner, target));
-      } else {
-        throw new CustomException("You already relate to target user", HttpStatus.UNPROCESSABLE_ENTITY);
       }
     }
 

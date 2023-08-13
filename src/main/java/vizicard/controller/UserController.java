@@ -96,16 +96,10 @@ public class UserController {
     return userService.updateBackground(file);
   }
 
-  @GetMapping(value = "/{id}/vcard")
-  public ResponseEntity<?> vcard(@ApiParam("Username") @PathVariable Integer id) throws IOException {
-    byte[] bytes = userService.getVcardBytes(id);
-    UserResponseDTO userResponseDTO = userService.search(id); // TODO
-
-    return ResponseEntity.ok()
-            .contentType(MediaType.valueOf("text/vcard"))
-            .header("Content-Disposition", "attachment; filename=\"" + userResponseDTO.getName() + ".pdf\"")
-            .contentLength(bytes.length)
-            .body(new InputStreamResource(new ByteArrayInputStream(bytes)));
+//  @GetMapping(value = "/{id}/vcard")
+  @PostMapping(value = "/{id}/relations")
+  public ResponseEntity<?> vcard(@ApiParam("Username") @PathVariable Integer id) throws Exception {
+    return userService.relate(id);
   }
 
   @PostMapping("/me/devices")

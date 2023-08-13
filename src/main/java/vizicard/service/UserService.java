@@ -10,7 +10,10 @@ import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -117,7 +120,9 @@ public class UserService {
 
   private Profile getUserFromAuth() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
+    if (!authentication.getName().equals("anonymousUser")) {
+      return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
+    } else return null;
   }
 
   private UserResponseDTO getUserResponseDTO(Profile user) {
@@ -171,21 +176,34 @@ public class UserService {
     return getUserResponseDTO(user);
   }
 
-  public void relate(Integer id) {
+  public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
+    Profile target = profileRepository.getById(targetProfileId);
+    if (target == null) {
+      throw new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND);
+    }
 
+    Profile owner = getUserFromAuth();
+    if (owner != null) {
+      Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
+      if (relation == null) {
+        relationRepository.save(new Relation(owner, target));
+      } else {
+        throw new CustomException("You already relate to target user", HttpStatus.UNPROCESSABLE_ENTITY);
+      }
+    }
+
+    return getVcardResponse(getVcardBytes(getVcard(target)), target.getName());
   }
 
-  public byte[] getVcardBytes(Integer id) throws IOException {
-    Profile profile = profileRepository.getById(id);
+  private ResponseEntity<?> getVcardResponse(byte[] vcardBytes, String targetName) {
+    return ResponseEntity.ok()
+            .contentType(MediaType.valueOf("text/vcard"))
+            .header("Content-Disposition", "attachment; filename=\"" + targetName + ".vcf\"")
+            .contentLength(vcardBytes.length)
+            .body(new InputStreamResource(new ByteArrayInputStream(vcardBytes)));
+  }
 
-    Relation relation = new Relation();
-    relation.setProfile(profile);
-    relation.setOwner(profileRepository.getById(1));
-    relationRepository.save(relation);
-    System.out.println(relation);
-
-    VCard vcard = getVcard(profile);
-
+  public byte[] getVcardBytes(VCard vcard) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     VCardWriter writer = new VCardWriter(outputStream, VCardVersion.V3_0);
     writer.getVObjectWriter().getFoldedLineWriter().setLineLength(null);

@@ -30,4 +30,9 @@ public class Relation {
     @CreationTimestamp
     private Instant createAt;
 
+    public Relation(Profile owner, Profile profile) {
+        this.owner = owner;
+        this.profile = profile;
+    }
+
 }

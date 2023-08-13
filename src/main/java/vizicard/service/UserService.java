@@ -293,6 +293,8 @@ public class UserService {
   public List<RelationResponseDTO> getRelations() {
     Profile owner = getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
-            .stream().map((val) -> modelMapper.map(val, RelationResponseDTO.class)).collect(Collectors.toList());
+            .stream().map((val) -> new RelationResponseDTO(
+                    getUserResponseDTO(val.getProfile()), val.getCreateAt()))
+            .collect(Collectors.toList());
   }
 }

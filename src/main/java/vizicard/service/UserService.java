@@ -31,10 +31,7 @@ import vizicard.security.JwtTokenProvider;
 import java.io.*;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
@@ -181,7 +178,7 @@ public class UserService {
             .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
 
     Profile owner = getUserFromAuth();
-    if (owner != null) {
+    if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null) {
         relationRepository.save(new Relation(owner, target));

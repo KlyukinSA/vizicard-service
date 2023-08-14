@@ -139,7 +139,7 @@ public class UserService {
 
   private void updateContacts(Profile owner, ContactRequest[] list) {
     for (ContactRequest dto : list) {
-      if (dto.getType() != null && dto.getType() != ContactEnum.MAIL && dto.getContact() != null) {
+      if (dto.getType() != null && dto.getContact() != null) {
         updateContact(owner, dto);
       }
     }

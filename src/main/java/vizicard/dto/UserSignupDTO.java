@@ -16,5 +16,9 @@ public class UserSignupDTO {
   private String name;
   @ApiModelProperty(position = 3)
   private String position;
+  @ApiModelProperty(position = 4)
+  private String company;
+  @ApiModelProperty(position = 5)
+  private String city;
 
 }

@@ -11,13 +11,8 @@ import java.time.Instant;
 @AllArgsConstructor
 public class PageActionDTO {
 
-    @ApiModelProperty(position = 0)
-    private Integer id;
-    @ApiModelProperty(position = 1)
-    private Integer actorId;
-    @ApiModelProperty(position = 2)
-    private Instant createAt;
-    @ApiModelProperty(position = 3)
-    private ActionType type;
+    private Integer vizits;
+    private Integer saves;
+    private Integer clicks;
 
 }

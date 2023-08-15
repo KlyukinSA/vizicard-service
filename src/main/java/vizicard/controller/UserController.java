@@ -128,7 +128,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}/actions")
-  List<PageActionDTO> getPageStats(@PathVariable("id") Integer id) {
+  PageActionDTO getPageStats(@PathVariable("id") Integer id) {
     return userService.getPageStats(id);
   }
 }

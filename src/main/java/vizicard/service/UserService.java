@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -353,14 +354,17 @@ public class UserService {
     actionRepository.save(new Action(null, getUserFromAuth(), target, null, ActionType.CLICK));
   }
 
-  public List<PageActionDTO> getPageStats(Integer targetProfileId) {
+  public PageActionDTO getPageStats(Integer targetProfileId) {
     Profile target = profileRepository.findById(targetProfileId)
             .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
 
-    return actionRepository.findAllByPageAndCreateAtBetween(target, Instant.now().minus(Duration.ofDays(7)), Instant.now())
-            .stream().map((val) -> new PageActionDTO(val.getId(),
-                    (val.getActor() != null) ? val.getActor().getId() : null,
-                    val.getCreateAt(), val.getType()))
-            .collect(Collectors.toList());
+    Instant stop = Instant.now();
+    Instant start = stop.minus(Duration.ofDays(7));
+
+    Function<ActionType, Integer> f = (actionType) ->
+            actionRepository.countByPageAndCreateAtBetweenAndType(target, start, stop, actionType);
+
+    return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
+
 }

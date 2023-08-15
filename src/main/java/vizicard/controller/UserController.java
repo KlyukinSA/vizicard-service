@@ -127,4 +127,8 @@ public class UserController {
     userService.leadGenerate(id, dto);
   }
 
+  @PostMapping("/{id}/clicks")
+  void addClickAction(@PathVariable("id") Integer id) {
+    userService.addClickAction(id);
+  }
 }

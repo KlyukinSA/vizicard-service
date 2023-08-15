@@ -30,6 +30,7 @@ import vizicard.security.JwtTokenProvider;
 
 import java.io.*;
 import java.net.URL;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,7 @@ public class UserService {
   private final ContactTypeRepository contactTypeRepository;
   private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
+  private final ActionRepository actionRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
@@ -79,6 +81,7 @@ public class UserService {
   public UserResponseDTO search(Integer id) {
     Profile profile = profileRepository.findById(id)
             .orElseThrow(() -> new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND));
+    actionRepository.save(new Action(null, getUserFromAuth(), profile, null, ActionType.VIZIT));
     return getUserResponseDTO(profile);
   }
 
@@ -188,6 +191,8 @@ public class UserService {
         relationRepository.save(new Relation(owner, target));
       }
     }
+
+    actionRepository.save(new Action(null, owner, target, null, ActionType.SAVE));
 
     return getVcardResponse(vCardBytes, fileName);
   }
@@ -338,4 +343,11 @@ public class UserService {
     }
     return res;
   }
+
+  public void addClickAction(Integer targetProfileId) {
+    Profile target = profileRepository.findById(targetProfileId)
+            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    actionRepository.save(new Action(null, getUserFromAuth(), target, null, ActionType.CLICK));
+  }
+
 }

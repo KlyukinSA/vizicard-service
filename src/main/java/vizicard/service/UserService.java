@@ -30,9 +30,7 @@ import vizicard.security.JwtTokenProvider;
 
 import java.io.*;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 @Service
@@ -307,5 +305,37 @@ public class UserService {
             .stream().map((val) -> new RelationResponseDTO(
                     getUserResponseDTO(val.getProfile()), val.getCreateAt()))
             .collect(Collectors.toList());
+  }
+
+  public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
+    Profile target = profileRepository.findById(targetProfileId)
+            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+
+    Profile author = getUserFromAuth();
+    if (author != null) {
+      if (Objects.equals(target.getId(), author.getId())) return;
+
+      if (dto.getName() == null) {
+        dto.setName(author.getName());
+      }
+      if (dto.getPosition() == null) {
+        dto.setPosition(author.getPosition());
+      }
+
+//      Relation relation = relationRepository.findByOwnerAndProfile(target, author);
+//      if (relation == null) {
+//        relationRepository.save(new Relation(target, author));
+//      }
+    }
+
+    emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
+  }
+
+  private String getLeadGenMessage(LeadGenerationDTO dto, Profile author) {
+    String res = dto.toString();
+    if (author != null) {
+      res += "\n\n" + getUserResponseDTO(author);
+    }
+    return res;
   }
 }

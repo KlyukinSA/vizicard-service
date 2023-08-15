@@ -17,23 +17,23 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendTest(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(vizicardEmail);
-        message.setTo(to);
-        message.setSubject("meet");
-        message.setText("person");
-        emailSender.send(message);
-    }
-
     public void sendRelation(String to, String fileName, byte[] vCardBytes) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setSubject("Новый контакт в ViziCard");
+        helper.setSubject("Сохранение контакта в ViziCard");
         helper.setFrom(vizicardEmail);
         helper.setTo(to);
         helper.setText("Вы сохранили контакт. Файл " + fileName + " в приложении к письму.", false);
         helper.addAttachment(fileName, new ByteArrayDataSource(vCardBytes, "text/vcard"));
+        emailSender.send(message);
+    }
+
+    public void sendUsual(String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(vizicardEmail);
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
         emailSender.send(message);
     }
 }

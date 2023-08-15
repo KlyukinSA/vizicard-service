@@ -122,4 +122,9 @@ public class UserController {
     return userService.addDevice(url);
   }
 
+  @PostMapping("/{id}/relations")
+  public void leadGenerate(@PathVariable("id") Integer id, @RequestBody LeadGenerationDTO dto) {
+    userService.leadGenerate(id, dto);
+  }
+
 }

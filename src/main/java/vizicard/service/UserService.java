@@ -52,6 +52,7 @@ public class UserService {
   private final ModelMapper modelMapper;
 
   private final S3Service s3Service;
+  private final EmailService emailService;
 
   public String signin(SigninDTO dto) {
     try {
@@ -177,21 +178,34 @@ public class UserService {
     Profile target = profileRepository.findById(targetProfileId)
             .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
 
+    byte[] vCardBytes = getVcardBytes(getVcard(target)); // TODO class VcardFile
+    String fileName = getVcardFileName(target); //
+
     Profile owner = getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
+      emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes);
+
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null) {
         relationRepository.save(new Relation(owner, target));
       }
     }
 
-    return getVcardResponse(getVcardBytes(getVcard(target)), target.getName());
+    return getVcardResponse(vCardBytes, fileName);
   }
 
-  private ResponseEntity<?> getVcardResponse(byte[] vcardBytes, String targetName) {
+  private String getVcardFileName(Profile target) {
+    return target.getName() + ".vcf";
+  }
+
+  private String getRelationEmail(Profile profile) {
+    return profile.getUsername();
+  }
+
+  private ResponseEntity<?> getVcardResponse(byte[] vcardBytes, String fileName) {
     return ResponseEntity.ok()
             .contentType(MediaType.valueOf("text/vcard"))
-            .header("Content-Disposition", "attachment; filename=\"" + targetName + ".vcf\"")
+            .header("Content-Disposition", "attachment; filename=\"" + fileName + '\"')
             .contentLength(vcardBytes.length)
             .body(new InputStreamResource(new ByteArrayInputStream(vcardBytes)));
   }

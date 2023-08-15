@@ -315,17 +315,17 @@ public class UserService {
     if (author != null) {
       if (Objects.equals(target.getId(), author.getId())) return;
 
-      if (dto.getName() == null) {
-        dto.setName(author.getName());
-      }
-      if (dto.getPosition() == null) {
-        dto.setPosition(author.getPosition());
-      }
-
-//      Relation relation = relationRepository.findByOwnerAndProfile(target, author);
-//      if (relation == null) {
-//        relationRepository.save(new Relation(target, author));
+//      if (dto.getName() == null) {
+//        dto.setName(author.getName());
 //      }
+//      if (dto.getPosition() == null) {
+//        dto.setPosition(author.getPosition());
+//      }
+
+      Relation relation = relationRepository.findByOwnerAndProfile(target, author);
+      if (relation == null) {
+        relationRepository.save(new Relation(target, author));
+      }
     }
 
     emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));

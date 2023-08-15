@@ -1,0 +1,1 @@
+curl -X POST "http://localhost:8081/users/13/relations" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"comment\": \"comment\",  \"name\": \"name\",  \"position\": \"position\"}" -H 'Authorization: Bearer '$1

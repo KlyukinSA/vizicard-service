@@ -31,6 +31,9 @@ import vizicard.security.JwtTokenProvider;
 import java.io.*;
 import java.net.URL;
 import java.security.Principal;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -350,4 +353,14 @@ public class UserService {
     actionRepository.save(new Action(null, getUserFromAuth(), target, null, ActionType.CLICK));
   }
 
+  public List<PageActionDTO> getPageStats(Integer targetProfileId) {
+    Profile target = profileRepository.findById(targetProfileId)
+            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+
+    return actionRepository.findAllByPageAndCreateAtBetween(target, Instant.now().minus(Duration.ofDays(7)), Instant.now())
+            .stream().map((val) -> new PageActionDTO(val.getId(),
+                    (val.getActor() != null) ? val.getActor().getId() : null,
+                    val.getCreateAt(), val.getType()))
+            .collect(Collectors.toList());
+  }
 }

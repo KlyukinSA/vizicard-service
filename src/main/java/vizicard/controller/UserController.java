@@ -1,10 +1,6 @@
 package vizicard.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,10 +13,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import vizicard.model.Relation;
+import vizicard.model.Action;
 import vizicard.service.UserService;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -130,5 +125,10 @@ public class UserController {
   @PostMapping("/{id}/clicks")
   void addClickAction(@PathVariable("id") Integer id) {
     userService.addClickAction(id);
+  }
+
+  @GetMapping("/{id}/actions")
+  List<PageActionDTO> getPageStats(@PathVariable("id") Integer id) {
+    return userService.getPageStats(id);
   }
 }

@@ -1,1 +1,1 @@
-curl -X GET "http://localhost:8081/users/2" -H  "accept: */*" -H 'Authorization: Bearer '$1
+curl -X GET "http://localhost:8081/users/me/actions" -H  "accept: */*" -H 'Authorization: Bearer '$1

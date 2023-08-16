@@ -354,15 +354,14 @@ public class UserService {
     actionRepository.save(new Action(null, getUserFromAuth(), target, null, ActionType.CLICK));
   }
 
-  public PageActionDTO getPageStats(Integer targetProfileId) {
-    Profile target = profileRepository.findById(targetProfileId)
-            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+  public PageActionDTO getPageStats() {
+    Profile user = getUserFromAuth();
 
     Instant stop = Instant.now();
     Instant start = stop.minus(Duration.ofDays(7));
 
     Function<ActionType, Integer> f = (actionType) ->
-            actionRepository.countByPageAndCreateAtBetweenAndType(target, start, stop, actionType);
+            actionRepository.countByPageAndCreateAtBetweenAndType(user, start, stop, actionType);
 
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }

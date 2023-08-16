@@ -127,8 +127,9 @@ public class UserController {
     userService.addClickAction(id);
   }
 
-  @GetMapping("/{id}/actions")
-  PageActionDTO getPageStats(@PathVariable("id") Integer id) {
-    return userService.getPageStats(id);
+  @GetMapping("/me/actions")
+  @PreAuthorize("isAuthenticated()")
+  PageActionDTO getPageStats() {
+    return userService.getPageStats();
   }
 }

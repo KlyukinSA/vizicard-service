@@ -2,7 +2,10 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -43,5 +46,8 @@ public class Profile {
 
   @OneToOne
   private CloudFile background;
+
+  @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
+  private final Date createAt = new Date();
 
 }

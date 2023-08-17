@@ -85,7 +85,7 @@ public class UserService {
   public UserResponseDTO search(Integer id) {
     Profile profile = profileRepository.findById(id)
             .orElseThrow(() -> new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND));
-    actionRepository.save(new Action(null, getUserFromAuth(), profile, null, ActionType.VIZIT));
+    actionRepository.save(new Action(getUserFromAuth(), profile, ActionType.VIZIT));
     return getUserResponseDTO(profile);
   }
 
@@ -196,7 +196,7 @@ public class UserService {
       }
     }
 
-    actionRepository.save(new Action(null, owner, target, null, ActionType.SAVE));
+    actionRepository.save(new Action(owner, target, ActionType.SAVE));
 
     return getVcardResponse(vCardBytes, fileName);
   }
@@ -351,14 +351,14 @@ public class UserService {
   public void addClickAction(Integer targetProfileId) {
     Profile target = profileRepository.findById(targetProfileId)
             .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
-    actionRepository.save(new Action(null, getUserFromAuth(), target, null, ActionType.CLICK));
+    actionRepository.save(new Action(getUserFromAuth(), target, ActionType.CLICK));
   }
 
   public PageActionDTO getPageStats() {
     Profile user = getUserFromAuth();
 
-    Instant stop = Instant.now();
-    Instant start = stop.minus(Duration.ofDays(7));
+    Date stop = Date.from(Instant.now());
+    Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
 
     Function<ActionType, Integer> f = (actionType) ->
             actionRepository.countByPageAndCreateAtBetweenAndType(user, start, stop, actionType);

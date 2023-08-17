@@ -1,5 +1,6 @@
 package vizicard.dto;
 
+import java.util.Date;
 import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -30,5 +31,8 @@ public class UserResponseDTO {
   private CloudFile avatar;
   @ApiModelProperty(position = 9)
   private CloudFile background;
+
+  @ApiModelProperty(position = 10)
+  private Date createAt;
 
 }

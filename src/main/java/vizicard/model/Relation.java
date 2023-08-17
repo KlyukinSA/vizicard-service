@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -27,8 +28,8 @@ public class Relation {
     @JoinColumn(nullable = false)
     private Profile profile;
 
-    @CreationTimestamp
-    private Instant createAt;
+    @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
+    private final Date createAt = new Date();
 
     public Relation(Profile owner, Profile profile) {
         this.owner = owner;

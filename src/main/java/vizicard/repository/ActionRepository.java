@@ -6,9 +6,9 @@ import vizicard.model.ActionType;
 import vizicard.model.Profile;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 public interface ActionRepository extends JpaRepository<Action, Integer> {
-//    List<Action> findAllByPageAndCreateAtBetween(Profile target, Instant start, Instant stop);
-    Integer countByPageAndCreateAtBetweenAndType(Profile target, Instant start, Instant stop, ActionType actionType);
+    Integer countByPageAndCreateAtBetweenAndType(Profile target, Date start, Date stop, ActionType actionType);
 }

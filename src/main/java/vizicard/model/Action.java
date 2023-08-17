@@ -7,11 +7,11 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Action {
 
     @Id
@@ -25,12 +25,16 @@ public class Action {
     @JoinColumn(nullable = false)
     private Profile page;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private Instant createAt;
+    @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
+    private final Date createAt = new Date();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ActionType type;
 
+    public Action(Profile actor, Profile page, ActionType type) {
+        this.actor = actor;
+        this.page = page;
+        this.type = type;
+    }
 }

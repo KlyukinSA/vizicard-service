@@ -13,7 +13,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import vizicard.model.Action;
 import vizicard.service.UserService;
 
 import java.io.IOException;
@@ -76,7 +75,7 @@ public class UserController {
           @ApiResponse(code = 400, message = "Something went wrong"), //
           @ApiResponse(code = 403, message = "Access denied")})
   public UserResponseDTO update(@ApiParam("Update User") @RequestBody UserUpdateDTO dto) {
-    return userService.update(dto);
+    return userService.updateMe(dto);
   }
 
   @PostMapping("/me/avatar")
@@ -132,4 +131,11 @@ public class UserController {
   PageActionDTO getPageStats() {
     return userService.getPageStats();
   }
+
+  @PutMapping("/me/company")
+  @PreAuthorize("isAuthenticated()")
+  public UserResponseDTO updateMyCompany(@RequestBody UserUpdateDTO dto) {
+    return userService.updateMyCompany(dto);
+  }
+
 }

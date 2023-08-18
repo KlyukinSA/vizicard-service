@@ -30,10 +30,8 @@ import vizicard.security.JwtTokenProvider;
 
 import java.io.*;
 import java.net.URL;
-import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -94,29 +92,8 @@ public class UserService {
     return getUserResponseDTO(getUserFromAuth());
   }
 
-  public UserResponseDTO update(UserUpdateDTO dto) {
-    Profile user = getUserFromAuth();
-
-    if (dto.getName() != null) {
-      user.setName(dto.getName());
-    }
-    if (dto.getTitle() != null) {
-      user.setTitle(dto.getTitle());
-    }
-    if (dto.getDescription() != null) {
-      user.setDescription(dto.getDescription());
-    }
-    if (dto.getCity() != null) {
-      user.setCity(dto.getCity());
-    }
-
-    if (dto.getContacts() != null) {
-      updateContacts(user, dto.getContacts());
-    }
-
-    profileRepository.save(user);
-
-    return getUserResponseDTO(user);
+  public UserResponseDTO updateMe(UserUpdateDTO dto) {
+    return getUserResponseDTO(updateProfile(getUserFromAuth(), dto));
   }
 
   private Profile getUserFromAuth() {
@@ -362,6 +339,41 @@ public class UserService {
             actionRepository.countByPageAndCreateAtBetweenAndType(user, start, stop, actionType);
 
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
+  }
+
+  public UserResponseDTO updateMyCompany(UserUpdateDTO dto) {
+    Profile user = getUserFromAuth();
+    Profile company = user.getCompany();
+    if (company == null || !company.isStatus()) {
+      company = new Profile();
+      company.setName(dto.getName());
+      company.setProfileType(ProfileType.COMPANY);
+      profileRepository.save(company);
+      user.setCompany(company);
+      profileRepository.save(user);
+    }
+    return getUserResponseDTO(updateProfile(company, dto));
+  }
+
+  private Profile updateProfile(Profile profile, UserUpdateDTO dto) {
+    if (dto.getName() != null) {
+      profile.setName(dto.getName());
+    }
+    if (dto.getTitle() != null) {
+      profile.setTitle(dto.getTitle());
+    }
+    if (dto.getDescription() != null) {
+      profile.setDescription(dto.getDescription());
+    }
+    if (dto.getCity() != null) {
+      profile.setCity(dto.getCity());
+    }
+
+    if (dto.getContacts() != null) {
+      updateContacts(profile, dto.getContacts());
+    }
+
+    return profileRepository.save(profile);
   }
 
 }

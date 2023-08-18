@@ -82,8 +82,7 @@ public class UserService {
   }
 
   public UserResponseDTO search(Integer id) {
-    Profile profile = profileRepository.findById(id)
-            .orElseThrow(() -> new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile profile = getTarget(id);
     actionRepository.save(new Action(getUserFromAuth(), profile, ActionType.VIZIT));
     return getUserResponseDTO(profile);
   }
@@ -155,8 +154,7 @@ public class UserService {
   }
 
   public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
-    Profile target = profileRepository.findById(targetProfileId)
-            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile target = getTarget(targetProfileId);
 
     byte[] vCardBytes = getVcardBytes(getVcard(target)); // TODO class VcardFile
     String fileName = getVcardFileName(target); //
@@ -273,8 +271,8 @@ public class UserService {
   }
 
   public void unrelate(Integer targetProfileId) {
-    Profile target = profileRepository.findById(targetProfileId)
-            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile target = getTarget(targetProfileId);
+
     Profile owner = getUserFromAuth();
     Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
     if (relation == null) {
@@ -292,8 +290,7 @@ public class UserService {
   }
 
   public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
-    Profile target = profileRepository.findById(targetProfileId)
-            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile target = getTarget(targetProfileId);
 
     Profile author = getUserFromAuth();
     if (author != null) {
@@ -324,8 +321,7 @@ public class UserService {
   }
 
   public void addClickAction(Integer targetProfileId) {
-    Profile target = profileRepository.findById(targetProfileId)
-            .orElseThrow(() -> new CustomException("The target user doesn't exist", HttpStatus.NOT_FOUND));
+    Profile target = getTarget(targetProfileId);
     actionRepository.save(new Action(getUserFromAuth(), target, ActionType.CLICK));
   }
 
@@ -376,4 +372,13 @@ public class UserService {
     return profileRepository.save(profile);
   }
 
+  Profile getTarget(Integer id) {
+    CustomException exception = new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+    Profile profile = profileRepository.findById(id)
+            .orElseThrow(() -> exception);
+    if (!profile.isStatus()) {
+      throw exception;
+    }
+    return profile;
+  }
 }

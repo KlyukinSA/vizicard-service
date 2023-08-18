@@ -73,6 +73,7 @@ public class UserService {
     Profile profile = modelMapper.map(dto, Profile.class);
     if (!profileRepository.existsByUsername(profile.getUsername())) {
       profile.setPassword(passwordEncoder.encode(profile.getPassword()));
+      profile.setProfileType(ProfileType.USER);
       profile = profileRepository.save(profile);
       updateContact(profile, new ContactRequest(ContactEnum.MAIL, profile.getUsername()));
       String id = String.valueOf(profile.getId());
@@ -99,14 +100,11 @@ public class UserService {
     if (dto.getName() != null) {
       user.setName(dto.getName());
     }
-    if (dto.getPosition() != null) {
-      user.setPosition(dto.getPosition());
+    if (dto.getTitle() != null) {
+      user.setTitle(dto.getTitle());
     }
     if (dto.getDescription() != null) {
       user.setDescription(dto.getDescription());
-    }
-    if (dto.getCompany() != null) {
-      user.setCompany(dto.getCompany());
     }
     if (dto.getCity() != null) {
       user.setCity(dto.getCity());
@@ -232,15 +230,15 @@ public class UserService {
     if (isGoodForVcard(user.getName())) {
       vcard.setFormattedName(user.getName());
     }
-    if (isGoodForVcard(user.getPosition())) {
-      vcard.addTitle(user.getPosition());
+    if (isGoodForVcard(user.getTitle())) {
+      vcard.addTitle(user.getTitle());
     }
     if (isGoodForVcard(user.getDescription())) {
       vcard.addNote(user.getDescription());
     }
-    if (isGoodForVcard(user.getCompany())) {
-      vcard.setOrganization(user.getCompany());
-    }
+//    if (isGoodForVcard(user.getCompany())) {
+//      vcard.setOrganization(user.getCompany());
+//    }
     if (isGoodForVcard(user.getCity())) {
       Address address = new Address();
       address.setLocality(user.getCity());

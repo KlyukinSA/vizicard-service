@@ -20,23 +20,20 @@ public class Profile {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Column(unique = true, nullable = false, length = 50)
+  @Column(unique = true, nullable = true, length = 50)
   private String username;
 
-  @Column(nullable = false, length = 70)
+  @Column(nullable = true, length = 70)
   private String password;
 
   @Column(nullable = false, length = 50)
   private String name;
 
   @Column(length = 140)
-  private String position;
+  private String title;
 
   @Column(columnDefinition = "TEXT")
   private String description;
-
-  @Column(length = 50)
-  private String company;
 
   @Column(length = 50)
   private String city;
@@ -49,5 +46,15 @@ public class Profile {
 
   @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
   private final Date createAt = new Date();
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ProfileType profileType;
+
+  @OneToOne
+  private Profile company;
+
+  @Column(nullable = false)
+  private boolean status = true;
 
 }

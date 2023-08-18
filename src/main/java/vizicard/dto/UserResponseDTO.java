@@ -16,11 +16,9 @@ public class UserResponseDTO {
   @ApiModelProperty(position = 2)
   private String name;
   @ApiModelProperty(position = 3)
-  private String position;
+  private String title;
   @ApiModelProperty(position = 4)
   private String description;
-  @ApiModelProperty(position = 5)
-  private String company;
   @ApiModelProperty(position = 6)
   private String city;
 

@@ -13,11 +13,9 @@ public class UserUpdateDTO {
     @ApiModelProperty(position = 0)
     private String name;
     @ApiModelProperty(position = 1)
-    private String position;
+    private String title;
     @ApiModelProperty(position = 2)
     private String description;
-    @ApiModelProperty(position = 3)
-    private String company;
     @ApiModelProperty(position = 4)
     private String city;
 

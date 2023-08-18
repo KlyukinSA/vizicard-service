@@ -105,8 +105,8 @@ public class UserService {
   private UserResponseDTO getUserResponseDTO(Profile user) {
     UserResponseDTO res = modelMapper.map(user, UserResponseDTO.class);
     res.setContacts(getUserContacts(user));
-    if (user.getCompany() != null) {
-      res.setCompany(modelMapper.map(user.getCompany(), CompanyResponseDTO.class));
+    if (user.getCompany() == null || !user.getCompany().isStatus()) {
+      res.setCompany(null);
     }
     return res;
   }
@@ -383,5 +383,11 @@ public class UserService {
       throw exception;
     }
     return profile;
+  }
+
+  public void deleteMyCompany() {
+    Profile user = getUserFromAuth();
+    user.getCompany().setStatus(false);
+    profileRepository.save(user.getCompany());
   }
 }

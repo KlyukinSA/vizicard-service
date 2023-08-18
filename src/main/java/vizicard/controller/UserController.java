@@ -138,4 +138,9 @@ public class UserController {
     return userService.updateMyCompany(dto);
   }
 
+  @DeleteMapping("/me/company")
+  @PreAuthorize("isAuthenticated()")
+  public void deleteMyCompany() {
+    userService.deleteMyCompany();
+  }
 }

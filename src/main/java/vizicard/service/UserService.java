@@ -105,6 +105,9 @@ public class UserService {
   private UserResponseDTO getUserResponseDTO(Profile user) {
     UserResponseDTO res = modelMapper.map(user, UserResponseDTO.class);
     res.setContacts(getUserContacts(user));
+    if (user.getCompany() != null) {
+      res.setCompany(modelMapper.map(user.getCompany(), CompanyResponseDTO.class));
+    }
     return res;
   }
 

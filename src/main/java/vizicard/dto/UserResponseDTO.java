@@ -1,12 +1,11 @@
 package vizicard.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import vizicard.model.AppUserRole;
 import vizicard.model.CloudFile;
+import vizicard.model.ProfileType;
 
 @Data
 public class UserResponseDTO {
@@ -32,5 +31,10 @@ public class UserResponseDTO {
 
   @ApiModelProperty(position = 10)
   private Date createAt;
+
+  @ApiModelProperty(position = 11)
+  private ProfileType profileType;
+  @ApiModelProperty(position = 12)
+  private CompanyResponseDTO company;
 
 }

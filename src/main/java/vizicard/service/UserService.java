@@ -390,4 +390,12 @@ public class UserService {
     user.getCompany().setStatus(false);
     profileRepository.save(user.getCompany());
   }
+
+  public UserResponseDTO updateMyCompanyAvatar(MultipartFile file) throws IOException {
+    Profile company = getUserFromAuth().getCompany();
+    company.setAvatar(s3Service.uploadFile(file));
+    profileRepository.save(company);
+    return getUserResponseDTO(company);
+  }
+
 }

@@ -143,4 +143,11 @@ public class UserController {
   public void deleteMyCompany() {
     userService.deleteMyCompany();
   }
+
+  @PostMapping("/me/company/avatar")
+  @PreAuthorize("isAuthenticated()")
+  public UserResponseDTO updateMyCompanyAvatar(@RequestPart("file") MultipartFile file) throws IOException {
+    return userService.updateMyCompanyAvatar(file);
+  }
+
 }

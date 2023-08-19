@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
-import vizicard.dto.detail.EducationUpdateDTO;
+import vizicard.dto.detail.EducationDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
@@ -112,7 +112,14 @@ public class UserService {
     if (user.getCompany() == null || !user.getCompany().isStatus()) {
       res.setCompany(null);
     }
+    addDetails(res, user);
     return res;
+  }
+
+  private void addDetails(UserResponseDTO res, Profile user) {
+    res.setEducation(educationRepository.findAllByOwner(user).stream()
+            .map((val) -> modelMapper.map(val, EducationDTO.class))
+            .collect(Collectors.toList()));
   }
 
   private ContactDTO[] getUserContacts(Profile user) {
@@ -415,7 +422,7 @@ public class UserService {
     return getUserResponseDTO(user);
   }
 
-  public UserResponseDTO updateEducation(EducationUpdateDTO dto, Integer id) {
+  public UserResponseDTO updateEducation(EducationDTO dto, Integer id) {
     Profile user = getUserFromAuth();
     Education education = educationRepository.findById(id).get();
     if (Objects.equals(education.getOwner().getId(), user.getId())) {

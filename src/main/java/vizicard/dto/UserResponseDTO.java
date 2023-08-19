@@ -1,9 +1,11 @@
 package vizicard.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import vizicard.dto.detail.EducationDTO;
 import vizicard.model.CloudFile;
 import vizicard.model.ProfileType;
 
@@ -39,5 +41,8 @@ public class UserResponseDTO {
 
   @ApiModelProperty(position = 13)
   private Date lastVizit;
+
+  @ApiModelProperty(position = 14)
+  private List<EducationDTO> education;
 
 }

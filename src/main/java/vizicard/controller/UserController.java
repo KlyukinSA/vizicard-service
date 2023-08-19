@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import vizicard.dto.detail.EducationUpdateDTO;
+import vizicard.dto.detail.EducationDTO;
 import vizicard.service.UserService;
 
 import java.io.IOException;
@@ -165,7 +165,7 @@ public class UserController {
 
   @PutMapping("/me/education/{id}")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateEducation(@RequestBody EducationUpdateDTO dto, @PathVariable("id") Integer id) {
+  public UserResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
     return userService.updateEducation(dto, id);
   }
 

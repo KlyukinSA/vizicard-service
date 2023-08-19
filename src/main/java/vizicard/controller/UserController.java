@@ -169,4 +169,10 @@ public class UserController {
     return userService.updateEducation(dto, id);
   }
 
+  @DeleteMapping("/me/education/{id}")
+  @PreAuthorize("isAuthenticated()")
+  public void deleteEducation(@PathVariable("id") Integer id) {
+    userService.deleteEducation(id);
+  }
+
 }

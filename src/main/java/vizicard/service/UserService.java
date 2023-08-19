@@ -118,6 +118,7 @@ public class UserService {
 
   private void addDetails(UserResponseDTO res, Profile user) {
     res.setEducation(educationRepository.findAllByOwner(user).stream()
+            .filter(Education::isStatus)
             .map((val) -> modelMapper.map(val, EducationDTO.class))
             .collect(Collectors.toList()));
   }
@@ -431,4 +432,14 @@ public class UserService {
     }
     return getUserResponseDTO(user);
   }
+
+  public void deleteEducation(Integer id) {
+    Profile user = getUserFromAuth();
+    Education education = educationRepository.findById(id).get();
+    if (Objects.equals(education.getOwner().getId(), user.getId())) {
+      education.setStatus(false);
+      educationRepository.save(education);
+    }
+  }
+
 }

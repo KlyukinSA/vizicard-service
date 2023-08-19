@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import vizicard.dto.detail.EducationUpdateDTO;
 import vizicard.service.UserService;
 
 import java.io.IOException;
@@ -154,6 +155,18 @@ public class UserController {
   @PreAuthorize("isAuthenticated()")
   public UserResponseDTO updateMyLastVizit() {
     return userService.updateMyLastVizit();
+  }
+
+  @PostMapping("/me/education")
+  @PreAuthorize("isAuthenticated()")
+  public UserResponseDTO createEducation() {
+    return userService.createEducation();
+  }
+
+  @PutMapping("/me/education")
+  @PreAuthorize("isAuthenticated()")
+  public UserResponseDTO updateEducation(@RequestBody EducationUpdateDTO dto) {
+    return userService.updateEducation(dto);
   }
 
 }

@@ -23,9 +23,12 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
+import vizicard.dto.detail.EducationUpdateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
+import vizicard.model.detail.Education;
 import vizicard.repository.*;
+import vizicard.repository.detail.EducationRepository;
 import vizicard.security.JwtTokenProvider;
 
 import java.io.*;
@@ -46,6 +49,7 @@ public class UserService {
   private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
   private final ActionRepository actionRepository;
+  private final EducationRepository educationRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
@@ -405,4 +409,19 @@ public class UserService {
     return getUserResponseDTO(target);
   }
 
+  public UserResponseDTO createEducation() {
+    Profile user = getUserFromAuth();
+    educationRepository.save(new Education(user));
+    return getUserResponseDTO(user);
+  }
+
+  public UserResponseDTO updateEducation(EducationUpdateDTO dto) {
+    Profile user = getUserFromAuth();
+    Education education = educationRepository.findByOwner(user);
+    if (education != null) {
+      modelMapper.map(dto, education);
+    }
+    educationRepository.save(education);
+    return getUserResponseDTO(user);
+  }
 }

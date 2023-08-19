@@ -415,13 +415,13 @@ public class UserService {
     return getUserResponseDTO(user);
   }
 
-  public UserResponseDTO updateEducation(EducationUpdateDTO dto) {
+  public UserResponseDTO updateEducation(EducationUpdateDTO dto, Integer id) {
     Profile user = getUserFromAuth();
-    Education education = educationRepository.findByOwner(user);
-    if (education != null) {
+    Education education = educationRepository.findById(id).get();
+    if (Objects.equals(education.getOwner().getId(), user.getId())) {
       modelMapper.map(dto, education);
+      educationRepository.save(education);
     }
-    educationRepository.save(education);
     return getUserResponseDTO(user);
   }
 }

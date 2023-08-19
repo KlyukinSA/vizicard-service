@@ -163,10 +163,10 @@ public class UserController {
     return userService.createEducation();
   }
 
-  @PutMapping("/me/education")
+  @PutMapping("/me/education/{id}")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateEducation(@RequestBody EducationUpdateDTO dto) {
-    return userService.updateEducation(dto);
+  public UserResponseDTO updateEducation(@RequestBody EducationUpdateDTO dto, @PathVariable("id") Integer id) {
+    return userService.updateEducation(dto, id);
   }
 
 }

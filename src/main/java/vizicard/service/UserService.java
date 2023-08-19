@@ -398,4 +398,11 @@ public class UserService {
     return getUserResponseDTO(company);
   }
 
+  public UserResponseDTO updateMyLastVizit() {
+    Profile target = getUserFromAuth();
+    target.setLastVizit(new Date());
+    profileRepository.save(target);
+    return getUserResponseDTO(target);
+  }
+
 }

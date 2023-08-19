@@ -150,4 +150,10 @@ public class UserController {
     return userService.updateMyCompanyAvatar(file);
   }
 
+  @PutMapping("/me/online")
+  @PreAuthorize("isAuthenticated()")
+  public UserResponseDTO updateMyLastVizit() {
+    return userService.updateMyLastVizit();
+  }
+
 }

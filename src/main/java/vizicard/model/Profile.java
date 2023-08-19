@@ -57,4 +57,7 @@ public class Profile {
   @Column(nullable = false)
   private boolean status = true;
 
+  @Column(columnDefinition = "TIMESTAMP(0)")
+  private Date lastVizit;
+
 }

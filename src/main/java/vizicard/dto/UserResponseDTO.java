@@ -37,4 +37,7 @@ public class UserResponseDTO {
   @ApiModelProperty(position = 12)
   private CompanyResponseDTO company;
 
+  @ApiModelProperty(position = 13)
+  private Date lastVizit;
+
 }

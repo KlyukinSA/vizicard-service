@@ -417,9 +417,11 @@ public class UserService {
     return getUserResponseDTO(target);
   }
 
-  public UserResponseDTO createEducation() {
+  public UserResponseDTO createEducation(EducationDTO dto) {
     Profile user = getUserFromAuth();
-    educationRepository.save(new Education(user));
+    Education education = new Education(user);
+    modelMapper.map(dto, education);
+    educationRepository.save(education);
     return getUserResponseDTO(user);
   }
 

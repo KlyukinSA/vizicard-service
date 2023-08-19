@@ -159,8 +159,8 @@ public class UserController {
 
   @PostMapping("/me/education")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO createEducation() {
-    return userService.createEducation();
+  public UserResponseDTO createEducation(@RequestBody EducationDTO dto) {
+    return userService.createEducation(dto);
   }
 
   @PutMapping("/me/education/{id}")

@@ -10,6 +10,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RelationResponseDTO {
-    private UserResponseDTO profile;
+    private ProfileResponseDTO profile;
     private Date createAt;
 }

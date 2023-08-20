@@ -85,18 +85,18 @@ public class UserService {
     }
   }
 
-  public UserResponseDTO search(Integer id) {
+  public ProfileResponseDTO search(Integer id) {
     Profile profile = getTarget(id);
     actionRepository.save(new Action(getUserFromAuth(), profile, ActionType.VIZIT));
-    return getUserResponseDTO(profile);
+    return getProfileResponseDTO(profile);
   }
 
-  public UserResponseDTO whoami() {
-    return getUserResponseDTO(getUserFromAuth());
+  public ProfileResponseDTO whoami() {
+    return getProfileResponseDTO(getUserFromAuth());
   }
 
-  public UserResponseDTO updateMe(UserUpdateDTO dto) {
-    return getUserResponseDTO(updateProfile(getUserFromAuth(), dto));
+  public ProfileResponseDTO updateMe(ProfileUpdateDTO dto) {
+    return getProfileResponseDTO(updateProfile(getUserFromAuth(), dto));
   }
 
   private Profile getUserFromAuth() {
@@ -106,25 +106,25 @@ public class UserService {
     } else return null;
   }
 
-  private UserResponseDTO getUserResponseDTO(Profile user) {
-    UserResponseDTO res = modelMapper.map(user, UserResponseDTO.class);
-    res.setContacts(getUserContacts(user));
-    if (user.getCompany() == null || !user.getCompany().isStatus()) {
+  private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
+    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class);
+    res.setContacts(getContactDTOs(profile));
+    if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
       res.setCompany(null);
     }
-    addDetails(res, user);
+    addDetails(res, profile);
     return res;
   }
 
-  private void addDetails(UserResponseDTO res, Profile user) {
-    res.setEducation(educationRepository.findAllByOwner(user).stream()
+  private void addDetails(ProfileResponseDTO res, Profile profile) {
+    res.setEducation(educationRepository.findAllByOwner(profile).stream()
             .filter(Education::isStatus)
             .map((val) -> modelMapper.map(val, EducationDTO.class))
             .collect(Collectors.toList()));
   }
 
-  private ContactDTO[] getUserContacts(Profile user) {
-    Contact[] a = contactRepository.findByOwner(user);
+  private ContactDTO[] getContactDTOs(Profile profile) {
+    Contact[] a = contactRepository.findByOwner(profile);
     return Arrays.stream(a).map((val) -> new ContactDTO(
             val.getContactType().getContactEnum(),
             val.getContact(),
@@ -154,18 +154,18 @@ public class UserService {
     contactRepository.save(contact);
   }
 
-  public UserResponseDTO updateAvatar(MultipartFile file) throws IOException {
+  public ProfileResponseDTO updateAvatar(MultipartFile file) throws IOException {
     Profile user = getUserFromAuth();
     user.setAvatar(s3Service.uploadFile(file));
     profileRepository.save(user);
-    return getUserResponseDTO(user);
+    return getProfileResponseDTO(user);
   }
 
-  public UserResponseDTO updateBackground(MultipartFile file) throws IOException {
+  public ProfileResponseDTO updateBackground(MultipartFile file) throws IOException {
     Profile user = getUserFromAuth();
     user.setBackground(s3Service.uploadFile(file));
     profileRepository.save(user);
-    return getUserResponseDTO(user);
+    return getProfileResponseDTO(user);
   }
 
   public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
@@ -215,28 +215,28 @@ public class UserService {
     return outputStream.toByteArray();
   }
 
-  private VCard getVcard(Profile user) throws IOException {
+  private VCard getVcard(Profile profile) throws IOException {
     VCard vcard = new VCard();
-    if (isGoodForVcard(user.getName())) {
-      vcard.setFormattedName(user.getName());
+    if (isGoodForVcard(profile.getName())) {
+      vcard.setFormattedName(profile.getName());
     }
-    if (isGoodForVcard(user.getTitle())) {
-      vcard.addTitle(user.getTitle());
+    if (isGoodForVcard(profile.getTitle())) {
+      vcard.addTitle(profile.getTitle());
     }
-    if (isGoodForVcard(user.getDescription())) {
-      vcard.addNote(user.getDescription());
+    if (isGoodForVcard(profile.getDescription())) {
+      vcard.addNote(profile.getDescription());
     }
-//    if (isGoodForVcard(user.getCompany())) {
-//      vcard.setOrganization(user.getCompany());
+//    if (isGoodForVcard(profile.getCompany())) {
+//      vcard.setOrganization(profile.getCompany());
 //    }
-    if (isGoodForVcard(user.getCity())) {
+    if (isGoodForVcard(profile.getCity())) {
       Address address = new Address();
-      address.setLocality(user.getCity());
+      address.setLocality(profile.getCity());
       vcard.addAddress(address);
     }
 
     int group = 0;
-    ContactDTO[] contacts = getUserContacts(user);
+    ContactDTO[] contacts = getContactDTOs(profile);
     for (ContactDTO contact : contacts) {
       ContactEnum contactEnum = contact.getType();
       String string = contact.getContact();
@@ -259,8 +259,8 @@ public class UserService {
       }
     }
 
-    if (user.getAvatar() != null) {
-      String url = user.getAvatar().getUrl();
+    if (profile.getAvatar() != null) {
+      String url = profile.getAvatar().getUrl();
       InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
       Photo photo = new Photo(inputStream, ImageType.JPEG);
       vcard.addPhoto(photo); // TODO image types
@@ -300,7 +300,7 @@ public class UserService {
     Profile owner = getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
             .stream().map((val) -> new RelationResponseDTO(
-                    getUserResponseDTO(val.getProfile()), val.getCreateAt()))
+                    getProfileResponseDTO(val.getProfile()), val.getCreateAt()))
             .collect(Collectors.toList());
   }
 
@@ -330,7 +330,7 @@ public class UserService {
   private String getLeadGenMessage(LeadGenerationDTO dto, Profile author) {
     String res = dto.toString();
     if (author != null) {
-      res += "\n\n" + getUserResponseDTO(author);
+      res += "\n\n" + getProfileResponseDTO(author);
     }
     return res;
   }
@@ -352,7 +352,7 @@ public class UserService {
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
 
-  public UserResponseDTO updateMyCompany(UserUpdateDTO dto) {
+  public ProfileResponseDTO updateMyCompany(ProfileUpdateDTO dto) {
     Profile user = getUserFromAuth();
     Profile company = user.getCompany();
     if (company == null || !company.isStatus()) {
@@ -363,10 +363,10 @@ public class UserService {
       user.setCompany(company);
       profileRepository.save(user);
     }
-    return getUserResponseDTO(updateProfile(company, dto));
+    return getProfileResponseDTO(updateProfile(company, dto));
   }
 
-  private Profile updateProfile(Profile profile, UserUpdateDTO dto) {
+  private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
     if (dto.getName() != null) {
       profile.setName(dto.getName());
     }
@@ -388,7 +388,7 @@ public class UserService {
   }
 
   Profile getTarget(Integer id) {
-    CustomException exception = new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+    CustomException exception = new CustomException("The profile doesn't exist", HttpStatus.NOT_FOUND);
     Profile profile = profileRepository.findById(id)
             .orElseThrow(() -> exception);
     if (!profile.isStatus()) {
@@ -403,36 +403,36 @@ public class UserService {
     profileRepository.save(user.getCompany());
   }
 
-  public UserResponseDTO updateMyCompanyAvatar(MultipartFile file) throws IOException {
+  public ProfileResponseDTO updateMyCompanyAvatar(MultipartFile file) throws IOException {
     Profile company = getUserFromAuth().getCompany();
     company.setAvatar(s3Service.uploadFile(file));
     profileRepository.save(company);
-    return getUserResponseDTO(company);
+    return getProfileResponseDTO(company);
   }
 
-  public UserResponseDTO updateMyLastVizit() {
-    Profile target = getUserFromAuth();
-    target.setLastVizit(new Date());
-    profileRepository.save(target);
-    return getUserResponseDTO(target);
+  public ProfileResponseDTO updateMyLastVizit() {
+    Profile user = getUserFromAuth();
+    user.setLastVizit(new Date());
+    profileRepository.save(user);
+    return getProfileResponseDTO(user);
   }
 
-  public UserResponseDTO createEducation(EducationDTO dto) {
+  public ProfileResponseDTO createEducation(EducationDTO dto) {
     Profile user = getUserFromAuth();
     Education education = new Education(user);
     modelMapper.map(dto, education);
     educationRepository.save(education);
-    return getUserResponseDTO(user);
+    return getProfileResponseDTO(user);
   }
 
-  public UserResponseDTO updateEducation(EducationDTO dto, Integer id) {
+  public ProfileResponseDTO updateEducation(EducationDTO dto, Integer id) {
     Profile user = getUserFromAuth();
     Education education = educationRepository.findById(id).get();
     if (Objects.equals(education.getOwner().getId(), user.getId())) {
       modelMapper.map(dto, education);
       educationRepository.save(education);
     }
-    return getUserResponseDTO(user);
+    return getProfileResponseDTO(user);
   }
 
   public void deleteEducation(Integer id) {

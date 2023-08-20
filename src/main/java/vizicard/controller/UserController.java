@@ -48,48 +48,48 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  @ApiOperation(value = "${UserController.search}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  @ApiOperation(value = "${UserController.search}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 404, message = "The user doesn't exist"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public UserResponseDTO search(@ApiParam("Username") @PathVariable Integer id) {
+  public ProfileResponseDTO search(@ApiParam("Username") @PathVariable Integer id) {
     return userService.search(id);
   }
 
   @GetMapping("/me")
   @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  @ApiOperation(value = "${UserController.me}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
       @ApiResponse(code = 400, message = "Something went wrong"), //
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public UserResponseDTO whoami() {
+  public ProfileResponseDTO whoami() {
     return userService.whoami();
   }
 
   @PutMapping("/me")
   @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.update}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  @ApiOperation(value = "${UserController.update}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
   @ApiResponses(value = {//
           @ApiResponse(code = 400, message = "Something went wrong"), //
           @ApiResponse(code = 403, message = "Access denied")})
-  public UserResponseDTO update(@ApiParam("Update User") @RequestBody UserUpdateDTO dto) {
+  public ProfileResponseDTO update(@ApiParam("Update User") @RequestBody ProfileUpdateDTO dto) {
     return userService.updateMe(dto);
   }
 
   @PostMapping("/me/avatar")
   @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.updateAvatar}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
-  public UserResponseDTO updateAvatar(@RequestPart("file") MultipartFile file) throws IOException {
+  @ApiOperation(value = "${UserController.updateAvatar}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  public ProfileResponseDTO updateAvatar(@RequestPart("file") MultipartFile file) throws IOException {
     return userService.updateAvatar(file);
   }
 
   @PostMapping("/me/background")
   @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.updateAvatar}", response = UserResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
-  public UserResponseDTO updateBackground(@RequestPart("file") MultipartFile file) throws IOException {
+  @ApiOperation(value = "${UserController.updateAvatar}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
+  public ProfileResponseDTO updateBackground(@RequestPart("file") MultipartFile file) throws IOException {
     return userService.updateBackground(file);
   }
 
@@ -135,7 +135,7 @@ public class UserController {
 
   @PutMapping("/me/company")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateMyCompany(@RequestBody UserUpdateDTO dto) {
+  public ProfileResponseDTO updateMyCompany(@RequestBody ProfileUpdateDTO dto) {
     return userService.updateMyCompany(dto);
   }
 
@@ -147,25 +147,25 @@ public class UserController {
 
   @PostMapping("/me/company/avatar")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateMyCompanyAvatar(@RequestPart("file") MultipartFile file) throws IOException {
+  public ProfileResponseDTO updateMyCompanyAvatar(@RequestPart("file") MultipartFile file) throws IOException {
     return userService.updateMyCompanyAvatar(file);
   }
 
   @PutMapping("/me/online")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateMyLastVizit() {
+  public ProfileResponseDTO updateMyLastVizit() {
     return userService.updateMyLastVizit();
   }
 
   @PostMapping("/me/education")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO createEducation(@RequestBody EducationDTO dto) {
+  public ProfileResponseDTO createEducation(@RequestBody EducationDTO dto) {
     return userService.createEducation(dto);
   }
 
   @PutMapping("/me/education/{id}")
   @PreAuthorize("isAuthenticated()")
-  public UserResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
+  public ProfileResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
     return userService.updateEducation(dto, id);
   }
 

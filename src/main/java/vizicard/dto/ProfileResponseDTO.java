@@ -10,7 +10,7 @@ import vizicard.model.CloudFile;
 import vizicard.model.ProfileType;
 
 @Data
-public class UserResponseDTO {
+public class ProfileResponseDTO {
 
   @ApiModelProperty(position = 0)
   private Integer id;

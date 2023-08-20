@@ -2,15 +2,8 @@ package vizicard.controller;
 
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import vizicard.dto.UserResponseDTO;
 import vizicard.service.S3Service;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/files")

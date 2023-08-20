@@ -4,11 +4,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-
 @Data
 @NoArgsConstructor
-public class UserUpdateDTO {
+public class ProfileUpdateDTO {
 
     @ApiModelProperty(position = 0)
     private String name;

@@ -112,24 +112,6 @@ public class UserController {
     return userService.getPageStats();
   }
 
-  @PutMapping("/me/company")
-  @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO updateMyCompany(@RequestBody ProfileUpdateDTO dto) {
-    return userService.updateMyCompany(dto);
-  }
-
-  @DeleteMapping("/me/company")
-  @PreAuthorize("isAuthenticated()")
-  public void deleteMyCompany() {
-    userService.deleteMyCompany();
-  }
-
-  @PostMapping("/me/company/avatar")
-  @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO updateMyCompanyAvatar(@RequestPart("file") MultipartFile file) throws IOException {
-    return userService.updateMyCompanyAvatar(file);
-  }
-
   @PutMapping("/me/online")
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO updateMyLastVizit() {

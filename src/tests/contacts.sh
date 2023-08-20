@@ -1,1 +1,0 @@
-curl -X POST "http://localhost:8080/users/me/contacts" -H  "accept: */*" -H  "Content-Type: application/json" -d "{  \"contacts\": [    {      \"contact\": \"string\",      \"contactEnum\": \"PHONE\"    }, {      \"contact\": \"string-overwrite\",      \"contactEnum\": \"PHONE\"    }  ]}" -H 'Authorization: Bearer '$1

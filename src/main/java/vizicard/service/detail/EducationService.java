@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import vizicard.dto.ProfileResponseDTO;
 import vizicard.dto.detail.EducationDTO;
+import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.model.Profile;
 import vizicard.model.detail.Education;
 import vizicard.repository.ProfileRepository;
@@ -26,22 +27,22 @@ public class EducationService {
 
     private final UserService userService;
 
-    public ProfileResponseDTO createEducation(EducationDTO dto) {
+    public EducationResponseDTO createEducation(EducationDTO dto) {
         Profile user = userService.getUserFromAuth();
         Education education = new Education(user);
         userService.getModelMapper().map(dto, education);
         educationRepository.save(education);
-        return userService.getProfileResponseDTO(user);
+        return userService.getModelMapper().map(education, EducationResponseDTO.class);
     }
 
-    public ProfileResponseDTO updateEducation(EducationDTO dto, Integer id) {
+    public EducationResponseDTO updateEducation(EducationDTO dto, Integer id) {
         Profile user = userService.getUserFromAuth();
         Education education = educationRepository.findById(id).get();
         if (Objects.equals(education.getOwner().getId(), user.getId())) {
             userService.getModelMapper().map(dto, education);
             educationRepository.save(education);
         }
-        return userService.getProfileResponseDTO(user);
+        return userService.getModelMapper().map(education, EducationResponseDTO.class);
     }
 
     public void deleteEducation(Integer id) {

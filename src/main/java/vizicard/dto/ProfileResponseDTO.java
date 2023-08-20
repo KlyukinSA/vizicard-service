@@ -6,6 +6,7 @@ import java.util.List;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import vizicard.dto.detail.EducationDTO;
+import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.model.CloudFile;
 import vizicard.model.ProfileType;
 
@@ -43,6 +44,6 @@ public class ProfileResponseDTO {
   private Date lastVizit;
 
   @ApiModelProperty(position = 14)
-  private List<EducationDTO> educations; // need different name
+  private List<EducationResponseDTO> educations; // need different name
 
 }

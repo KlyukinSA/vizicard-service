@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
 import vizicard.dto.detail.EducationDTO;
+import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
@@ -50,7 +51,6 @@ public class UserService {
   private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
   private final ActionRepository actionRepository;
-  private final EducationRepository educationRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
@@ -108,7 +108,7 @@ public class UserService {
     } else return null;
   }
 
-  public ProfileResponseDTO getProfileResponseDTO(Profile profile) {
+  private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
     ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class);
     res.setContacts(getContactDTOs(profile));
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
@@ -121,7 +121,7 @@ public class UserService {
   private void addDetails(ProfileResponseDTO res, Profile profile) {
     res.setEducations(profile.getEducation().stream()
             .filter(Education::isStatus)
-            .map((val) -> modelMapper.map(val, EducationDTO.class))
+            .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
             .collect(Collectors.toList()));
   }
 

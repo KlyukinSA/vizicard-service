@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.ProfileResponseDTO;
 import vizicard.dto.detail.EducationDTO;
+import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.service.detail.EducationService;
 
 @RestController
@@ -17,13 +18,13 @@ public class EducationController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ProfileResponseDTO createEducation(@RequestBody EducationDTO dto) {
+    public EducationResponseDTO createEducation(@RequestBody EducationDTO dto) {
         return educationService.createEducation(dto);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public ProfileResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
+    public EducationResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
         return educationService.updateEducation(dto, id);
     }
 

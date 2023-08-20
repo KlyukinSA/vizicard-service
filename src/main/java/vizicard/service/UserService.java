@@ -39,13 +39,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
   private final ProfileRepository profileRepository;
-  private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
   private final ActionRepository actionRepository;
+  private final ContactUpdater contactUpdater;
 
   private final ModelMapper modelMapper;
   private final ProfileProvider auther;
-  private final ContactUpdater contactUpdater;
 
   private final S3Service s3Service;
   private final EmailService emailService;
@@ -82,6 +81,9 @@ public class UserService {
   }
 
   private List<ContactDTO> getContactDTOs(Profile profile) {
+    if (profile.getContacts() == null) {
+      return new ArrayList<>();
+    }
     return profile.getContacts().stream()
             .map((val) -> new ContactDTO(
                     val.getContactType().getContactEnum(),
@@ -216,18 +218,6 @@ public class UserService {
 
   private boolean isGoodForVcard(String string) {
     return string != null && string.length() > 0;
-  }
-
-  public boolean addDevice(String word) {
-    Device device = deviceRepository.findByUrl(word);
-    if (device == null) {
-      device = new Device();
-      device.setUrl(word);
-      device.setOwner(auther.getUserFromAuth());
-      deviceRepository.save(device);
-      return true;
-    }
-    return false;
   }
 
   public void unrelate(Integer targetProfileId) {

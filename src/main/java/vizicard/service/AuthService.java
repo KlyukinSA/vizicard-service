@@ -23,13 +23,13 @@ import vizicard.utils.ContactUpdater;
 public class AuthService {
 
     private final ProfileRepository profileRepository;
+    private final ContactUpdater contactUpdater;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
     private final ModelMapper modelMapper;
-    private final ContactUpdater contactUpdater;
 
     public String signin(SigninDTO dto) {
         try {

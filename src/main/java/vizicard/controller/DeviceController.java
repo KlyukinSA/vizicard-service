@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.DeviceDTO;
 import vizicard.model.Device;
 import vizicard.repository.DeviceRepository;
+import vizicard.service.DeviceService;
+import vizicard.utils.ProfileProvider;
 
 import java.io.IOException;
 
@@ -14,12 +16,18 @@ import java.io.IOException;
 @RequestMapping("/devices")
 @RequiredArgsConstructor
 public class DeviceController {
-    private final DeviceRepository deviceRepository;
-    //Получение девайса по url.
+
+    private final DeviceService deviceService;
+
     @GetMapping
-    public DeviceDTO getDevice(String url) throws IOException {
-        Device device = deviceRepository.findByUrl(url);
-        return new DeviceDTO(device.getId(), device.getOwner().getId(), device.getUrl());
+    public DeviceDTO findByUrl(String url) throws IOException {
+        return deviceService.findByUrl(url);
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public boolean addDevice(@RequestParam String url) {
+        return deviceService.addDevice(url);
     }
 
 }

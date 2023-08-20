@@ -7,7 +7,6 @@ import vizicard.service.S3Service;
 
 @RestController
 @RequestMapping("/files")
-@Api(tags = "files")
 @RequiredArgsConstructor
 public class S3Controller {
 

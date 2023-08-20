@@ -8,30 +8,21 @@ import ezvcard.property.Address;
 import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
-import vizicard.dto.detail.EducationDTO;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
 import vizicard.repository.*;
-import vizicard.repository.detail.EducationRepository;
-import vizicard.security.JwtTokenProvider;
 import vizicard.utils.ContactUpdater;
 import vizicard.utils.ProfileProvider;
 
@@ -48,7 +39,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
   private final ProfileRepository profileRepository;
-  private final ContactRepository contactRepository;
   private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
   private final ActionRepository actionRepository;
@@ -75,7 +65,7 @@ public class UserService {
   }
 
   private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
-    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class);
+    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except education and contacts
     res.setContacts(getContactDTOs(profile));
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
       res.setCompany(null);
@@ -85,19 +75,19 @@ public class UserService {
   }
 
   private void addDetails(ProfileResponseDTO res, Profile profile) {
-    res.setEducations(profile.getEducation().stream()
+    res.setEducation(profile.getEducation().stream()
             .filter(Education::isStatus)
             .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
             .collect(Collectors.toList()));
   }
 
-  private ContactDTO[] getContactDTOs(Profile profile) {
-    Contact[] a = contactRepository.findByOwner(profile);
-    return Arrays.stream(a).map((val) -> new ContactDTO(
-            val.getContactType().getContactEnum(),
-            val.getContact(),
-            val.getContactType().getLogo().getUrl())
-    ).toArray(ContactDTO[]::new);
+  private List<ContactDTO> getContactDTOs(Profile profile) {
+    return profile.getContacts().stream()
+            .map((val) -> new ContactDTO(
+                    val.getContactType().getContactEnum(),
+                    val.getContact(),
+                    val.getContactType().getLogo().getUrl())
+    ).collect(Collectors.toList());
   }
 
   private void updateContacts(Profile owner, ContactRequest[] list) {
@@ -192,8 +182,7 @@ public class UserService {
     }
 
     int group = 0;
-    ContactDTO[] contacts = getContactDTOs(profile);
-    for (ContactDTO contact : contacts) {
+    for (ContactDTO contact : getContactDTOs(profile)) {
       ContactEnum contactEnum = contact.getType();
       String string = contact.getContact();
       if (isGoodForVcard(string)) {

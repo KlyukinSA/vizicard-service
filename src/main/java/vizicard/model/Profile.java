@@ -29,15 +29,14 @@ public class Profile {
 
   @Column(nullable = false, length = 50)
   private String name;
-
   @Column(length = 140)
   private String title;
-
   @Column(columnDefinition = "TEXT")
   private String description;
-
   @Column(length = 50)
   private String city;
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  private List<Contact> contacts;
 
   @OneToOne
   private CloudFile avatar;

@@ -32,6 +32,7 @@ import vizicard.model.detail.Education;
 import vizicard.repository.*;
 import vizicard.repository.detail.EducationRepository;
 import vizicard.security.JwtTokenProvider;
+import vizicard.utils.ProfileProvider;
 
 import java.io.*;
 import java.net.URL;
@@ -56,8 +57,8 @@ public class UserService {
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
 
-  @Getter
   private final ModelMapper modelMapper;
+  private final ProfileProvider auther;
 
   private final S3Service s3Service;
   private final EmailService emailService;
@@ -89,23 +90,16 @@ public class UserService {
 
   public ProfileResponseDTO search(Integer id) {
     Profile profile = getTarget(id);
-    actionRepository.save(new Action(getUserFromAuth(), profile, ActionType.VIZIT));
+    actionRepository.save(new Action(auther.getUserFromAuth(), profile, ActionType.VIZIT));
     return getProfileResponseDTO(profile);
   }
 
   public ProfileResponseDTO whoami() {
-    return getProfileResponseDTO(getUserFromAuth());
+    return getProfileResponseDTO(auther.getUserFromAuth());
   }
 
   public ProfileResponseDTO updateMe(ProfileUpdateDTO dto) {
-    return getProfileResponseDTO(updateProfile(getUserFromAuth(), dto));
-  }
-
-  public Profile getUserFromAuth() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (!authentication.getName().equals("anonymousUser")) {
-      return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
-    } else return null;
+    return getProfileResponseDTO(updateProfile(auther.getUserFromAuth(), dto));
   }
 
   private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
@@ -157,14 +151,14 @@ public class UserService {
   }
 
   public ProfileResponseDTO updateAvatar(MultipartFile file) throws IOException {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
     user.setAvatar(s3Service.uploadFile(file));
     profileRepository.save(user);
     return getProfileResponseDTO(user);
   }
 
   public ProfileResponseDTO updateBackground(MultipartFile file) throws IOException {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
     user.setBackground(s3Service.uploadFile(file));
     profileRepository.save(user);
     return getProfileResponseDTO(user);
@@ -176,7 +170,7 @@ public class UserService {
     byte[] vCardBytes = getVcardBytes(getVcard(target)); // TODO class VcardFile
     String fileName = getVcardFileName(target); //
 
-    Profile owner = getUserFromAuth();
+    Profile owner = auther.getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
       try {
         emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes);
@@ -282,7 +276,7 @@ public class UserService {
     if (device == null) {
       device = new Device();
       device.setUrl(word);
-      device.setOwner(getUserFromAuth());
+      device.setOwner(auther.getUserFromAuth());
       deviceRepository.save(device);
       return true;
     }
@@ -292,7 +286,7 @@ public class UserService {
   public void unrelate(Integer targetProfileId) {
     Profile target = getTarget(targetProfileId);
 
-    Profile owner = getUserFromAuth();
+    Profile owner = auther.getUserFromAuth();
     Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
     if (relation == null) {
       throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
@@ -301,7 +295,7 @@ public class UserService {
   }
 
   public List<RelationResponseDTO> getRelations() {
-    Profile owner = getUserFromAuth();
+    Profile owner = auther.getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
             .stream().map((val) -> new RelationResponseDTO(
                     getProfileResponseDTO(val.getProfile()), val.getCreateAt()))
@@ -311,7 +305,7 @@ public class UserService {
   public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
     Profile target = getTarget(targetProfileId);
 
-    Profile author = getUserFromAuth();
+    Profile author = auther.getUserFromAuth();
     if (author != null) {
       if (Objects.equals(target.getId(), author.getId())) return;
       Relation relation = relationRepository.findByOwnerAndProfile(target, author);
@@ -335,11 +329,11 @@ public class UserService {
 
   public void addClickAction(Integer targetProfileId) {
     Profile target = getTarget(targetProfileId);
-    actionRepository.save(new Action(getUserFromAuth(), target, ActionType.CLICK));
+    actionRepository.save(new Action(auther.getUserFromAuth(), target, ActionType.CLICK));
   }
 
   public PageActionDTO getPageStats() {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
 
     Date stop = Date.from(Instant.now());
     Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
@@ -351,7 +345,7 @@ public class UserService {
   }
 
   public ProfileResponseDTO updateMyCompany(ProfileUpdateDTO dto) {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
     Profile company = user.getCompany();
     if (company == null || !company.isStatus()) {
       company = new Profile();
@@ -396,20 +390,20 @@ public class UserService {
   }
 
   public void deleteMyCompany() {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
     user.getCompany().setStatus(false);
     profileRepository.save(user.getCompany());
   }
 
   public ProfileResponseDTO updateMyCompanyAvatar(MultipartFile file) throws IOException {
-    Profile company = getUserFromAuth().getCompany();
+    Profile company = auther.getUserFromAuth().getCompany();
     company.setAvatar(s3Service.uploadFile(file));
     profileRepository.save(company);
     return getProfileResponseDTO(company);
   }
 
   public ProfileResponseDTO updateMyLastVizit() {
-    Profile user = getUserFromAuth();
+    Profile user = auther.getUserFromAuth();
     user.setLastVizit(new Date());
     profileRepository.save(user);
     return getProfileResponseDTO(user);

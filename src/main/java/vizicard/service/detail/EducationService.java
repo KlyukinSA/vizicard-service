@@ -14,6 +14,7 @@ import vizicard.model.detail.Education;
 import vizicard.repository.ProfileRepository;
 import vizicard.repository.detail.EducationRepository;
 import vizicard.service.UserService;
+import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,28 +26,29 @@ public class EducationService {
 
     private final EducationRepository educationRepository;
 
-    private final UserService userService;
+    private final ModelMapper modelMapper;
+    private final ProfileProvider profileProvider;
 
     public EducationResponseDTO createEducation(EducationDTO dto) {
-        Profile user = userService.getUserFromAuth();
+        Profile user = profileProvider.getUserFromAuth();
         Education education = new Education(user);
-        userService.getModelMapper().map(dto, education);
+        modelMapper.map(dto, education);
         educationRepository.save(education);
-        return userService.getModelMapper().map(education, EducationResponseDTO.class);
+        return modelMapper.map(education, EducationResponseDTO.class);
     }
 
     public EducationResponseDTO updateEducation(EducationDTO dto, Integer id) {
-        Profile user = userService.getUserFromAuth();
+        Profile user = profileProvider.getUserFromAuth();
         Education education = educationRepository.findById(id).get();
         if (Objects.equals(education.getOwner().getId(), user.getId())) {
-            userService.getModelMapper().map(dto, education);
+            modelMapper.map(dto, education);
             educationRepository.save(education);
         }
-        return userService.getModelMapper().map(education, EducationResponseDTO.class);
+        return modelMapper.map(education, EducationResponseDTO.class);
     }
 
     public void deleteEducation(Integer id) {
-        Profile user = userService.getUserFromAuth();
+        Profile user = profileProvider.getUserFromAuth();
         Education education = educationRepository.findById(id).get();
         if (Objects.equals(education.getOwner().getId(), user.getId())) {
             education.setStatus(false);

@@ -176,7 +176,9 @@ public class UserService {
 
     Profile owner = getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
-      emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes);
+      try {
+        emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes);
+      } catch (Exception ignored) {}
 
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null) {
@@ -226,9 +228,9 @@ public class UserService {
     if (isGoodForVcard(profile.getDescription())) {
       vcard.addNote(profile.getDescription());
     }
-//    if (isGoodForVcard(profile.getCompany())) {
-//      vcard.setOrganization(profile.getCompany());
-//    }
+    if (profile.getCompany() != null && isGoodForVcard(profile.getCompany().getName())) {
+      vcard.setOrganization(profile.getCompany().getName());
+    }
     if (isGoodForVcard(profile.getCity())) {
       Address address = new Address();
       address.setLocality(profile.getCity());
@@ -310,21 +312,15 @@ public class UserService {
     Profile author = getUserFromAuth();
     if (author != null) {
       if (Objects.equals(target.getId(), author.getId())) return;
-
-//      if (dto.getName() == null) {
-//        dto.setName(author.getName());
-//      }
-//      if (dto.getPosition() == null) {
-//        dto.setPosition(author.getPosition());
-//      }
-
       Relation relation = relationRepository.findByOwnerAndProfile(target, author);
       if (relation == null) {
         relationRepository.save(new Relation(target, author));
       }
     }
 
-    emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
+    try {
+      emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
+    } catch (Exception ignored) {}
   }
 
   private String getLeadGenMessage(LeadGenerationDTO dto, Profile author) {

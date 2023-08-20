@@ -32,6 +32,7 @@ import vizicard.model.detail.Education;
 import vizicard.repository.*;
 import vizicard.repository.detail.EducationRepository;
 import vizicard.security.JwtTokenProvider;
+import vizicard.utils.ContactUpdater;
 import vizicard.utils.ProfileProvider;
 
 import java.io.*;
@@ -48,45 +49,16 @@ public class UserService {
 
   private final ProfileRepository profileRepository;
   private final ContactRepository contactRepository;
-  private final ContactTypeRepository contactTypeRepository;
   private final DeviceRepository deviceRepository;
   private final RelationRepository relationRepository;
   private final ActionRepository actionRepository;
 
-  private final PasswordEncoder passwordEncoder;
-  private final JwtTokenProvider jwtTokenProvider;
-  private final AuthenticationManager authenticationManager;
-
   private final ModelMapper modelMapper;
   private final ProfileProvider auther;
+  private final ContactUpdater contactUpdater;
 
   private final S3Service s3Service;
   private final EmailService emailService;
-
-  public String signin(SigninDTO dto) {
-    try {
-      Profile profile = profileRepository.findByUsername(dto.getUsername());
-      String id = String.valueOf(profile.getId());
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
-      return jwtTokenProvider.createToken(id);
-    } catch (Exception e) {
-      throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-  }
-
-  public String signup(UserSignupDTO dto) {
-    Profile profile = modelMapper.map(dto, Profile.class);
-    if (!profileRepository.existsByUsername(profile.getUsername())) {
-      profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-      profile.setProfileType(ProfileType.USER);
-      profile = profileRepository.save(profile);
-      updateContact(profile, new ContactRequest(ContactEnum.MAIL, profile.getUsername()));
-      String id = String.valueOf(profile.getId());
-      return jwtTokenProvider.createToken(id);
-    } else {
-      throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-  }
 
   public ProfileResponseDTO search(Integer id) {
     Profile profile = getTarget(id);
@@ -131,23 +103,9 @@ public class UserService {
   private void updateContacts(Profile owner, ContactRequest[] list) {
     for (ContactRequest dto : list) {
       if (dto.getType() != null && dto.getContact() != null) {
-        updateContact(owner, dto);
+        contactUpdater.updateContact(owner, dto);
       }
     }
-  }
-
-  private void updateContact(Profile owner, ContactRequest dto) {
-    ContactType contactType = contactTypeRepository.findByContactEnum(dto.getType());
-    Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
-    if (contact != null) {
-      contact.setContact(dto.getContact());
-    } else {
-      contact = new Contact();
-      contact.setContactType(contactType);
-      contact.setOwner(owner);
-      contact.setContact(dto.getContact());
-    }
-    contactRepository.save(contact);
   }
 
   public ProfileResponseDTO updateAvatar(MultipartFile file) throws IOException {

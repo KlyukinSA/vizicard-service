@@ -21,30 +21,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@Api(tags = "users")
 @RequiredArgsConstructor
 public class UserController {
 
   private final UserService userService;
-
-  @PostMapping("/signin")
-  @ApiOperation(value = "${UserController.signin}")
-  @ApiResponses(value = {//
-      @ApiResponse(code = 400, message = "Something went wrong"), //
-      @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-  public String login(@RequestBody SigninDTO signinDTO) {
-    return userService.signin(signinDTO);
-  }
-
-  @PostMapping("/signup")
-  @ApiOperation(value = "${UserController.signup}")
-  @ApiResponses(value = {//
-      @ApiResponse(code = 400, message = "Something went wrong"), //
-      @ApiResponse(code = 403, message = "Access denied"), //
-      @ApiResponse(code = 422, message = "Username is already in use")})
-  public String signup(@ApiParam("Signup User") @RequestBody UserSignupDTO user) {
-    return userService.signup(user);
-  }
 
   @GetMapping("/{id}")
   @ApiOperation(value = "${UserController.search}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })

@@ -1,6 +1,7 @@
 package vizicard.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class ProfileProvider {
 
     public Profile getUserFromAuth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!authentication.getName().equals("anonymousUser")) {
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
             return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
         } else return null;
     }

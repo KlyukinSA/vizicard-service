@@ -8,6 +8,7 @@ import ezvcard.property.Address;
 import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
@@ -55,6 +56,7 @@ public class UserService {
   private final JwtTokenProvider jwtTokenProvider;
   private final AuthenticationManager authenticationManager;
 
+  @Getter
   private final ModelMapper modelMapper;
 
   private final S3Service s3Service;
@@ -99,14 +101,14 @@ public class UserService {
     return getProfileResponseDTO(updateProfile(getUserFromAuth(), dto));
   }
 
-  private Profile getUserFromAuth() {
+  public Profile getUserFromAuth() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (!authentication.getName().equals("anonymousUser")) {
       return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
     } else return null;
   }
 
-  private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
+  public ProfileResponseDTO getProfileResponseDTO(Profile profile) {
     ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class);
     res.setContacts(getContactDTOs(profile));
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
@@ -411,33 +413,6 @@ public class UserService {
     user.setLastVizit(new Date());
     profileRepository.save(user);
     return getProfileResponseDTO(user);
-  }
-
-  public ProfileResponseDTO createEducation(EducationDTO dto) {
-    Profile user = getUserFromAuth();
-    Education education = new Education(user);
-    modelMapper.map(dto, education);
-    educationRepository.save(education);
-    return getProfileResponseDTO(user);
-  }
-
-  public ProfileResponseDTO updateEducation(EducationDTO dto, Integer id) {
-    Profile user = getUserFromAuth();
-    Education education = educationRepository.findById(id).get();
-    if (Objects.equals(education.getOwner().getId(), user.getId())) {
-      modelMapper.map(dto, education);
-      educationRepository.save(education);
-    }
-    return getProfileResponseDTO(user);
-  }
-
-  public void deleteEducation(Integer id) {
-    Profile user = getUserFromAuth();
-    Education education = educationRepository.findById(id).get();
-    if (Objects.equals(education.getOwner().getId(), user.getId())) {
-      education.setStatus(false);
-      educationRepository.save(education);
-    }
   }
 
 }

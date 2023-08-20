@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("/users")
 @Api(tags = "users")
 @RequiredArgsConstructor
-@CrossOrigin
 public class UserController {
 
   private final UserService userService;
@@ -155,24 +154,6 @@ public class UserController {
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO updateMyLastVizit() {
     return userService.updateMyLastVizit();
-  }
-
-  @PostMapping("/me/education")
-  @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO createEducation(@RequestBody EducationDTO dto) {
-    return userService.createEducation(dto);
-  }
-
-  @PutMapping("/me/education/{id}")
-  @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
-    return userService.updateEducation(dto, id);
-  }
-
-  @DeleteMapping("/me/education/{id}")
-  @PreAuthorize("isAuthenticated()")
-  public void deleteEducation(@PathVariable("id") Integer id) {
-    userService.deleteEducation(id);
   }
 
 }

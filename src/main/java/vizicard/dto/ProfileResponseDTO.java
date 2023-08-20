@@ -37,7 +37,7 @@ public class ProfileResponseDTO {
   @ApiModelProperty(position = 11)
   private ProfileType profileType;
   @ApiModelProperty(position = 12)
-  private CompanyResponseDTO company;
+  private BriefResponseDTO company;
 
   @ApiModelProperty(position = 13)
   private Date lastVizit;

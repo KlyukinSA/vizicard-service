@@ -234,8 +234,7 @@ public class UserService {
   public List<RelationResponseDTO> getRelations() {
     Profile owner = auther.getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
-            .stream().map((val) -> new RelationResponseDTO(
-                    getProfileResponseDTO(val.getProfile()), val.getCreateAt()))
+            .stream().map((val) -> modelMapper.map(val, RelationResponseDTO.class))
             .collect(Collectors.toList());
   }
 

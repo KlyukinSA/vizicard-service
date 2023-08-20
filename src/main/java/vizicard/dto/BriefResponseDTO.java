@@ -6,7 +6,7 @@ import vizicard.model.CloudFile;
 
 @Data
 @NoArgsConstructor
-public class CompanyResponseDTO {
+public class BriefResponseDTO {
     private Integer id;
     private String name;
     private String title;

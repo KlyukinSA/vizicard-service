@@ -117,7 +117,7 @@ public class UserService {
   }
 
   private void addDetails(ProfileResponseDTO res, Profile profile) {
-    res.setEducation(educationRepository.findAllByOwner(profile).stream()
+    res.setEducations(profile.getEducation().stream()
             .filter(Education::isStatus)
             .map((val) -> modelMapper.map(val, EducationDTO.class))
             .collect(Collectors.toList()));

@@ -3,6 +3,7 @@ package vizicard.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import vizicard.model.detail.Education;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -59,5 +60,8 @@ public class Profile {
 
   @Column(columnDefinition = "TIMESTAMP(0)")
   private Date lastVizit;
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  private List<Education> education;
 
 }

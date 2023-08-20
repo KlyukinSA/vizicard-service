@@ -16,14 +16,13 @@ public class Education {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Profile owner;
 
     private String stage;
     private String institution;
     private String specialization;
-
     @Column(columnDefinition = "TIMESTAMP(0)")
     private Date graduationAt;
 

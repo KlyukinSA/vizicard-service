@@ -43,6 +43,6 @@ public class ProfileResponseDTO {
   private Date lastVizit;
 
   @ApiModelProperty(position = 14)
-  private List<EducationDTO> education;
+  private List<EducationDTO> educations; // need different name
 
 }

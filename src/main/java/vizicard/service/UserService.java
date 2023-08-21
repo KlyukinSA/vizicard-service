@@ -140,7 +140,7 @@ public class UserService {
     Profile owner = auther.getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
       try {
-        emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes);
+        emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes, owner.getName(), owner.getId());
       } catch (Exception ignored) {}
 
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);

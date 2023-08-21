@@ -1,6 +1,7 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -9,6 +10,12 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,15 +24,27 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendRelation(String to, String fileName, byte[] vCardBytes) throws MessagingException {
+    public void sendRelation(String to, String fileName, byte[] vCardBytes, String ownerName, Integer ownerId) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setSubject("Сохранение контакта в ViziCard");
+        helper.setSubject("Новый контакт");
         helper.setFrom(vizicardEmail);
         helper.setTo(to);
-        helper.setText("Вы сохранили контакт. Файл " + fileName + " в приложении к письму.", false);
+        helper.setText(getRelationText(ownerName, String.valueOf(ownerId)), true);
         helper.addAttachment(fileName, new ByteArrayDataSource(vCardBytes, "text/vcard"));
         emailSender.send(message);
+    }
+
+    private String getRelationText(String name, String id) {
+        try {
+            InputStream is = new ClassPathResource("save-contact-letter.html").getInputStream();
+            String raw = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+            return raw.replaceAll("\\$1", name).replaceAll("\\$2", id);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void sendUsual(String to, String subject, String text) {

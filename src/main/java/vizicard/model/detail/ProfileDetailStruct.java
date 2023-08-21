@@ -10,10 +10,14 @@ import java.util.List;
 @Embeddable
 @Data
 public class ProfileDetailStruct {
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Education> education;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Experience> experience;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Skill> skills;
 
 }

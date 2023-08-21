@@ -44,6 +44,6 @@ public class ProfileResponseDTO {
   private Date lastVizit;
 
   @ApiModelProperty(position = 14)
-  private ProfileDetailStructResponseDTO detailStruct;
+  private ProfileDetailStructResponseDTO about;
 
 }

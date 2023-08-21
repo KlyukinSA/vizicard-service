@@ -21,12 +21,13 @@ import vizicard.dto.*;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
+import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.model.detail.DetailBase;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
+import vizicard.model.detail.Skill;
 import vizicard.repository.*;
 import vizicard.utils.ContactUpdater;
 import vizicard.utils.ProfileProvider;
@@ -74,11 +75,11 @@ public class UserService {
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
       res.setCompany(null);
     }
-    res.setDetailStruct(getDetailStructDTO(profile));
+    res.setAbout(getAbout(profile));
     return res;
   }
 
-  private ProfileDetailStructResponseDTO getDetailStructDTO(Profile profile) {
+  private ProfileDetailStructResponseDTO getAbout(Profile profile) {
       ProfileDetailStruct detailStruct = profile.getDetailStruct();
       return new ProfileDetailStructResponseDTO(
             detailStruct.getEducation().stream()
@@ -88,7 +89,12 @@ public class UserService {
             detailStruct.getExperience().stream()
                     .filter(Experience::isStatus)
                     .map((val) -> modelMapper.map(val, ExperienceResponseDTO.class))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList()),
+            detailStruct.getSkills().stream()
+                    .filter(Skill::isStatus)
+                    .map((val) -> modelMapper.map(val, SkillResponseDTO.class))
+                    .collect(Collectors.toList())
+            );
   }
 
   private List<ContactDTO> getContactDTOs(Profile profile) {

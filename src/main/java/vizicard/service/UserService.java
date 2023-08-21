@@ -19,9 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.*;
 import vizicard.dto.detail.EducationResponseDTO;
+import vizicard.dto.detail.ExperienceResponseDTO;
+import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
+import vizicard.model.detail.DetailBase;
 import vizicard.model.detail.Education;
+import vizicard.model.detail.Experience;
+import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.repository.*;
 import vizicard.utils.ContactUpdater;
 import vizicard.utils.ProfileProvider;
@@ -69,15 +74,21 @@ public class UserService {
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
       res.setCompany(null);
     }
-    addDetails(res, profile);
+    res.setDetailStruct(getDetailStructDTO(profile));
     return res;
   }
 
-  private void addDetails(ProfileResponseDTO res, Profile profile) {
-    res.setEducation(profile.getEducation().stream()
-            .filter(Education::isStatus)
-            .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
-            .collect(Collectors.toList()));
+  private ProfileDetailStructResponseDTO getDetailStructDTO(Profile profile) {
+      ProfileDetailStruct detailStruct = profile.getDetailStruct();
+      return new ProfileDetailStructResponseDTO(
+            detailStruct.getEducation().stream()
+                    .filter(Education::isStatus)
+                    .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
+                    .collect(Collectors.toList()),
+            detailStruct.getExperience().stream()
+                    .filter(Experience::isStatus)
+                    .map((val) -> modelMapper.map(val, ExperienceResponseDTO.class))
+                    .collect(Collectors.toList()));
   }
 
   private List<ContactDTO> getContactDTOs(Profile profile) {

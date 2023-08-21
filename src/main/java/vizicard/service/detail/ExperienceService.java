@@ -10,6 +10,7 @@ import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.model.Profile;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
+import vizicard.model.detail.Skill;
 import vizicard.repository.detail.EducationRepository;
 import vizicard.repository.detail.ExperienceRepository;
 import vizicard.utils.ProfileProvider;
@@ -19,7 +20,6 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ExperienceService {
-
 
     private final ExperienceRepository repository;
 

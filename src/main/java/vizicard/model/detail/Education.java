@@ -10,15 +10,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-public class Education {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private Profile owner;
+public class Education extends DetailBase {
 
     private String stage;
     private String institution;
@@ -26,10 +18,7 @@ public class Education {
     @Column(columnDefinition = "TIMESTAMP(0)")
     private Date graduationAt;
 
-    @Column(nullable = false)
-    private boolean status = true;
-
-    public Education(Profile owner) {
-        this.owner = owner;
+    public Education(Profile user) {
+        super(user);
     }
 }

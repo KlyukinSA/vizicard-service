@@ -108,4 +108,11 @@ public class UserController {
     return userService.updateMyLastVizit();
   }
 
+
+  @DeleteMapping("{id}")
+  @PreAuthorize("isAuthenticated()")
+  public void deleteProfile(@PathVariable("id") Integer id) {
+    userService.deleteProfile(id);
+  }
+
 }

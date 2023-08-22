@@ -66,11 +66,8 @@ public class UserService {
   }
 
   public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
-    Profile user = auther.getUserFromAuth();
     Profile target = getTarget(id);
-    if (!Objects.equals(target.getOwnerId(), user.getId())) {
-      throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
-    }
+    stopNotOwnerOf(target);
     return getProfileResponseDTO(updateProfile(target, dto));
   }
 
@@ -316,7 +313,7 @@ public class UserService {
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
-    if (dto.getName() != null) {
+    if (dto.getName() != null) { // TODO set modelMapper how to map contacts and cloudFiles
       profile.setName(dto.getName());
     }
     if (dto.getTitle() != null) {
@@ -371,6 +368,19 @@ public class UserService {
     user.setLastVizit(new Date());
     profileRepository.save(user);
     return getProfileResponseDTO(user);
+  }
+
+  public void deleteProfile(Integer id) {
+    Profile target = getTarget(id);
+    stopNotOwnerOf(target);
+    target.setStatus(false);
+    profileRepository.save(target);
+  }
+
+  private void stopNotOwnerOf(Profile target) {
+    if (!Objects.equals(target.getOwnerId(), auther.getUserFromAuth().getId())) {
+      throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
+    }
   }
 
 }

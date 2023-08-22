@@ -333,6 +333,13 @@ public class UserService {
       updateContacts(profile, dto.getContacts());
     }
 
+    if (dto.getAvatarId() != null) {
+      profile.setAvatar(s3Service.getById(dto.getAvatarId()));
+    }
+    if (dto.getBackgroundId() != null) {
+      profile.setBackground(s3Service.getById(dto.getBackgroundId()));
+    }
+
     return profileRepository.save(profile);
   }
 

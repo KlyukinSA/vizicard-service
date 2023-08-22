@@ -41,4 +41,8 @@ public class S3Service {
     public String getUrlById(Integer id) {
         return cloudFileRepository.getById(id).getUrl();
     }
+
+    public CloudFile getById(Integer id) {
+        return cloudFileRepository.findById(id).get();
+    }
 }

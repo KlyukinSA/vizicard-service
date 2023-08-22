@@ -16,8 +16,10 @@ public class ProfileUpdateDTO {
     private String description;
     @ApiModelProperty(position = 4)
     private String city;
-
     @ApiModelProperty(position = 5)
     private ContactRequest[] contacts;
+
+    private Integer avatarId;
+    private Integer backgroundId;
 
 }

@@ -17,22 +17,10 @@ public class CompanyController {
 
     private final UserService userService;
 
-    @PutMapping
+    @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ProfileResponseDTO updateMyCompany(@RequestBody ProfileUpdateDTO dto) {
-        return userService.updateMyCompany(dto);
-    }
-
-    @DeleteMapping
-    @PreAuthorize("isAuthenticated()")
-    public void deleteMyCompany() {
-        userService.deleteMyCompany();
-    }
-
-    @PostMapping("avatar")
-    @PreAuthorize("isAuthenticated()")
-    public ProfileResponseDTO updateMyCompanyAvatar(@RequestPart("file") MultipartFile file) throws IOException {
-        return userService.updateMyCompanyAvatar(file);
+    public ProfileResponseDTO createCompany(@RequestBody ProfileUpdateDTO dto) {
+        return userService.createCompany(dto);
     }
 
 }

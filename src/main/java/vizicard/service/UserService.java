@@ -72,11 +72,11 @@ public class UserService {
   }
 
   private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
-    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except education and contacts
-    res.setContacts(getContactDTOs(profile));
-    if (profile.getCompany() == null || !profile.getCompany().isStatus()) {
+    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
+    if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO same checks
       res.setCompany(null);
     }
+    res.setContacts(getContactDTOs(profile));
     res.setAbout(getAbout(profile));
     return res;
   }
@@ -178,7 +178,8 @@ public class UserService {
     if (isGoodForVcard(profile.getDescription())) {
       vcard.addNote(profile.getDescription());
     }
-    if (profile.getCompany() != null && isGoodForVcard(profile.getCompany().getName())) {
+    if (profile.getCompany() != null && profile.getCompany().isStatus() &&
+            isGoodForVcard(profile.getCompany().getName())) {
       vcard.setOrganization(profile.getCompany().getName());
     }
     if (isGoodForVcard(profile.getCity())) {
@@ -284,7 +285,7 @@ public class UserService {
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
 
-  public ProfileResponseDTO updateMyCompany(ProfileUpdateDTO dto) {
+  public ProfileResponseDTO createCompany(ProfileUpdateDTO dto) {
     Profile user = auther.getUserFromAuth();
     Profile company = user.getCompany();
     if (company == null || !company.isStatus()) {
@@ -294,6 +295,8 @@ public class UserService {
       profileRepository.save(company);
       user.setCompany(company);
       profileRepository.save(user);
+    } else {
+      throw new CustomException("You already have a company", HttpStatus.BAD_REQUEST);
     }
     return getProfileResponseDTO(updateProfile(company, dto));
   }
@@ -334,19 +337,6 @@ public class UserService {
       throw exception;
     }
     return profile;
-  }
-
-  public void deleteMyCompany() {
-    Profile user = auther.getUserFromAuth();
-    user.getCompany().setStatus(false);
-    profileRepository.save(user.getCompany());
-  }
-
-  public ProfileResponseDTO updateMyCompanyAvatar(MultipartFile file) throws IOException {
-    Profile company = auther.getUserFromAuth().getCompany();
-    company.setAvatar(s3Service.uploadFile(file));
-    profileRepository.save(company);
-    return getProfileResponseDTO(company);
   }
 
   public ProfileResponseDTO updateMyLastVizit() {

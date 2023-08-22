@@ -54,21 +54,6 @@ public class UserController {
     return userService.update(id, dto);
   }
 
-  @PostMapping("/me/avatar")
-  @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.updateAvatar}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
-  public ProfileResponseDTO updateAvatar(@RequestPart("file") MultipartFile file) throws IOException {
-    return userService.updateAvatar(file);
-  }
-
-  @PostMapping("/me/background")
-  @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.updateAvatar}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
-  public ProfileResponseDTO updateBackground(@RequestPart("file") MultipartFile file) throws IOException {
-    return userService.updateBackground(file);
-  }
-
-//  @GetMapping(value = "/{id}/vcard")
   @PostMapping("/me/relations")
   public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
     return userService.relate(id);

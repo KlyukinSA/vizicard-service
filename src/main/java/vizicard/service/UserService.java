@@ -119,20 +119,6 @@ public class UserService {
     }
   }
 
-  public ProfileResponseDTO updateAvatar(MultipartFile file) throws IOException {
-    Profile user = auther.getUserFromAuth();
-    user.setAvatar(s3Service.uploadFile(file));
-    profileRepository.save(user);
-    return getProfileResponseDTO(user);
-  }
-
-  public ProfileResponseDTO updateBackground(MultipartFile file) throws IOException {
-    Profile user = auther.getUserFromAuth();
-    user.setBackground(s3Service.uploadFile(file));
-    profileRepository.save(user);
-    return getProfileResponseDTO(user);
-  }
-
   public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
     Profile target = getTarget(targetProfileId);
 
@@ -171,7 +157,7 @@ public class UserService {
             .body(new InputStreamResource(new ByteArrayInputStream(vcardBytes)));
   }
 
-  public byte[] getVcardBytes(VCard vcard) throws IOException {
+  private byte[] getVcardBytes(VCard vcard) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     VCardWriter writer = new VCardWriter(outputStream, VCardVersion.V3_0);
     writer.getVObjectWriter().getFoldedLineWriter().setLineLength(null);
@@ -340,7 +326,7 @@ public class UserService {
     return profileRepository.save(profile);
   }
 
-  Profile getTarget(Integer id) {
+  private Profile getTarget(Integer id) {
     CustomException exception = new CustomException("The profile doesn't exist", HttpStatus.NOT_FOUND);
     Profile profile = profileRepository.findById(id)
             .orElseThrow(() -> exception);

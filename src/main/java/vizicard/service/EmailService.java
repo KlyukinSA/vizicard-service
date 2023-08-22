@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,14 +23,15 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendRelation(String to, String fileName, byte[] vCardBytes, String ownerName, Integer ownerId) throws MessagingException {
+    public void sendRelation(String to, String ownerName, Integer ownerId) throws MessagingException {
+        String text = getRelationText(ownerName, String.valueOf(ownerId));
+
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setSubject("Новый контакт");
         helper.setFrom(vizicardEmail);
         helper.setTo(to);
-        helper.setText(getRelationText(ownerName, String.valueOf(ownerId)), true);
-        helper.addAttachment(fileName, new ByteArrayDataSource(vCardBytes, "text/vcard"));
+        helper.setSubject("Новый контакт");
+        helper.setText(text, true);
         emailSender.send(message);
     }
 

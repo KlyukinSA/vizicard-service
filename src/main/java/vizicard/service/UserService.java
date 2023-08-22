@@ -140,8 +140,11 @@ public class UserService {
     Profile owner = auther.getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
       try {
-        emailService.sendRelation(getRelationEmail(owner), fileName, vCardBytes, owner.getName(), owner.getId());
-      } catch (Exception ignored) {}
+        emailService.sendRelation(target.getUsername(), owner.getName(), owner.getId());
+      } catch (Exception e) {
+        System.out.println("tried to send message from " + owner.getId() + " to " + target.getId() + "\nbut\n");
+        e.printStackTrace();
+      }
 
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null) {
@@ -156,10 +159,6 @@ public class UserService {
 
   private String getVcardFileName(Profile target) {
     return target.getName() + ".vcf";
-  }
-
-  private String getRelationEmail(Profile profile) {
-    return profile.getUsername();
   }
 
   private ResponseEntity<?> getVcardResponse(byte[] vcardBytes, String fileName) {

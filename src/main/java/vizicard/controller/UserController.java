@@ -48,14 +48,10 @@ public class UserController {
     return userService.whoami();
   }
 
-  @PutMapping("/me")
+  @PutMapping("{id}")
   @PreAuthorize("isAuthenticated()")
-  @ApiOperation(value = "${UserController.update}", response = ProfileResponseDTO.class, authorizations = { @Authorization(value="apiKey") })
-  @ApiResponses(value = {//
-          @ApiResponse(code = 400, message = "Something went wrong"), //
-          @ApiResponse(code = 403, message = "Access denied")})
-  public ProfileResponseDTO update(@ApiParam("Update User") @RequestBody ProfileUpdateDTO dto) {
-    return userService.updateMe(dto);
+  public ProfileResponseDTO update(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
+    return userService.update(id, dto);
   }
 
   @PostMapping("/me/avatar")

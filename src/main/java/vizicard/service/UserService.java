@@ -65,8 +65,13 @@ public class UserService {
     return getProfileResponseDTO(auther.getUserFromAuth());
   }
 
-  public ProfileResponseDTO updateMe(ProfileUpdateDTO dto) {
-    return getProfileResponseDTO(updateProfile(auther.getUserFromAuth(), dto));
+  public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
+    Profile user = auther.getUserFromAuth();
+    Profile target = getTarget(id);
+    if (!Objects.equals(target.getOwnerId(), user.getId())) {
+      throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
+    }
+    return getProfileResponseDTO(updateProfile(target, dto));
   }
 
   private ProfileResponseDTO getProfileResponseDTO(Profile profile) {

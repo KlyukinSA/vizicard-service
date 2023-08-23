@@ -36,14 +36,17 @@ public class ProfileResponseDTO {
   private Date createAt;
 
   @ApiModelProperty(position = 11)
-  private ProfileType profileType;
-  @ApiModelProperty(position = 12)
+  private ProfileType type;
+  @ApiModelProperty(position = 13)
   private BriefResponseDTO company;
 
-  @ApiModelProperty(position = 13)
+  @ApiModelProperty(position = 14)
   private Date lastVizit;
 
-  @ApiModelProperty(position = 14)
+  @ApiModelProperty(position = 15)
   private ProfileDetailStructResponseDTO about;
+
+  @ApiModelProperty(position = 12)
+  private Integer ownerId;
 
 }

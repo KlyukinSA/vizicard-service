@@ -27,5 +27,7 @@ public class ProfileUpdateDTO {
 
     @ApiModelProperty(position = 0)
     private ProfileType profileType;
+    @ApiModelProperty(position = 8)
+    private Integer companyId;
 
 }

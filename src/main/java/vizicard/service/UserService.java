@@ -290,43 +290,13 @@ public class UserService {
   }
 
   public ProfileResponseDTO createProfile(ProfileUpdateDTO dto) {
-    dto.getName().length();
     Profile owner = auther.getUserFromAuth();
-    Profile res = null;
-    if (dto.getProfileType() == ProfileType.COMPANY) {
-      res = createCompany(owner);
-    } else {
-      res = createRelatedProfile(owner);
-    }
-    return getProfileResponseDTO(updateProfile(res, dto));
-  }
-
-  private Profile createRelatedProfile(Profile owner) {
     Profile profile = new Profile();
-    profile.setName("");
-    profile.setProfileType(ProfileType.USER);
     profile.setOwnerId(owner.getId());
+    profile.setProfileType(dto.getProfileType());
     profile = profileRepository.save(profile);
     relationRepository.save(new Relation(owner, profile));
-    return profile;
-  }
-
-  private Profile createCompany(Profile owner) {
-    Profile company = owner.getCompany();
-    if (company == null || !company.isStatus()) {
-
-      company = new Profile();
-      company.setName("");
-      company.setProfileType(ProfileType.COMPANY);
-      company.setOwnerId(owner.getId());
-      profileRepository.save(company);
-
-      owner.setCompany(company);
-      profileRepository.save(owner);
-    } else {
-      throw new CustomException("You already have a company", HttpStatus.BAD_REQUEST);
-    }
-    return company;
+    return getProfileResponseDTO(updateProfile(profile, dto));
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
@@ -348,6 +318,10 @@ public class UserService {
     }
     if (dto.getBackgroundId() != null) {
       profile.setBackground(s3Service.getById(dto.getBackgroundId()));
+    }
+
+    if (dto.getCompanyId() != null) {
+      profile.setCompany(getTarget(dto.getCompanyId()));
     }
 
     profile = profileRepository.save(profile);

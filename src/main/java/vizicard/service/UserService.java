@@ -9,6 +9,7 @@ import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForInstant;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -288,22 +289,44 @@ public class UserService {
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
 
-  public ProfileResponseDTO createCompany(ProfileUpdateDTO dto) {
-    Profile user = auther.getUserFromAuth();
-    Profile company = user.getCompany();
+  public ProfileResponseDTO createProfile(ProfileUpdateDTO dto) {
+    dto.getName().length();
+    Profile owner = auther.getUserFromAuth();
+    Profile res = null;
+    if (dto.getProfileType() == ProfileType.COMPANY) {
+      res = createCompany(owner);
+    } else {
+      res = createRelatedProfile(owner);
+    }
+    return getProfileResponseDTO(updateProfile(res, dto));
+  }
+
+  private Profile createRelatedProfile(Profile owner) {
+    Profile profile = new Profile();
+    profile.setName("");
+    profile.setProfileType(ProfileType.USER);
+    profile.setOwnerId(owner.getId());
+    profile = profileRepository.save(profile);
+    relationRepository.save(new Relation(owner, profile));
+    return profile;
+  }
+
+  private Profile createCompany(Profile owner) {
+    Profile company = owner.getCompany();
     if (company == null || !company.isStatus()) {
 
       company = new Profile();
+      company.setName("");
       company.setProfileType(ProfileType.COMPANY);
-      company.setOwnerId(user.getId());
-      company = updateProfile(company, dto);
+      company.setOwnerId(owner.getId());
+      profileRepository.save(company);
 
-      user.setCompany(company);
-      profileRepository.save(user);
+      owner.setCompany(company);
+      profileRepository.save(owner);
     } else {
       throw new CustomException("You already have a company", HttpStatus.BAD_REQUEST);
     }
-    return getProfileResponseDTO(company);
+    return company;
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

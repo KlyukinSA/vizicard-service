@@ -83,6 +83,9 @@ public class UserService {
 
   private ProfileDetailStructResponseDTO getAbout(Profile profile) {
       ProfileDetailStruct detailStruct = profile.getDetailStruct();
+      if (detailStruct == null) {
+        return null;
+      }
       return new ProfileDetailStructResponseDTO(
             detailStruct.getEducation().stream()
                     .filter(Education::isStatus)
@@ -289,16 +292,18 @@ public class UserService {
     Profile user = auther.getUserFromAuth();
     Profile company = user.getCompany();
     if (company == null || !company.isStatus()) {
+
       company = new Profile();
-      company.setName(dto.getName());
       company.setProfileType(ProfileType.COMPANY);
-      profileRepository.save(company);
+      company.setOwnerId(user.getId());
+      company = updateProfile(company, dto);
+
       user.setCompany(company);
       profileRepository.save(user);
     } else {
       throw new CustomException("You already have a company", HttpStatus.BAD_REQUEST);
     }
-    return getProfileResponseDTO(updateProfile(company, dto));
+    return getProfileResponseDTO(company);
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
@@ -315,10 +320,6 @@ public class UserService {
       profile.setCity(dto.getCity());
     }
 
-    if (dto.getContacts() != null) {
-      updateContacts(profile, dto.getContacts());
-    }
-
     if (dto.getAvatarId() != null) {
       profile.setAvatar(s3Service.getById(dto.getAvatarId()));
     }
@@ -326,7 +327,13 @@ public class UserService {
       profile.setBackground(s3Service.getById(dto.getBackgroundId()));
     }
 
-    return profileRepository.save(profile);
+    profile = profileRepository.save(profile);
+
+    if (dto.getContacts() != null) {
+      updateContacts(profile, dto.getContacts());
+    }
+
+    return profile;
   }
 
   private Profile getTarget(Integer id) {

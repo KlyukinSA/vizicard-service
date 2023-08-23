@@ -312,14 +312,26 @@ public class ProfileService {
     }
 
     if (dto.getAvatarId() != null) {
-      profile.setAvatar(s3Service.getById(dto.getAvatarId()));
+      if (dto.getAvatarId().equals(0)) {
+        profile.setAvatar(null);
+      } else {
+        profile.setAvatar(s3Service.getById(dto.getAvatarId()));
+      }
     }
     if (dto.getBackgroundId() != null) {
-      profile.setBackground(s3Service.getById(dto.getBackgroundId()));
+      if (dto.getBackgroundId().equals(0)) {
+        profile.setBackground(null);
+      } else {
+        profile.setBackground(s3Service.getById(dto.getBackgroundId()));
+      }
     }
 
     if (dto.getCompanyId() != null) {
-      profile.setCompany(getTarget(dto.getCompanyId()));
+      if (dto.getCompanyId().equals(0)) {
+        profile.setCompany(null);
+      } else {
+        profile.setCompany(getTarget(dto.getCompanyId()));
+      }
     }
 
     profile = profileRepository.save(profile);

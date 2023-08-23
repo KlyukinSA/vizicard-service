@@ -10,7 +10,7 @@ import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.service.detail.EducationService;
 
 @RestController
-@RequestMapping("users/me/education")
+@RequestMapping("profiles/me/education")
 @RequiredArgsConstructor
 public class EducationController {
 

@@ -11,7 +11,7 @@ import vizicard.service.detail.ExperienceService;
 import vizicard.service.detail.SkillService;
 
 @RestController
-@RequestMapping("users/me/skills")
+@RequestMapping("profiles/me/skills")
 @RequiredArgsConstructor
 public class SkillController {
 

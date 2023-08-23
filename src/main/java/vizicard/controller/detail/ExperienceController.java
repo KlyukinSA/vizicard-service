@@ -11,7 +11,7 @@ import vizicard.service.detail.EducationService;
 import vizicard.service.detail.ExperienceService;
 
 @RestController
-@RequestMapping("users/me/experience")
+@RequestMapping("profiles/me/experience")
 @RequiredArgsConstructor
 public class ExperienceController {
 

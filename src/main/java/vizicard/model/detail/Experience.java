@@ -19,6 +19,7 @@ public class Experience extends DetailBase {
     private Date startAt;
     @Column(columnDefinition = "TIMESTAMP(0)")
     private Date finishAt;
+    private String tasks;
 
     public Experience(Profile user) {
         super(user);

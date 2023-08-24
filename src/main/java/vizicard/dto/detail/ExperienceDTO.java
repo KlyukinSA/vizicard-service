@@ -15,4 +15,5 @@ public class ExperienceDTO {
     private String position;
     private Date startAt;
     private Date finishAt;
+    private String tasks;
 }

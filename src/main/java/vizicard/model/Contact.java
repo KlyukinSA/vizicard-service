@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "contact_type_id"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "type_id"}))
 public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class Contact {
 
     @OneToOne
     @JoinColumn(nullable = false)
-    private ContactType contactType;
+    private ContactType type;
 
     @Column(nullable = false, length = 200)
     private String contact;

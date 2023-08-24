@@ -107,9 +107,9 @@ public class ProfileService {
     }
     return profile.getContacts().stream()
             .map((val) -> new ContactDTO(
-                    val.getContactType().getContactEnum(),
+                    val.getType().getType(),
                     val.getContact(),
-                    val.getContactType().getLogo().getUrl())
+                    val.getType().getLogo().getUrl())
     ).collect(Collectors.toList());
   }
 

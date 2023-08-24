@@ -45,7 +45,7 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   void save(CloudFile cloudFile, ContactEnum contactEnum) {
     ContactType contactType = new ContactType();
-    contactType.setContactEnum(contactEnum);
+    contactType.setType(contactEnum);
     contactType.setLogo(cloudFile);
     contactTypeRepository.save(contactType);
   }

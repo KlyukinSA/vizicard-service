@@ -15,7 +15,7 @@ public class ContactType { // TODO GET all
 
     @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false) // TODO make as id
-    private ContactEnum contactEnum;
+    private ContactEnum type;
 
     @OneToOne
     private CloudFile logo;

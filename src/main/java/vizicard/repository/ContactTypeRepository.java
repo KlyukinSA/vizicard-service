@@ -7,5 +7,5 @@ import vizicard.model.ContactType;
 import java.util.List;
 
 public interface ContactTypeRepository extends JpaRepository<ContactType, Integer> {
-    ContactType findByContactEnum(ContactEnum contactEnum);
+    ContactType findByType(ContactEnum type);
 }

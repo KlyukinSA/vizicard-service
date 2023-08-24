@@ -17,13 +17,13 @@ public class ContactUpdater {
     private final ContactTypeRepository contactTypeRepository;
 
     public void updateContact(Profile owner, ContactRequest dto) {
-        ContactType contactType = contactTypeRepository.findByContactEnum(dto.getType());
-        Contact contact = contactRepository.findByOwnerAndContactType(owner, contactType);
+        ContactType contactType = contactTypeRepository.findByType(dto.getType());
+        Contact contact = contactRepository.findByOwnerAndType(owner, contactType);
         if (contact != null) {
             contact.setContact(dto.getContact());
         } else {
             contact = new Contact();
-            contact.setContactType(contactType);
+            contact.setType(contactType);
             contact.setOwner(owner);
             contact.setContact(dto.getContact());
         }

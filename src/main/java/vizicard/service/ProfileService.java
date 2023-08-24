@@ -49,23 +49,23 @@ public class ProfileService {
   private final ContactUpdater contactUpdater;
 
   private final ModelMapper modelMapper;
-  private final ProfileProvider auther;
+  private final ProfileProvider profileProvider;
 
   private final S3Service s3Service;
   private final EmailService emailService;
 
   public ProfileResponseDTO search(Integer id) {
-    Profile profile = getTarget(id);
-    actionRepository.save(new Action(auther.getUserFromAuth(), profile, ActionType.VIZIT));
+    Profile profile = profileProvider.getTarget(id);
+    actionRepository.save(new Action(profileProvider.getUserFromAuth(), profile, ActionType.VIZIT));
     return getProfileResponseDTO(profile);
   }
 
   public ProfileResponseDTO whoami() {
-    return getProfileResponseDTO(auther.getUserFromAuth());
+    return getProfileResponseDTO(profileProvider.getUserFromAuth());
   }
 
   public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
-    Profile target = getTarget(id);
+    Profile target = profileProvider.getTarget(id);
     stopNotOwnerOf(target);
     return getProfileResponseDTO(updateProfile(target, dto));
   }
@@ -122,12 +122,12 @@ public class ProfileService {
   }
 
   public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
-    Profile target = getTarget(targetProfileId);
+    Profile target = profileProvider.getTarget(targetProfileId);
 
     byte[] vCardBytes = getVcardBytes(getVcard(target)); // TODO class VcardFile
     String fileName = getVcardFileName(target); //
 
-    Profile owner = auther.getUserFromAuth();
+    Profile owner = profileProvider.getUserFromAuth();
     if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
       try {
         emailService.sendRelation(target.getUsername(), owner.getName(), owner.getId());
@@ -228,9 +228,9 @@ public class ProfileService {
   }
 
   public void unrelate(Integer targetProfileId) {
-    Profile target = getTarget(targetProfileId);
+    Profile target = profileProvider.getTarget(targetProfileId);
 
-    Profile owner = auther.getUserFromAuth();
+    Profile owner = profileProvider.getUserFromAuth();
     Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
     if (relation == null) {
       throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
@@ -239,16 +239,16 @@ public class ProfileService {
   }
 
   public List<RelationResponseDTO> getRelations() {
-    Profile owner = auther.getUserFromAuth();
+    Profile owner = profileProvider.getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
             .stream().map((val) -> modelMapper.map(val, RelationResponseDTO.class))
             .collect(Collectors.toList());
   }
 
   public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
-    Profile target = getTarget(targetProfileId);
+    Profile target = profileProvider.getTarget(targetProfileId);
 
-    Profile author = auther.getUserFromAuth();
+    Profile author = profileProvider.getUserFromAuth();
     if (author != null) {
       if (Objects.equals(target.getId(), author.getId())) return;
       Relation relation = relationRepository.findByOwnerAndProfile(target, author);
@@ -271,12 +271,12 @@ public class ProfileService {
   }
 
   public void addClickAction(Integer targetProfileId) {
-    Profile target = getTarget(targetProfileId);
-    actionRepository.save(new Action(auther.getUserFromAuth(), target, ActionType.CLICK));
+    Profile target = profileProvider.getTarget(targetProfileId);
+    actionRepository.save(new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK));
   }
 
   public PageActionDTO getPageStats() {
-    Profile user = auther.getUserFromAuth();
+    Profile user = profileProvider.getUserFromAuth();
 
     Date stop = Date.from(Instant.now());
     Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
@@ -288,7 +288,7 @@ public class ProfileService {
   }
 
   public ProfileResponseDTO createProfile(ProfileCreateDTO dto) {
-    Profile owner = auther.getUserFromAuth();
+    Profile owner = profileProvider.getUserFromAuth();
     Profile profile = new Profile();
     profile.setOwnerId(owner.getId());
     profile.setType(dto.getType());
@@ -331,7 +331,7 @@ public class ProfileService {
       if (dto.getCompanyId().equals(0)) {
         profile.setCompany(null);
       } else {
-        profile.setCompany(getTarget(dto.getCompanyId()));
+        profile.setCompany(profileProvider.getTarget(dto.getCompanyId()));
       }
     }
 
@@ -344,32 +344,22 @@ public class ProfileService {
     return profile;
   }
 
-  private Profile getTarget(Integer id) {
-    CustomException exception = new CustomException("The profile doesn't exist", HttpStatus.NOT_FOUND);
-    Profile profile = profileRepository.findById(id)
-            .orElseThrow(() -> exception);
-    if (!profile.isStatus()) {
-      throw exception;
-    }
-    return profile;
-  }
-
   public ProfileResponseDTO updateMyLastVizit() {
-    Profile user = auther.getUserFromAuth();
+    Profile user = profileProvider.getUserFromAuth();
     user.setLastVizit(new Date());
     profileRepository.save(user);
     return getProfileResponseDTO(user);
   }
 
   public void deleteProfile(Integer id) {
-    Profile target = getTarget(id);
+    Profile target = profileProvider.getTarget(id);
     stopNotOwnerOf(target);
     target.setStatus(false);
     profileRepository.save(target);
   }
 
   private void stopNotOwnerOf(Profile target) {
-    if (!Objects.equals(target.getOwnerId(), auther.getUserFromAuth().getId())) {
+    if (!Objects.equals(target.getOwnerId(), profileProvider.getUserFromAuth().getId())) {
       throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
     }
   }

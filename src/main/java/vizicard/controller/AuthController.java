@@ -32,7 +32,7 @@ public class AuthController {
             @ApiResponse(code = 400, message = "Something went wrong"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 422, message = "Username is already in use")})
-    public String signup(@ApiParam("Signup User") @RequestBody UserSignupDTO dto) {
+    public String signup(@RequestBody UserSignupDTO dto) {
         return authService.signup(dto);
     }
 

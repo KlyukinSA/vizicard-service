@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import vizicard.model.Publication;
 import vizicard.service.ProfileService;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class ProfileController {
       @ApiResponse(code = 403, message = "Access denied"), //
       @ApiResponse(code = 404, message = "The user doesn't exist"), //
       @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
-  public ProfileResponseDTO search(@ApiParam("Username") @PathVariable Integer id) {
+  public ProfileResponseDTO search(@PathVariable Integer id) {
     return profileService.search(id);
   }
 

@@ -23,7 +23,7 @@ import vizicard.utils.ContactUpdater;
 public class AuthService {
 
     private final ProfileRepository profileRepository;
-    private final ContactUpdater contactUpdater;
+//    private final ContactUpdater contactUpdater;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -46,7 +46,7 @@ public class AuthService {
         Profile profile = modelMapper.map(dto, Profile.class);
         if (!profileRepository.existsByUsername(profile.getUsername())) {
             profile = saveNewProfileBasedOn(profile);
-            contactUpdater.updateContact(profile, new ContactRequest(ContactEnum.MAIL, profile.getUsername()));
+//            contactUpdater.updateContact(profile, new ContactRequest(ContactEnum.MAIL, profile.getUsername()));
             return jwtTokenProvider.createToken(String.valueOf(profile.getId()));
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);

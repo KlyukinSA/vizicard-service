@@ -2,16 +2,12 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import vizicard.model.detail.Education;
 import vizicard.model.detail.ProfileDetailStruct;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 
 @Entity
 @Data
@@ -50,7 +46,7 @@ public class Profile {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private ProfileType profileType;
+  private ProfileType type;
 
   @OneToOne
   private Profile company;

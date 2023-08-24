@@ -55,7 +55,7 @@ public class AuthService {
 
     private Profile saveNewProfileBasedOn(Profile profile) {
         profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-        profile.setProfileType(ProfileType.USER);
+        profile.setType(ProfileType.USER);
         profile.setOwnerId(1);
         profile = profileRepository.save(profile);
         profile.setOwnerId(profile.getId());

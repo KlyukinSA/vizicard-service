@@ -291,7 +291,7 @@ public class ProfileService {
     Profile owner = auther.getUserFromAuth();
     Profile profile = new Profile();
     profile.setOwnerId(owner.getId());
-    profile.setProfileType(dto.getProfileType());
+    profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile = profileRepository.save(profile);
     relationRepository.save(new Relation(owner, profile));

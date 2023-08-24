@@ -98,7 +98,7 @@ public class ProfileController {
 
   @PostMapping
   @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO createProfile(@RequestBody ProfileUpdateDTO dto) {
+  public ProfileResponseDTO createProfile(@RequestBody ProfileCreateDTO dto) {
     return profileService.createProfile(dto);
   }
 

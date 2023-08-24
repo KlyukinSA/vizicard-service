@@ -287,11 +287,12 @@ public class ProfileService {
     return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
 
-  public ProfileResponseDTO createProfile(ProfileUpdateDTO dto) {
+  public ProfileResponseDTO createProfile(ProfileCreateDTO dto) {
     Profile owner = auther.getUserFromAuth();
     Profile profile = new Profile();
     profile.setOwnerId(owner.getId());
     profile.setProfileType(dto.getProfileType());
+    profile.setName(dto.getName());
     profile = profileRepository.save(profile);
     relationRepository.save(new Relation(owner, profile));
     return getProfileResponseDTO(updateProfile(profile, dto));

@@ -17,6 +17,7 @@ public class Education extends DetailBase {
     private String specialization;
     @Column(columnDefinition = "TIMESTAMP(0)")
     private Date graduationAt;
+    private EducationLevel level;
 
     public Education(Profile user) {
         super(user);

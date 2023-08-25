@@ -56,6 +56,9 @@ public class ProfileService {
 
   public ProfileResponseDTO search(Integer id) {
     Profile profile = profileProvider.getTarget(id);
+    if (profile.getType() == ProfileType.CUSTOM) {
+      stopNotOwnerOf(profile);
+    }
     actionRepository.save(new Action(profileProvider.getUserFromAuth(), profile, ActionType.VIZIT));
     return getProfileResponseDTO(profile);
   }
@@ -359,7 +362,8 @@ public class ProfileService {
   }
 
   private void stopNotOwnerOf(Profile target) {
-    if (!Objects.equals(target.getOwnerId(), profileProvider.getUserFromAuth().getId())) {
+    if (profileProvider.getUserFromAuth() == null ||
+            !Objects.equals(target.getOwnerId(), profileProvider.getUserFromAuth().getId())) {
       throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
     }
   }

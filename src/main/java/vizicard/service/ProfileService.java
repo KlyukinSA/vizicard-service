@@ -53,13 +53,14 @@ public class ProfileService {
 
   private final S3Service s3Service;
   private final EmailService emailService;
+  private final ActionService actionService;
 
   public ProfileResponseDTO search(Integer id) {
     Profile profile = profileProvider.getTarget(id);
     if (profile.getType() == ProfileType.CUSTOM) {
       stopNotOwnerOf(profile);
     }
-    actionRepository.save(new Action(profileProvider.getUserFromAuth(), profile, ActionType.VIZIT));
+    actionService.vizit(profile);
     return getProfileResponseDTO(profile);
   }
 

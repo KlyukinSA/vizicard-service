@@ -40,8 +40,10 @@ public class Profile {
   private List<Contact> contacts;
 
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private CloudFile avatar;
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private CloudFile background;
 
   @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
@@ -52,6 +54,7 @@ public class Profile {
   private ProfileType type;
 
   @OneToOne
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Profile company;
 
   @Column(nullable = false)

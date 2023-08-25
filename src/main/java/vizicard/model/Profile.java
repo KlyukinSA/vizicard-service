@@ -2,6 +2,8 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import vizicard.model.detail.ProfileDetailStruct;
 
 import java.util.Date;
@@ -34,6 +36,7 @@ public class Profile {
   @Column(length = 50)
   private String city;
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Contact> contacts;
 
   @OneToOne
@@ -58,5 +61,31 @@ public class Profile {
   private Date lastVizit;
 
   private ProfileDetailStruct detailStruct;
+
+  // SQL settings
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Relation> relationsWhereOwner;
+  @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Relation> relationsWhereProfile;
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Publication> publicationsWhereOwner;
+  @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Publication> publicationsWhereProfile;
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Device> devices;
+
+  @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Action> actionsWhereActor;
+  @OneToMany(mappedBy = "page", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<Action> actionsWherePage;
 
 }

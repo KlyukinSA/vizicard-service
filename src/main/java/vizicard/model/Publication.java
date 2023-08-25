@@ -15,11 +15,11 @@ public class Publication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Profile owner;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Profile profile;
 
     private String title;

@@ -2,6 +2,7 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -10,11 +11,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "type_id"}))
 public class Contact {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Profile owner;
 

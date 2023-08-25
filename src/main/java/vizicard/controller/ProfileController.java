@@ -73,17 +73,6 @@ public class ProfileController {
     profileService.leadGenerate(id, dto);
   }
 
-  @PostMapping("/{id}/clicks")
-  void addClickAction(@PathVariable("id") Integer id) {
-    profileService.addClickAction(id);
-  }
-
-  @GetMapping("/me/actions")
-  @PreAuthorize("isAuthenticated()")
-  PageActionDTO getPageStats() {
-    return profileService.getPageStats();
-  }
-
   @PutMapping("/me/online")
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO updateMyLastVizit() {

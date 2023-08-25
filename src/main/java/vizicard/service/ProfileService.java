@@ -45,9 +45,8 @@ public class ProfileService {
 
   private final ProfileRepository profileRepository;
   private final RelationRepository relationRepository;
-  private final ActionRepository actionRepository;
-  private final ContactUpdater contactUpdater;
 
+  private final ContactUpdater contactUpdater;
   private final ModelMapper modelMapper;
   private final ProfileProvider profileProvider;
 
@@ -146,7 +145,7 @@ public class ProfileService {
       }
     }
 
-    actionRepository.save(new Action(owner, target, ActionType.SAVE));
+    actionService.save(owner, target);
 
     return getVcardResponse(vCardBytes, fileName);
   }
@@ -272,23 +271,6 @@ public class ProfileService {
       res += "\n\n" + getProfileResponseDTO(author);
     }
     return res;
-  }
-
-  public void addClickAction(Integer targetProfileId) {
-    Profile target = profileProvider.getTarget(targetProfileId);
-    actionRepository.save(new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK));
-  }
-
-  public PageActionDTO getPageStats() {
-    Profile user = profileProvider.getUserFromAuth();
-
-    Date stop = Date.from(Instant.now());
-    Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
-
-    Function<ActionType, Integer> f = (actionType) ->
-            actionRepository.countByPageAndCreateAtBetweenAndType(user, start, stop, actionType);
-
-    return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
   }
 
   public ProfileResponseDTO createProfile(ProfileCreateDTO dto) {

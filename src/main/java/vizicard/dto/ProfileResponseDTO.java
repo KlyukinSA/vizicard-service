@@ -29,8 +29,6 @@ public class ProfileResponseDTO {
 
   @ApiModelProperty(position = 8)
   private CloudFile avatar;
-  @ApiModelProperty(position = 9)
-  private CloudFile background;
 
   @ApiModelProperty(position = 10)
   private Date createAt;

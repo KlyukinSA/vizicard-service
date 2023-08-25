@@ -42,9 +42,6 @@ public class Profile {
   @OneToOne
   @OnDelete(action = OnDeleteAction.CASCADE)
   private CloudFile avatar;
-  @OneToOne
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private CloudFile background;
 
   @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
   private final Date createAt = new Date();

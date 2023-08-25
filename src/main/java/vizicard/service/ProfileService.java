@@ -305,13 +305,6 @@ public class ProfileService {
         profile.setAvatar(s3Service.getById(dto.getAvatarId()));
       }
     }
-    if (dto.getBackgroundId() != null) {
-      if (dto.getBackgroundId().equals(0)) {
-        profile.setBackground(null);
-      } else {
-        profile.setBackground(s3Service.getById(dto.getBackgroundId()));
-      }
-    }
 
     if (dto.getCompanyId() != null) {
       if (dto.getCompanyId().equals(0)) {

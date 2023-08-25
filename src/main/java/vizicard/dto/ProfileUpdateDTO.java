@@ -22,10 +22,8 @@ public class ProfileUpdateDTO {
 
     @ApiModelProperty(position = 6)
     private Integer avatarId;
-    @ApiModelProperty(position = 7)
-    private Integer backgroundId;
 
-    @ApiModelProperty(position = 8)
+    @ApiModelProperty(position = 7)
     private Integer companyId;
 
 }

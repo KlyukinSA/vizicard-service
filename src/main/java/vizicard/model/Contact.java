@@ -20,7 +20,7 @@ public class Contact {
     @JoinColumn(nullable = false)
     private Profile owner;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private ContactType type;
 

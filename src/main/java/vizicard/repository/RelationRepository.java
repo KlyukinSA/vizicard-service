@@ -11,4 +11,6 @@ public interface RelationRepository extends JpaRepository<Relation, Integer> {
     Relation findByOwnerAndProfile(Profile owner, Profile target);
 
     List<Relation> findAllByOwnerOrderByProfileNameAsc(Profile owner);
+
+    List<Relation> findAllByProfile(Profile target);
 }

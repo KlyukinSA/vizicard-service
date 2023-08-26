@@ -354,10 +354,8 @@ public class ProfileService {
             ProfileType.USER, ProfileType.CUSTOM, ProfileType.COMPANY));
 
     Profile group = profileProvider.getTarget(groupId);
-    Profile user = profileProvider.getUserFromAuth();
-    if (!Objects.equals(group.getOwnerId(), user.getId())) {
-      throw new CustomException("You are not owner of this group", HttpStatus.FORBIDDEN);
-    }
+    letGroupPass(group);
+    stopNotOwnerOf(group);
 
     for (Integer memberId : memberIds) {
       Profile profile = profileProvider.getTarget(memberId);
@@ -373,6 +371,25 @@ public class ProfileService {
             .filter(Profile::isStatus)
             .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
             .collect(Collectors.toList());
+  }
+
+  public List<BriefResponseDTO> getAllGroupMembers(Integer groupId) {
+    Profile group = profileProvider.getTarget(groupId);
+    letGroupPass(group);
+    Integer ownerId = group.getOwnerId();
+
+    return relationRepository.findAllByProfile(group).stream()
+            .map(Relation::getOwner)
+            .filter(Profile::isStatus)
+            .filter((val) -> !Objects.equals(val.getId(), ownerId))
+            .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
+            .collect(Collectors.toList());
+  }
+
+  void letGroupPass(Profile group) {
+    if (group.getType() != ProfileType.GROUP) {
+      throw new CustomException("This profile should be a group", HttpStatus.FORBIDDEN);
+    }
   }
 
 }

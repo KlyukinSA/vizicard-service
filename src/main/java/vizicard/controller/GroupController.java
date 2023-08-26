@@ -15,6 +15,12 @@ public class GroupController {
 
     private final ProfileService profileService;
 
+    @GetMapping("/{id}/members")
+    @PreAuthorize("isAuthenticated()")
+    public List<BriefResponseDTO> getAllGroupMembers(@PathVariable("id") Integer groupId) {
+        return profileService.getAllGroupMembers(groupId);
+    }
+
     @PostMapping("{id}/members")
     @PreAuthorize("isAuthenticated()")
     public void addGroupMembers(@PathVariable("id") Integer groupId, @RequestBody List<Integer> memberIds) {

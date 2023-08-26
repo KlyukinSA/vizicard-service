@@ -7,8 +7,10 @@ import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vizicard.dto.CloudFileDTO;
 import vizicard.model.CloudFile;
 import vizicard.repository.CloudFileRepository;
+import vizicard.utils.ProfileProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +25,8 @@ public class S3Service {
     private final String bucketName = "2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2";
     private final CloudFileRepository cloudFileRepository;
 
+    private final ProfileProvider profileProvider;
+
     public CloudFile uploadFile(final MultipartFile file) throws AmazonClientException, IOException {
         String keyName = String.valueOf(UUID.randomUUID());
 
@@ -35,7 +39,7 @@ public class S3Service {
         URL url = s3Client.getUrl(bucketName, keyName);
 //        System.out.println(url);
 
-        return cloudFileRepository.save(new CloudFile(url.toString()));
+        return cloudFileRepository.save(new CloudFile(url.toString(), profileProvider.getUserFromAuth()));
     }
 
     public String getUrlById(Integer id) {
@@ -45,4 +49,5 @@ public class S3Service {
     public CloudFile getById(Integer id) {
         return cloudFileRepository.findById(id).get();
     }
+
 }

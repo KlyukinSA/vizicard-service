@@ -28,7 +28,7 @@ public class ProfileResponseDTO {
   private List<ContactDTO> contacts;
 
   @ApiModelProperty(position = 8)
-  private CloudFile avatar;
+  private CloudFileDTO avatar;
 
   @ApiModelProperty(position = 10)
   private Date createAt;

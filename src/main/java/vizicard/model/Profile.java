@@ -88,4 +88,8 @@ public class Profile {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Action> actionsWherePage;
 
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private List<CloudFile> files;
+
 }

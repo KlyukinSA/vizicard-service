@@ -35,7 +35,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   }
 
   void fillContactTypes() {
-    CloudFile cloudFile = cloudFileRepository.save(new CloudFile("empty"));
+    CloudFile cloudFile = cloudFileRepository.save(new CloudFile("empty", null));
 
     for (ContactEnum contactEnum : ContactEnum.class.getEnumConstants())
     {

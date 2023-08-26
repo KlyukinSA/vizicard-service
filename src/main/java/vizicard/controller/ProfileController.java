@@ -98,4 +98,10 @@ public class ProfileController {
     profileService.addGroupMembers(groupId, memberIds);
   }
 
+  @GetMapping("/me/groups")
+  @PreAuthorize("isAuthenticated()")
+  public List<BriefResponseDTO> getAllMyGroups() {
+    return profileService.getAllMyGroups();
+  }
+
 }

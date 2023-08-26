@@ -243,8 +243,9 @@ public class ProfileService {
 
   public List<RelationResponseDTO> getRelations() {
     Profile owner = profileProvider.getUserFromAuth();
-    return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner)
-            .stream().map((val) -> modelMapper.map(val, RelationResponseDTO.class))
+    return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner).stream()
+            .filter((val) -> val.getProfile().isStatus())
+            .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
             .collect(Collectors.toList());
   }
 
@@ -310,7 +311,11 @@ public class ProfileService {
       if (dto.getCompanyId().equals(0)) {
         profile.setCompany(null);
       } else {
-        profile.setCompany(profileProvider.getTarget(dto.getCompanyId()));
+        Profile company = profileProvider.getTarget(dto.getCompanyId());
+        profile.setCompany(company);
+        if (null == relationRepository.findByOwnerAndProfile(profile, company)) {
+          relationRepository.save(new Relation(profile, company));
+        }
       }
     }
 
@@ -361,4 +366,13 @@ public class ProfileService {
       }
     }
   }
+
+  public List<BriefResponseDTO> getAllMyGroups() {
+    Profile user = profileProvider.getUserFromAuth();
+    return profileRepository.findAllByOwnerIdAndType(user.getId(), ProfileType.GROUP).stream()
+            .filter(Profile::isStatus)
+            .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
+            .collect(Collectors.toList());
+  }
+
 }

@@ -92,4 +92,10 @@ public class ProfileController {
     return profileService.createProfile(dto);
   }
 
+  @PostMapping("{id}/group-members")
+  @PreAuthorize("isAuthenticated()")
+  public void addGroupMembers(@RequestParam Integer groupId, @RequestBody List<Integer> memberIds) {
+    profileService.addGroupMembers(groupId, memberIds);
+  }
+
 }

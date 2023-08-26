@@ -1,5 +1,5 @@
 package vizicard.model;
 
 public enum ProfileType {
-    USER, COMPANY, CUSTOM;
+    USER, COMPANY, CUSTOM, GROUP;
 }

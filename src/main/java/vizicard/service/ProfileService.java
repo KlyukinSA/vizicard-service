@@ -344,4 +344,21 @@ public class ProfileService {
     }
   }
 
+  public void addGroupMembers(Integer groupId, List<Integer> memberIds) {
+    Set<ProfileType> goodTypes = new HashSet<>(Arrays.asList(
+            ProfileType.USER, ProfileType.CUSTOM, ProfileType.COMPANY));
+
+    Profile group = profileProvider.getTarget(groupId);
+    Profile user = profileProvider.getUserFromAuth();
+    if (!Objects.equals(group.getOwnerId(), user.getId())) {
+      throw new CustomException("You are not owner of this group", HttpStatus.FORBIDDEN);
+    }
+
+    for (Integer memberId : memberIds) {
+      Profile profile = profileProvider.getTarget(memberId);
+      if (goodTypes.contains(profile.getType())) {
+        relationRepository.save(new Relation(profile, group));
+      }
+    }
+  }
 }

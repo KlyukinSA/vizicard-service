@@ -1,0 +1,30 @@
+package vizicard.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import vizicard.dto.BriefResponseDTO;
+import vizicard.service.ProfileService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/profiles")
+@RequiredArgsConstructor
+public class GroupController {
+
+    private final ProfileService profileService;
+
+    @PostMapping("{id}/members")
+    @PreAuthorize("isAuthenticated()")
+    public void addGroupMembers(@PathVariable("id") Integer groupId, @RequestBody List<Integer> memberIds) {
+        profileService.addGroupMembers(groupId, memberIds);
+    }
+
+    @GetMapping("/me/groups")
+    @PreAuthorize("isAuthenticated()")
+    public List<BriefResponseDTO> getAllMyGroups() {
+        return profileService.getAllMyGroups();
+    }
+
+}

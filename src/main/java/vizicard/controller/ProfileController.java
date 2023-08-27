@@ -56,12 +56,6 @@ public class ProfileController {
     return profileService.relate(id);
   }
 
-  @DeleteMapping("/me/relations/{id}")
-  @PreAuthorize("isAuthenticated()")
-  public void unrelate(@PathVariable("id") Integer id) {
-    profileService.unrelate(id);
-  }
-
   @GetMapping("/me/relations")
   @PreAuthorize("isAuthenticated()")
   public List<RelationResponseDTO> getRelations() {

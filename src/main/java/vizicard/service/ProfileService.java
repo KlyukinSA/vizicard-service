@@ -30,6 +30,7 @@ import vizicard.model.detail.Skill;
 import vizicard.repository.*;
 import vizicard.utils.ContactUpdater;
 import vizicard.utils.ProfileProvider;
+import vizicard.utils.RelationValidator;
 
 import java.io.*;
 import java.net.URL;
@@ -49,6 +50,7 @@ public class ProfileService {
   private final ContactUpdater contactUpdater;
   private final ModelMapper modelMapper;
   private final ProfileProvider profileProvider;
+  private final RelationValidator relationValidator;
 
   private final S3Service s3Service;
   private final EmailService emailService;
@@ -57,7 +59,7 @@ public class ProfileService {
   public ProfileResponseDTO search(Integer id) {
     Profile profile = profileProvider.getTarget(id);
     if (profile.getType() == ProfileType.CUSTOM) {
-      stopNotOwnerOf(profile);
+      relationValidator.stopNotOwnerOf(profile);
     }
     actionService.vizit(profile);
     return getProfileResponseDTO(profile);
@@ -69,7 +71,7 @@ public class ProfileService {
 
   public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
     Profile target = profileProvider.getTarget(id);
-    stopNotOwnerOf(target);
+    relationValidator.stopNotOwnerOf(target);
     return getProfileResponseDTO(updateProfile(target, dto));
   }
 
@@ -230,22 +232,10 @@ public class ProfileService {
     return string != null && string.length() > 0;
   }
 
-  public void unrelate(Integer targetProfileId) {
-    Profile target = profileProvider.getTarget(targetProfileId);
-
-    Profile owner = profileProvider.getUserFromAuth();
-    Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
-    if (relation == null) {
-      throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
-    }
-    relation.setStatus(false);
-    relationRepository.save(relation);
-  }
-
   public List<RelationResponseDTO> getRelations() {
     Profile owner = profileProvider.getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner).stream()
-            .filter(Relation::isStatus)
+            .filter(Relation::isStatus) // TODO filer not owner
             .filter((val) -> val.getProfile().isStatus())
             .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
             .collect(Collectors.toList());
@@ -339,17 +329,9 @@ public class ProfileService {
 
   public void deleteProfile(Integer id) {
     Profile target = profileProvider.getTarget(id);
-    stopNotOwnerOf(target);
+    relationValidator.stopNotOwnerOf(target);
     target.setStatus(false);
     profileRepository.save(target);
-  }
-
-  private void stopNotOwnerOf(Profile target) {
-    Profile user = profileProvider.getUserFromAuth();
-    Relation relation = relationRepository.findByOwnerAndProfile(user, target);
-    if (relation == null || relation.getType() != RelationType.OWNER) {
-      throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
-    }
   }
 
   public void addGroupMembers(Integer groupId, List<Integer> memberIds) {
@@ -358,7 +340,7 @@ public class ProfileService {
 
     Profile group = profileProvider.getTarget(groupId);
     letGroupPass(group);
-    stopNotOwnerOf(group);
+    relationValidator.stopNotOwnerOf(group);
 
     for (Integer memberId : memberIds) {
       Profile profile = profileProvider.getTarget(memberId);

@@ -34,9 +34,14 @@ public class Relation {
     @Column(nullable = false)
     private boolean status = true;
 
-    public Relation(Profile owner, Profile profile) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RelationType type;
+
+    public Relation(Profile owner, Profile profile, RelationType relationType) {
         this.owner = owner;
         this.profile = profile;
+        this.type = relationType;
     }
 
 }

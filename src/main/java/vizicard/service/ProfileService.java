@@ -141,7 +141,7 @@ public class ProfileService {
 
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
       if (relation == null || !relation.isStatus()) {
-        relationRepository.save(new Relation(owner, target));
+        relationRepository.save(new Relation(owner, target, RelationType.USUAL));
       }
     }
 
@@ -259,7 +259,7 @@ public class ProfileService {
       if (Objects.equals(target.getId(), author.getId())) return;
       Relation relation = relationRepository.findByOwnerAndProfile(target, author);
       if (relation == null || !relation.isStatus()) {
-        relationRepository.save(new Relation(target, author));
+        relationRepository.save(new Relation(target, author, RelationType.USUAL));
       }
     }
 
@@ -283,7 +283,7 @@ public class ProfileService {
     profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile = profileRepository.save(profile);
-    relationRepository.save(new Relation(owner, profile));
+    relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
     return getProfileResponseDTO(updateProfile(profile, dto));
   }
 
@@ -317,7 +317,7 @@ public class ProfileService {
         profile.setCompany(company);
         Relation relation = relationRepository.findByOwnerAndProfile(profile, company);
         if (relation == null || !relation.isStatus()) {
-          relationRepository.save(new Relation(profile, company));
+          relationRepository.save(new Relation(profile, company, RelationType.USUAL));
         }
       }
     }
@@ -363,7 +363,7 @@ public class ProfileService {
     for (Integer memberId : memberIds) {
       Profile profile = profileProvider.getTarget(memberId);
       if (goodTypes.contains(profile.getType())) {
-        relationRepository.save(new Relation(profile, group));
+        relationRepository.save(new Relation(profile, group, RelationType.USUAL));
       }
     }
   }

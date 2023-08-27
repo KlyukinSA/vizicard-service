@@ -279,7 +279,6 @@ public class ProfileService {
   public ProfileResponseDTO createProfile(ProfileCreateDTO dto) {
     Profile owner = profileProvider.getUserFromAuth();
     Profile profile = new Profile();
-    profile.setOwnerId(owner.getId());
     profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile = profileRepository.save(profile);
@@ -346,8 +345,9 @@ public class ProfileService {
   }
 
   private void stopNotOwnerOf(Profile target) {
-    if (profileProvider.getUserFromAuth() == null ||
-            !Objects.equals(target.getOwnerId(), profileProvider.getUserFromAuth().getId())) {
+    Profile user = profileProvider.getUserFromAuth();
+    Relation relation = relationRepository.findByOwnerAndProfile(user, target);
+    if (relation == null || relation.getType() != RelationType.OWNER) {
       throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
     }
   }
@@ -370,7 +370,8 @@ public class ProfileService {
 
   public List<BriefResponseDTO> getAllMyGroups() {
     Profile user = profileProvider.getUserFromAuth();
-    return profileRepository.findAllByOwnerIdAndType(user.getId(), ProfileType.GROUP).stream()
+    return relationRepository.findAllByOwnerAndProfileType(user, ProfileType.GROUP).stream()
+            .map(Relation::getProfile)
             .filter(Profile::isStatus)
             .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
             .collect(Collectors.toList());
@@ -379,7 +380,7 @@ public class ProfileService {
   public List<BriefResponseDTO> getAllGroupMembers(Integer groupId) {
     Profile group = profileProvider.getTarget(groupId);
     letGroupPass(group);
-    Integer ownerId = group.getOwnerId();
+    Integer ownerId = relationRepository.findByTypeAndProfile(RelationType.OWNER, group).getOwner().getId();
 
     return relationRepository.findAllByProfile(group).stream()
             .filter(Relation::isStatus)

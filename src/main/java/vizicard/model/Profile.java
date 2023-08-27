@@ -24,8 +24,6 @@ public class Profile {
   private String username;
   @Column(nullable = true, length = 70)
   private String password;
-  @Column(nullable = false)
-  private Integer ownerId;
 
   @Column(nullable = false, length = 50)
   private String name;

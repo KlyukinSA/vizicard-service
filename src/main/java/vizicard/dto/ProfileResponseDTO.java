@@ -44,7 +44,4 @@ public class ProfileResponseDTO {
   @ApiModelProperty(position = 15)
   private ProfileDetailStructResponseDTO about;
 
-  @ApiModelProperty(position = 12)
-  private Integer ownerId;
-
 }

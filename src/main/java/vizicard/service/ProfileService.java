@@ -140,7 +140,7 @@ public class ProfileService {
       }
 
       Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
-      if (relation == null) {
+      if (relation == null || !relation.isStatus()) {
         relationRepository.save(new Relation(owner, target));
       }
     }
@@ -238,12 +238,14 @@ public class ProfileService {
     if (relation == null) {
       throw new CustomException("No such relation", HttpStatus.NOT_MODIFIED);
     }
-    relationRepository.delete(relation);
+    relation.setStatus(false);
+    relationRepository.save(relation);
   }
 
   public List<RelationResponseDTO> getRelations() {
     Profile owner = profileProvider.getUserFromAuth();
     return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner).stream()
+            .filter(Relation::isStatus)
             .filter((val) -> val.getProfile().isStatus())
             .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
             .collect(Collectors.toList());
@@ -256,7 +258,7 @@ public class ProfileService {
     if (author != null) {
       if (Objects.equals(target.getId(), author.getId())) return;
       Relation relation = relationRepository.findByOwnerAndProfile(target, author);
-      if (relation == null) {
+      if (relation == null || !relation.isStatus()) {
         relationRepository.save(new Relation(target, author));
       }
     }
@@ -313,7 +315,8 @@ public class ProfileService {
       } else {
         Profile company = profileProvider.getTarget(dto.getCompanyId());
         profile.setCompany(company);
-        if (null == relationRepository.findByOwnerAndProfile(profile, company)) {
+        Relation relation = relationRepository.findByOwnerAndProfile(profile, company);
+        if (relation == null || !relation.isStatus()) {
           relationRepository.save(new Relation(profile, company));
         }
       }
@@ -379,6 +382,7 @@ public class ProfileService {
     Integer ownerId = group.getOwnerId();
 
     return relationRepository.findAllByProfile(group).stream()
+            .filter(Relation::isStatus)
             .map(Relation::getOwner)
             .filter(Profile::isStatus)
             .filter((val) -> !Objects.equals(val.getId(), ownerId))

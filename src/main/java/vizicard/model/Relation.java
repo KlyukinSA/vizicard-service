@@ -31,6 +31,9 @@ public class Relation {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
+    @Column(nullable = false)
+    private boolean status = true;
+
     public Relation(Profile owner, Profile profile) {
         this.owner = owner;
         this.profile = profile;

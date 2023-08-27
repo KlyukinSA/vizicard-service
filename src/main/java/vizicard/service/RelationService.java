@@ -23,13 +23,17 @@ public class RelationService {
     private final RelationValidator relationValidator;
 
     public void unrelate(Integer ownerId, Integer profileId) {
-        Profile owner = profileProvider.getTarget(ownerId);
+        Profile owner;
+        if (ownerId == null) {
+            owner = profileProvider.getUserFromAuth();
+        } else {
+            owner = profileProvider.getTarget(ownerId);
+            relationValidator.stopNotOwnerOf(owner);
+        }
         Profile target = profileProvider.getTarget(profileId);
 
-        relationValidator.stopNotOwnerOf(owner);
-
         Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
-        if (relation == null) {
+        if (relation == null || !relation.isStatus()) {
             throw new CustomException("No such relation", HttpStatus.CONFLICT);
         }
         relation.setStatus(false);

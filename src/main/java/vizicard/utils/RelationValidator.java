@@ -20,7 +20,7 @@ public class RelationValidator {
     public void stopNotOwnerOf(Profile target) {
         Profile user = profileProvider.getUserFromAuth();
         Relation relation = relationRepository.findByOwnerAndProfile(user, target);
-        if (relation == null || relation.getType() != RelationType.OWNER) {
+        if (relation == null || !relation.isStatus() || relation.getType() != RelationType.OWNER) {
             throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
         }
     }

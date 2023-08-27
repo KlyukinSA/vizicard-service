@@ -17,7 +17,7 @@ public class RelationController {
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public void unrelate(@RequestParam Integer owner, @RequestParam Integer profile) {
+    public void unrelate(@RequestParam(required = false) Integer owner, @RequestParam Integer profile) {
         relationService.unrelate(owner, profile);
     }
 

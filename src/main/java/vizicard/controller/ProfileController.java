@@ -56,12 +56,6 @@ public class ProfileController {
     return profileService.relate(id);
   }
 
-  @GetMapping("/me/relations")
-  @PreAuthorize("isAuthenticated()")
-  public List<RelationResponseDTO> getRelations() {
-    return profileService.getRelations();
-  }
-
   @PostMapping("/{id}/relations")
   public void leadGenerate(@PathVariable("id") Integer id, @RequestBody LeadGenerationDTO dto) {
     profileService.leadGenerate(id, dto);

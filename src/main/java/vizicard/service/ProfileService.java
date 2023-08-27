@@ -232,15 +232,6 @@ public class ProfileService {
     return string != null && string.length() > 0;
   }
 
-  public List<RelationResponseDTO> getRelations() {
-    Profile owner = profileProvider.getUserFromAuth();
-    return relationRepository.findAllByOwnerOrderByProfileNameAsc(owner).stream()
-            .filter(Relation::isStatus) // TODO filer not owner
-            .filter((val) -> val.getProfile().isStatus())
-            .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
-            .collect(Collectors.toList());
-  }
-
   public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
     Profile target = profileProvider.getTarget(targetProfileId);
 

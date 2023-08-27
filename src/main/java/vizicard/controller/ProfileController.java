@@ -51,16 +51,6 @@ public class ProfileController {
     return profileService.update(id, dto);
   }
 
-  @PostMapping("/me/relations")
-  public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
-    return profileService.relate(id);
-  }
-
-  @PostMapping("/{id}/relations")
-  public void leadGenerate(@PathVariable("id") Integer id, @RequestBody LeadGenerationDTO dto) {
-    profileService.leadGenerate(id, dto);
-  }
-
   @PutMapping("/me/online")
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO updateMyLastVizit() {

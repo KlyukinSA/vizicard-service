@@ -1,8 +1,10 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.LeadGenerationDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
@@ -27,6 +29,16 @@ public class RelationController {
     @PreAuthorize("isAuthenticated()")
     public List<RelationResponseDTO> getRelations() {
         return relationService.getRelations();
+    }
+
+    @PostMapping
+    public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
+        return relationService.relate(id);
+    }
+
+    @PostMapping("/lead")
+    public void leadGenerate(@RequestParam Integer id, @RequestBody LeadGenerationDTO dto) {
+        relationService.leadGenerate(id, dto);
     }
 
 }

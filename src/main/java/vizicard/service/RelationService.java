@@ -2,8 +2,12 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import vizicard.dto.LeadGenerationDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
@@ -12,7 +16,9 @@ import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
+import vizicard.utils.VcardFile;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -28,6 +34,9 @@ public class RelationService {
     private final RelationValidator relationValidator;
 
     private final ModelMapper modelMapper;
+
+    private final ActionService actionService;
+    private final EmailService emailService;
 
     public void unrelate(Integer ownerId, Integer profileId) {
         Profile owner;
@@ -55,6 +64,62 @@ public class RelationService {
                 .filter((val) -> val.getProfile().isStatus())
                 .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
+        Profile target = profileProvider.getTarget(targetProfileId);
+
+        Profile owner = profileProvider.getUserFromAuth();
+        if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
+            try {
+                emailService.sendRelation(target.getUsername(), owner.getName(), owner.getId());
+            } catch (Exception e) {
+                System.out.println("tried to send message from " + owner.getId() + " to " + target.getId() + "\nbut\n");
+                e.printStackTrace();
+            }
+
+            Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
+            if (relation == null || !relation.isStatus()) {
+                relationRepository.save(new Relation(owner, target, RelationType.USUAL));
+            }
+        }
+
+        actionService.save(owner, target);
+
+        return getVcardResponse(new VcardFile(target));
+    }
+
+    private ResponseEntity<?> getVcardResponse(VcardFile vcardFile) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("text/vcard"))
+                .header("Content-Disposition", "attachment; filename=\"" + vcardFile.getName() + '\"')
+                .contentLength(vcardFile.getBytes().length)
+                .body(new InputStreamResource(new ByteArrayInputStream(vcardFile.getBytes())));
+    }
+
+    public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
+        Profile target = profileProvider.getTarget(targetProfileId);
+
+        Profile author = profileProvider.getUserFromAuth();
+        if (author != null) {
+            if (Objects.equals(target.getId(), author.getId())) return;
+            Relation relation = relationRepository.findByOwnerAndProfile(target, author);
+            if (relation == null || !relation.isStatus()) {
+                relationRepository.save(new Relation(target, author, RelationType.USUAL));
+            }
+        }
+
+        try {
+            emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
+        } catch (Exception ignored) {}
+    }
+
+    private String getLeadGenMessage(LeadGenerationDTO dto, Profile author) {
+        String res = dto.toString();
+        if (author != null) {
+            res += "\n\n" + author;
+        }
+        return res;
     }
 
 }

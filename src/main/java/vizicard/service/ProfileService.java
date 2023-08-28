@@ -3,6 +3,7 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.*;
@@ -38,6 +39,7 @@ public class ProfileService {
   private final ProfileProvider profileProvider;
   private final RelationValidator relationValidator;
   private final ProfileMapper profileMapper;
+  private final PasswordEncoder passwordEncoder;
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
@@ -161,6 +163,10 @@ public class ProfileService {
           relationRepository.save(new Relation(profile, company, RelationType.USUAL));
         }
       }
+    }
+
+    if (dto.getPassword() != null) {
+      profile.setPassword(passwordEncoder.encode(dto.getPassword()));
     }
 
     profile = profileRepository.save(profile);

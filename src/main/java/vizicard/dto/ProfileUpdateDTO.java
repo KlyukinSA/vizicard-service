@@ -26,4 +26,6 @@ public class ProfileUpdateDTO {
     @ApiModelProperty(position = 7)
     private Integer companyId;
 
+    private String password;
+
 }

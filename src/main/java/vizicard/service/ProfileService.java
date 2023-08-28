@@ -46,6 +46,7 @@ public class ProfileService {
 
   private final ProfileRepository profileRepository;
   private final RelationRepository relationRepository; // TODO GroupService, RelationSaver
+  private final ShortnameRepository shortnameRepository;
 
   private final ContactUpdater contactUpdater;
   private final ModelMapper modelMapper;
@@ -131,7 +132,10 @@ public class ProfileService {
     profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile = profileRepository.save(profile);
+
     relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
+    shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
+
     return getProfileResponseDTO(updateProfile(profile, dto));
   }
 

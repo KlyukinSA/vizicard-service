@@ -17,7 +17,7 @@ public class Shortname {
     @ManyToOne(fetch = FetchType.LAZY)
     private Profile owner;
 
-    @Column(length = 8, nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String shortname;
 
     @Enumerated(EnumType.STRING)

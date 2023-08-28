@@ -45,16 +45,15 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
   private final ProfileRepository profileRepository;
-  private final RelationRepository relationRepository;
+  private final RelationRepository relationRepository; // TODO GroupService, RelationSaver
 
   private final ContactUpdater contactUpdater;
   private final ModelMapper modelMapper;
   private final ProfileProvider profileProvider;
   private final RelationValidator relationValidator;
 
-  private final S3Service s3Service;
-  private final EmailService emailService;
-  private final ActionService actionService;
+  private final S3Service s3Service; // TODO CloudFileProvider
+  private final ActionService actionService; // TODO ActionSaver
 
   public ProfileResponseDTO search(Integer id) {
     Profile profile = profileProvider.getTarget(id);

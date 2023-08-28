@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-public class Device {
+public class Shortname {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +18,16 @@ public class Device {
     private Profile owner;
 
     @Column(length = 8, nullable = false, unique = true)
-    private String url;
+    private String shortname;
 
-    public Device(Profile owner, String url) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ShortnameType type;
+
+    public Shortname(Profile owner, String shortname, ShortnameType shortnameType) {
         this.owner = owner;
-        this.url = url;
+        this.shortname = shortname;
+        this.type = shortnameType;
     }
 
 }

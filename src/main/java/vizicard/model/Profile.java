@@ -77,7 +77,7 @@ public class Profile {
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private List<Device> devices;
+  private List<Shortname> shortnames;
 
   @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)

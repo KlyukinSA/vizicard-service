@@ -14,6 +14,7 @@ import vizicard.model.Profile;
 import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
+import vizicard.utils.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 import vizicard.utils.VcardFile;
@@ -33,7 +34,7 @@ public class RelationService {
     private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
 
-    private final ModelMapper modelMapper;
+    private final ProfileMapper profileMapper;
 
     private final ActionService actionService;
     private final EmailService emailService;
@@ -62,7 +63,7 @@ public class RelationService {
                 .filter(Relation::isStatus)
                 .filter((val) -> !Objects.equals(val.getProfile().getId(), user.getId()))
                 .filter((val) -> val.getProfile().isStatus())
-                .map((val) -> modelMapper.map(val, RelationResponseDTO.class))
+                .map((val) -> new RelationResponseDTO(profileMapper.mapBrief(val.getProfile()), val.getCreateAt()))
                 .collect(Collectors.toList());
     }
 

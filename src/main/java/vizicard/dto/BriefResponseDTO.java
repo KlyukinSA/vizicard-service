@@ -1,5 +1,6 @@
 package vizicard.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.CloudFile;
@@ -11,4 +12,5 @@ public class BriefResponseDTO {
     private String name;
     private String title;
     private CloudFileDTO avatar;
+    private String mainShortname;
 }

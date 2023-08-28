@@ -60,7 +60,7 @@ public class Profile {
 
   private ProfileDetailStruct detailStruct;
 
-  // SQL settings
+  // SQL settings (OnDeleteAction.CASCADE)
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   private List<Relation> relationsWhereOwner;

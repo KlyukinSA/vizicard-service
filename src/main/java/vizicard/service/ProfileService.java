@@ -1,19 +1,8 @@
 package vizicard.service;
 
-import ezvcard.VCard;
-import ezvcard.VCardVersion;
-import ezvcard.io.text.VCardWriter;
-import ezvcard.parameter.ImageType;
-import ezvcard.property.Address;
-import ezvcard.property.Photo;
-import ezvcard.property.RawProperty;
-import ezvcard.property.Url;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.*;
@@ -29,15 +18,11 @@ import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.*;
 import vizicard.utils.ContactUpdater;
+import vizicard.utils.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
-import java.io.*;
-import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +37,7 @@ public class ProfileService {
   private final ModelMapper modelMapper;
   private final ProfileProvider profileProvider;
   private final RelationValidator relationValidator;
+  private final ProfileMapper profileMapper;
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
@@ -75,13 +61,16 @@ public class ProfileService {
     return getProfileResponseDTO(updateProfile(target, dto));
   }
 
-  private ProfileResponseDTO getProfileResponseDTO(Profile profile) {
+  private ProfileResponseDTO getProfileResponseDTO(Profile profile) { // TODO move to ProfileMapper
     ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
     if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO same checks
       res.setCompany(null);
+    } else {
+      res.getCompany().setMainShortname(profileMapper.getMainShortname(profile.getCompany()));
     }
     res.setContacts(getContactDTOs(profile));
     res.setAbout(getAbout(profile));
+    res.setMainShortname(profileMapper.getMainShortname(profile));
     return res;
   }
 
@@ -218,7 +207,7 @@ public class ProfileService {
     return relationRepository.findAllByOwnerAndProfileType(user, ProfileType.GROUP).stream()
             .map(Relation::getProfile)
             .filter(Profile::isStatus)
-            .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
+            .map(profileMapper::mapBrief)
             .collect(Collectors.toList());
   }
 
@@ -232,7 +221,7 @@ public class ProfileService {
             .map(Relation::getOwner)
             .filter(Profile::isStatus)
             .filter((val) -> !Objects.equals(val.getId(), ownerId))
-            .map((val) -> modelMapper.map(val, BriefResponseDTO.class))
+            .map(profileMapper::mapBrief)
             .collect(Collectors.toList());
   }
 

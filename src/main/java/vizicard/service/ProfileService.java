@@ -44,7 +44,7 @@ public class ProfileService {
 
   public ProfileResponseDTO search(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
-    if (profile.getType() == ProfileType.CUSTOM) {
+    if (profile.getType() == ProfileType.CUSTOM || profile.getType() == ProfileType.GROUP) {
       relationValidator.stopNotOwnerOf(profile);
     }
     actionService.vizit(profile);

@@ -23,8 +23,8 @@ public class ShortnameController {
 
     @PostMapping("my")
     @PreAuthorize("isAuthenticated()")
-    public void add(@RequestBody ShortnameDTO dto) {
-        shortnameService.add(dto);
+    public boolean add(@RequestBody ShortnameDTO dto) {
+        return shortnameService.add(dto);
     }
 
 }

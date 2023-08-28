@@ -22,7 +22,10 @@ public class ShortnameService {
         return new DeviceDTO(shortname.getId(), shortname.getOwner().getId(), shortname.getShortname());
     }
 
-    public void add(ShortnameDTO dto) {
+    public boolean add(ShortnameDTO dto) {
+        if (null != shortnameRepository.findByShortname(dto.getShortname())) {
+            return false;
+        }
         Profile user = profileProvider.getUserFromAuth();
         if (dto.getType() == ShortnameType.MAIN) {
             Shortname oldMain = shortnameRepository.findByOwnerAndType(user, ShortnameType.MAIN);
@@ -32,6 +35,7 @@ public class ShortnameService {
             }
         }
         shortnameRepository.save(new Shortname(user, dto.getShortname(), dto.getType()));
+        return true;
     }
 
 }

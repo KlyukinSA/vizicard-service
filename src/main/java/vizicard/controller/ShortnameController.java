@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.DeviceDTO;
+import vizicard.dto.ShortnameDTO;
 import vizicard.service.ShortnameService;
 
 import java.io.IOException;
@@ -20,10 +21,10 @@ public class ShortnameController {
         return shortnameService.findByShortname(shortname);
     }
 
-    @PostMapping
+    @PostMapping("my")
     @PreAuthorize("isAuthenticated()")
-    public boolean add(@RequestParam String shortname) {
-        return shortnameService.add(shortname);
+    public void add(@RequestBody ShortnameDTO dto) {
+        shortnameService.add(dto);
     }
 
 }

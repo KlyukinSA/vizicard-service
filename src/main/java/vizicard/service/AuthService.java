@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vizicard.dto.ContactRequest;
 import vizicard.dto.SigninDTO;
+import vizicard.dto.SigninResponseDTO;
 import vizicard.dto.UserSignupDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
@@ -35,12 +36,12 @@ public class AuthService {
 
     private final ModelMapper modelMapper;
 
-    public String signin(SigninDTO dto) {
+    public SigninResponseDTO signin(SigninDTO dto) {
         try {
             Profile profile = profileRepository.findByUsername(dto.getUsername());
             String id = String.valueOf(profile.getId());
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
-            return jwtTokenProvider.createToken(id);
+            return new SigninResponseDTO(jwtTokenProvider.createToken(id), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
         } catch (Exception e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }

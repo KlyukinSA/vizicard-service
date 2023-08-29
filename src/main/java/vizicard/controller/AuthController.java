@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vizicard.dto.SigninDTO;
+import vizicard.dto.SigninResponseDTO;
 import vizicard.dto.UserSignupDTO;
 import vizicard.service.AuthService;
 
@@ -22,7 +23,7 @@ public class AuthController {
     @ApiResponses(value = {//
             @ApiResponse(code = 400, message = "Something went wrong"), //
             @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-    public String login(@RequestBody SigninDTO signinDTO) {
+    public SigninResponseDTO login(@RequestBody SigninDTO signinDTO) {
         return authService.signin(signinDTO);
     }
 

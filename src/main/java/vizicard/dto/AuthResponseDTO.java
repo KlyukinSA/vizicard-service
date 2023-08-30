@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SigninResponseDTO {
+public class AuthResponseDTO {
     private String token;
     private String mainShortname;
 }

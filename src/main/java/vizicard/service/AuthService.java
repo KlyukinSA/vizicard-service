@@ -7,9 +7,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vizicard.dto.ContactRequest;
 import vizicard.dto.SigninDTO;
-import vizicard.dto.SigninResponseDTO;
+import vizicard.dto.AuthResponseDTO;
 import vizicard.dto.UserSignupDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
@@ -17,10 +16,8 @@ import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.ShortnameRepository;
 import vizicard.security.JwtTokenProvider;
-import vizicard.utils.ContactUpdater;
 
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 @RequiredArgsConstructor
@@ -36,18 +33,18 @@ public class AuthService {
 
     private final ModelMapper modelMapper;
 
-    public SigninResponseDTO signin(SigninDTO dto) {
+    public AuthResponseDTO signin(SigninDTO dto) {
         try {
             Profile profile = profileRepository.findByUsername(dto.getUsername());
             String id = String.valueOf(profile.getId());
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
-            return new SigninResponseDTO(jwtTokenProvider.createToken(id), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
+            return new AuthResponseDTO(jwtTokenProvider.createToken(id), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
         } catch (Exception e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
-    public String signup(UserSignupDTO dto) {
+    public AuthResponseDTO signup(UserSignupDTO dto) {
         Profile profile = modelMapper.map(dto, Profile.class);
         if (!profileRepository.existsByUsername(profile.getUsername())) {
             profile.setPassword(passwordEncoder.encode(profile.getPassword()));
@@ -55,9 +52,10 @@ public class AuthService {
             profileRepository.save(profile);
 
             relationRepository.save(new Relation(profile, profile, RelationType.OWNER));
-            shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
+            Shortname shortname = new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN);
+            shortnameRepository.save(shortname);
 
-            return jwtTokenProvider.createToken(String.valueOf(profile.getId()));
+            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortname.getShortname());
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }

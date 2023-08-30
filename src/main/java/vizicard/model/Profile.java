@@ -55,8 +55,8 @@ public class Profile {
   @Column(nullable = false)
   private boolean status = true;
 
-  @Column(columnDefinition = "TIMESTAMP(0)")
-  private Date lastVizit;
+  @Column(columnDefinition = "TIMESTAMP(0)", nullable = false)
+  private Date lastVizit = new Date();
 
   private ProfileDetailStruct detailStruct;
 

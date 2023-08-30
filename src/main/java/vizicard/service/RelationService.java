@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vizicard.dto.LeadGenerationDTO;
+import vizicard.dto.ProfileCreateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
@@ -38,6 +39,7 @@ public class RelationService {
 
     private final ActionService actionService;
     private final EmailService emailService;
+    private final ProfileService profileService;
 
     public void unrelate(Integer ownerId, Integer profileId) {
         Profile owner;
@@ -98,16 +100,20 @@ public class RelationService {
                 .body(new InputStreamResource(new ByteArrayInputStream(vcardFile.getBytes())));
     }
 
-    public void leadGenerate(Integer targetProfileId, LeadGenerationDTO dto) {
+    public void leadGenerate(Integer targetProfileId, ProfileCreateDTO dto) {
         Profile target = profileProvider.getTarget(targetProfileId);
 
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
             if (Objects.equals(target.getId(), author.getId())) return;
+            System.out.println("before find \n");
             Relation relation = relationRepository.findByOwnerAndProfile(target, author);
+            System.out.println("before save \n");
             if (relation == null || !relation.isStatus()) {
-                relationRepository.save(new Relation(target, author, RelationType.USUAL));
+                relationRepository.save(new Relation(target, author, RelationType.OWNER));
             }
+        } else {
+            profileService.createProfile(dto, target, null);
         }
 
         try {
@@ -115,12 +121,12 @@ public class RelationService {
         } catch (Exception ignored) {}
     }
 
-    private String getLeadGenMessage(LeadGenerationDTO dto, Profile author) {
-        String res = dto.toString();
-        if (author != null) {
-            res += "\n\n" + author;
-        }
-        return res;
+    private String getLeadGenMessage(ProfileCreateDTO dto, Profile author) {
+//        String res = dto.toString();
+//        if (author != null) {
+//            res += "\n\n" + author;
+//        }
+        return null;
     }
 
 }

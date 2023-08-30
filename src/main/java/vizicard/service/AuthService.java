@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import vizicard.dto.ProfileCreateDTO;
 import vizicard.dto.SigninDTO;
 import vizicard.dto.AuthResponseDTO;
 import vizicard.dto.UserSignupDTO;
@@ -33,6 +34,8 @@ public class AuthService {
 
     private final ModelMapper modelMapper;
 
+    private final ProfileService profileService;
+
     public AuthResponseDTO signin(SigninDTO dto) {
         try {
             Profile profile = profileRepository.findByUsername(dto.getUsername());
@@ -45,17 +48,14 @@ public class AuthService {
     }
 
     public AuthResponseDTO signup(UserSignupDTO dto) {
-        Profile profile = modelMapper.map(dto, Profile.class);
-        if (!profileRepository.existsByUsername(profile.getUsername())) {
-            profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-            profile.setType(ProfileType.USER);
-            profileRepository.save(profile);
+        if (!profileRepository.existsByUsername(dto.getUsername())) {
+            ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
+            dto1.setType(ProfileType.USER);
+            dto1.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-            relationRepository.save(new Relation(profile, profile, RelationType.OWNER));
-            Shortname shortname = new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN);
-            shortnameRepository.save(shortname);
+            Profile profile = profileService.createProfile(dto1, null, dto.getUsername());
 
-            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortname.getShortname());
+            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }

@@ -126,17 +126,26 @@ public class ProfileService {
     }
   }
 
-  public ProfileResponseDTO createProfile(ProfileCreateDTO dto) {
-    Profile owner = profileProvider.getUserFromAuth();
+  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username) {
     Profile profile = new Profile();
     profile.setType(dto.getType());
     profile.setName(dto.getName());
+    profile.setUsername(username);
     profile = profileRepository.save(profile);
 
+    if (owner == null) {
+      owner = profile;
+    }
     relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
-    return getProfileResponseDTO(updateProfile(profile, dto));
+    return updateProfile(profile, dto);
+  }
+
+  public ProfileResponseDTO createMyProfile(ProfileCreateDTO dto) {
+    Profile owner = profileProvider.getUserFromAuth();
+    createProfile(dto, owner, null);
+    return null;
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

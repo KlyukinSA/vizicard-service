@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.LeadGenerationDTO;
+import vizicard.dto.ProfileCreateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
@@ -37,7 +38,7 @@ public class RelationController {
     }
 
     @PostMapping("/lead")
-    public void leadGenerate(@RequestParam Integer id, @RequestBody LeadGenerationDTO dto) {
+    public void leadGenerate(@RequestParam Integer id, @RequestBody ProfileCreateDTO dto) {
         relationService.leadGenerate(id, dto);
     }
 

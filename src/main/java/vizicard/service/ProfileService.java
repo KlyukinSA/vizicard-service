@@ -44,8 +44,17 @@ public class ProfileService {
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
 
-  public ProfileResponseDTO search(String shortname) {
+  public ProfileResponseDTO searchByShortname(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
+    return search(profile);
+  }
+
+  public ProfileResponseDTO searchById(Integer id) {
+    Profile profile = profileProvider.getTarget(id);
+    return search(profile);
+  }
+
+  private ProfileResponseDTO search(Profile profile) {
     if (profile.getType() == ProfileType.CUSTOM || profile.getType() == ProfileType.GROUP) {
       relationValidator.stopNotOwnerOf(profile);
     }

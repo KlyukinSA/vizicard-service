@@ -24,8 +24,13 @@ public class ProfileController {
   private final ProfileService profileService;
 
   @GetMapping("/{shortname}")
-  public ProfileResponseDTO search(@PathVariable String shortname) {
-    return profileService.search(shortname);
+  public ProfileResponseDTO searchByShortname(@PathVariable String shortname) {
+    return profileService.searchByShortname(shortname);
+  }
+
+  @GetMapping("/id{id}")
+  public ProfileResponseDTO searchById(@PathVariable Integer id) {
+    return profileService.searchById(id);
   }
 
   @GetMapping("/me")

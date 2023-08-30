@@ -9,16 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vizicard.dto.LeadGenerationDTO;
 import vizicard.dto.ProfileCreateDTO;
+import vizicard.dto.ProfileUpdateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
 import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
-import vizicard.utils.ProfileMapper;
-import vizicard.utils.ProfileProvider;
-import vizicard.utils.RelationValidator;
-import vizicard.utils.VcardFile;
+import vizicard.utils.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -34,6 +32,7 @@ public class RelationService {
 
     private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
+    private final ProfileCompanySetter profileCompanySetter;
 
     private final ProfileMapper profileMapper;
 
@@ -102,6 +101,7 @@ public class RelationService {
 
     public void leadGenerate(Integer targetProfileId, ProfileCreateDTO dto) {
         Profile target = profileProvider.getTarget(targetProfileId);
+        Profile company;
 
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
@@ -112,14 +112,20 @@ public class RelationService {
             if (relation == null || !relation.isStatus()) {
                 relationRepository.save(new Relation(target, author, RelationType.OWNER));
             }
+            company = author.getCompany();
         } else {
             profileService.createProfile(dto, target, null);
+            company = profileProvider.getTarget(dto.getCompanyId());
         }
+
+        profileCompanySetter.addRelation(target, company);
 
         try {
             emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
         } catch (Exception ignored) {}
     }
+
+
 
     private String getLeadGenMessage(ProfileCreateDTO dto, Profile author) {
 //        String res = dto.toString();

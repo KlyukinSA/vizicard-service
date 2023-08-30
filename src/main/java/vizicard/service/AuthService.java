@@ -51,7 +51,6 @@ public class AuthService {
         if (!profileRepository.existsByUsername(dto.getUsername())) {
             ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
             dto1.setType(ProfileType.USER);
-            dto1.setPassword(passwordEncoder.encode(dto.getPassword()));
 
             Profile profile = profileService.createProfile(dto1, null, dto.getUsername());
 

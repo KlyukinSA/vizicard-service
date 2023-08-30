@@ -18,10 +18,7 @@ import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.*;
-import vizicard.utils.ContactUpdater;
-import vizicard.utils.ProfileMapper;
-import vizicard.utils.ProfileProvider;
-import vizicard.utils.RelationValidator;
+import vizicard.utils.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,6 +37,7 @@ public class ProfileService {
   private final RelationValidator relationValidator;
   private final ProfileMapper profileMapper;
   private final PasswordEncoder passwordEncoder;
+  private final ProfileCompanySetter profileCompanySetter;
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
@@ -174,12 +172,7 @@ public class ProfileService {
       if (dto.getCompanyId().equals(0)) {
         profile.setCompany(null);
       } else {
-        Profile company = profileProvider.getTarget(dto.getCompanyId());
-        profile.setCompany(company);
-        Relation relation = relationRepository.findByOwnerAndProfile(profile, company);
-        if (relation == null || !relation.isStatus()) {
-          relationRepository.save(new Relation(profile, company, RelationType.USUAL));
-        }
+        profileCompanySetter.setCompany(profile, profileProvider.getTarget(dto.getCompanyId()));
       }
     }
 

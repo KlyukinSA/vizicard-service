@@ -1,13 +1,15 @@
 package vizicard.controller.detail;
 
-import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.ProfileResponseDTO;
 import vizicard.dto.detail.EducationDTO;
 import vizicard.dto.detail.EducationResponseDTO;
+import vizicard.dto.detail.EducationTypeDTO;
 import vizicard.service.detail.EducationService;
+
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("profiles/me/education")
@@ -32,6 +34,11 @@ public class EducationController {
     @PreAuthorize("isAuthenticated()")
     public void deleteEducation(@PathVariable("id") Integer id) {
         educationService.deleteEducation(id);
+    }
+
+    @GetMapping("types")
+    public List<EducationTypeDTO> findAllTypes() {
+        return educationService.findAllTypes();
     }
 
 }

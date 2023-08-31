@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.detail.EducationLevel;
+import vizicard.model.detail.EducationType;
 
 import java.util.Date;
 
@@ -11,9 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EducationDTO {
-    private String stage;
     private String institution;
     private String specialization;
-    private Date graduationAt;
-    private EducationLevel level;
+    private Short graduationAt;
+    private Integer typeId;
 }

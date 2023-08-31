@@ -17,14 +17,14 @@ public class SkillController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public void addSkills(@RequestBody List<SkillDTO> dto) {
+    public void addSkills(@RequestBody List<String> dto) {
         service.addSkills(dto);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public void deleteEducation(@PathVariable("id") Integer id) {
-        service.deleteSkill(id);
+    public void deleteSkills(@RequestBody List<Integer> ids) {
+        service.deleteSkills(ids);
     }
 
 }

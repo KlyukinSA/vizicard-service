@@ -17,8 +17,9 @@ public class Skill extends DetailBase {
 
     private String skill;
 
-    public Skill(Profile user) {
+    public Skill(Profile user, String skill) {
         super(user);
+        this.skill = skill;
     }
 
 }

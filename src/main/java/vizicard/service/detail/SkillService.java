@@ -21,23 +21,24 @@ public class SkillService {
     private final ModelMapper modelMapper;
     private final ProfileProvider profileProvider;
 
-    public void addSkills(List<SkillDTO> dtos) {
+    public void addSkills(List<String> dto) {
         Profile user = profileProvider.getUserFromAuth();
-        for (SkillDTO dto : dtos) {
-            Skill detail = new Skill(user);
-            modelMapper.map(dto, detail);
+        for (String s : dto) {
+            Skill detail = new Skill(user, s);
             try {
                 repository.save(detail);
             } catch (Exception ignored) {}
         }
     }
 
-    public void deleteSkill(Integer id) {
+    public void deleteSkills(List<Integer> ids) {
         Profile user = profileProvider.getUserFromAuth();
-        Skill detail = repository.findById(id).get();
-        if (Objects.equals(detail.getOwner().getId(), user.getId())) {
-            detail.setStatus(false);
-            repository.save(detail);
+        for (Integer id : ids) {
+            Skill detail = repository.findById(id).get();
+            if (Objects.equals(detail.getOwner().getId(), user.getId())) {
+                detail.setStatus(false);
+                repository.save(detail);
+            }
         }
     }
 

@@ -6,6 +6,8 @@ import vizicard.model.Profile;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
@@ -17,9 +19,10 @@ public class Experience extends DetailBase {
     private String company;
     @Column(nullable = false)
     private String position;
-    @Column(columnDefinition = "TIMESTAMP(0)", nullable = false)
+    @Column(nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date startAt;
-    @Column(columnDefinition = "TIMESTAMP(0)")
+    @Temporal(TemporalType.DATE)
     private Date finishAt;
     @Column(nullable = false)
     private String tasks;

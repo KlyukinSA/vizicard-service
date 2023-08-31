@@ -12,5 +12,5 @@ import java.util.List;
 public class ProfileDetailStructResponseDTO {
     List<EducationResponseDTO> education;
     List<ExperienceResponseDTO> experience;
-    List<SkillResponseDTO> skills;
+    List<String> skills;
 }

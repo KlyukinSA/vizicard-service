@@ -99,7 +99,7 @@ public class ProfileService {
                     .collect(Collectors.toList()),
             detailStruct.getSkills().stream()
                     .filter(Skill::isStatus)
-                    .map((val) -> modelMapper.map(val, SkillResponseDTO.class))
+                    .map(Skill::getSkill)
                     .collect(Collectors.toList())
             );
   }

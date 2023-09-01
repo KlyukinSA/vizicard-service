@@ -84,6 +84,10 @@ public class RelationService {
             if (relation == null || !relation.isStatus()) {
                 relationRepository.save(new Relation(owner, target, RelationType.USUAL));
             }
+
+            if (target.getCompany() != null && target.getCompany().isStatus()) {
+                relationRepository.save(new Relation(owner, target.getCompany(), RelationType.USUAL));
+            }
         }
 
         actionService.save(owner, target);

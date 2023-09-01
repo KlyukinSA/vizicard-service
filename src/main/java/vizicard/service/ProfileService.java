@@ -1,5 +1,6 @@
 package vizicard.service;
 
+import com.mysql.cj.Session;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ import vizicard.model.detail.Skill;
 import vizicard.repository.*;
 import vizicard.utils.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +45,8 @@ public class ProfileService {
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
+
+  private final EntityManager entityManager;
 
   public ProfileResponseDTO searchByShortname(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
@@ -246,6 +252,34 @@ public class ProfileService {
     if (group.getType() != ProfileType.GROUP) {
       throw new CustomException("This profile should be a group", HttpStatus.FORBIDDEN);
     }
+  }
+
+  public ProfileResponseDTO searchLike(String request) {
+    String[] parts = request.split(" ");
+    for (int i = 0; i < parts.length; i++) {
+      if (!parts[i].startsWith("%")) {
+        parts[i] = "%" + parts[i];
+      }
+      if (!parts[i].endsWith("%")) {
+        parts[i] = parts[i] + "%";
+      }
+    }
+
+    StringBuilder query = new StringBuilder("SELECT id FROM profile WHERE name LIKE '" + parts[0] + "'");
+    for (int i = 1; i < parts.length; i++) {
+      query.append(" AND name LIKE '").append(parts[i]).append("'");
+    }
+
+    Query nativeQuery = entityManager.createNativeQuery(query.toString());
+
+    Integer id;
+    try {
+      id = (Integer) nativeQuery.getSingleResult();
+    } catch (Exception e) {
+      throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    return getProfileResponseDTO(profileProvider.getTarget(id));
   }
 
 }

@@ -2,6 +2,8 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import vizicard.model.detail.ProfileDetailStruct;
@@ -35,6 +37,7 @@ public class Profile {
   private String city;
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Contact> contacts;
 
   @OneToOne
@@ -63,31 +66,39 @@ public class Profile {
   // SQL settings (OnDeleteAction.CASCADE)
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Relation> relationsWhereOwner;
   @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Relation> relationsWhereProfile;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Publication> publicationsWhereOwner;
   @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Publication> publicationsWhereProfile;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Shortname> shortnames;
 
   @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Action> actionsWhereActor;
   @OneToMany(mappedBy = "page", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<Action> actionsWherePage;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
   private List<CloudFile> files;
 
 }

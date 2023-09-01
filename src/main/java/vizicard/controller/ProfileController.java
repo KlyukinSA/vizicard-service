@@ -69,4 +69,9 @@ public class ProfileController {
     return profileService.createMyProfile(dto);
   }
 
+  @GetMapping("like")
+  public ProfileResponseDTO searchLike(String request) {
+    return profileService.searchLike(request);
+  }
+
 }

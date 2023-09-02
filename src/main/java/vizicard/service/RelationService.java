@@ -60,7 +60,7 @@ public class RelationService {
                 .filter(Relation::isStatus)
                 .filter((val) -> !Objects.equals(val.getProfile().getId(), user.getId()))
                 .filter((val) -> val.getProfile().isStatus())
-                .map((val) -> new RelationResponseDTO(profileMapper.mapToBrief(val.getProfile()), val.getCreateAt()))
+                .map((val) -> new RelationResponseDTO(profileMapper.mapToBrief(val.getProfile()), val.getCreateAt(), val.getType()))
                 .collect(Collectors.toList());
     }
 

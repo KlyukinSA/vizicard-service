@@ -10,8 +10,9 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RelationResponseDTO {
-    private BriefProfileResponseDTO profile;
+public class BriefRelationResponseDTO {
+    private Integer ownerId;
+    private Integer profileId;
     private Date createAt;
     private RelationType type;
 }

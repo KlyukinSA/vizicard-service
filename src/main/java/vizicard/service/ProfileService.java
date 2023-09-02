@@ -1,21 +1,13 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.*;
-import vizicard.dto.detail.EducationResponseDTO;
-import vizicard.dto.detail.ExperienceResponseDTO;
-import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.model.detail.Education;
-import vizicard.model.detail.Experience;
-import vizicard.model.detail.ProfileDetailStruct;
-import vizicard.model.detail.Skill;
 import vizicard.repository.*;
 import vizicard.utils.*;
 
@@ -96,10 +88,9 @@ public class ProfileService {
     return updateProfile(profile, dto);
   }
 
-  public ProfileResponseDTO createMyProfile(ProfileCreateDTO dto) {
+  public void createMyProfile(ProfileCreateDTO dto) {
     Profile owner = profileProvider.getUserFromAuth();
     createProfile(dto, owner, null);
-    return null;
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
@@ -175,7 +166,7 @@ public class ProfileService {
     }
   }
 
-  public List<BriefResponseDTO> getAllMyGroups() {
+  public List<BriefProfileResponseDTO> getAllMyGroups() {
     Profile user = profileProvider.getUserFromAuth();
     return relationRepository.findAllByOwnerAndProfileType(user, ProfileType.GROUP).stream()
             .map(Relation::getProfile)
@@ -184,7 +175,7 @@ public class ProfileService {
             .collect(Collectors.toList());
   }
 
-  public List<BriefResponseDTO> getAllGroupMembers(Integer groupId) {
+  public List<BriefProfileResponseDTO> getAllGroupMembers(Integer groupId) {
     Profile group = profileProvider.getTarget(groupId);
     letGroupPass(group);
     Integer ownerId = relationRepository.findByTypeAndProfile(RelationType.OWNER, group).getOwner().getId();

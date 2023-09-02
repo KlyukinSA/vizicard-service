@@ -3,22 +3,23 @@ package vizicard.utils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import vizicard.dto.BriefResponseDTO;
-import vizicard.dto.ContactDTO;
-import vizicard.dto.ProfileResponseDTO;
+import vizicard.dto.*;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.model.Profile;
+import vizicard.model.Relation;
 import vizicard.model.ShortnameType;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
+import vizicard.repository.RelationRepository;
 import vizicard.repository.ShortnameRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,11 +27,13 @@ import java.util.stream.Collectors;
 public class ProfileMapper {
 
     private final ShortnameRepository shortnameRepository;
+    private final RelationRepository relationRepository;
 
     private final ModelMapper modelMapper;
+    private final ProfileProvider profileProvider;
 
-    public BriefResponseDTO mapToBrief(Profile profile) {
-        BriefResponseDTO res = modelMapper.map(profile, BriefResponseDTO.class);
+    public BriefProfileResponseDTO mapToBrief(Profile profile) {
+        BriefProfileResponseDTO res = modelMapper.map(profile, BriefProfileResponseDTO.class);
         res.setMainShortname(getMainShortname(profile));
         return res;
     }
@@ -41,7 +44,7 @@ public class ProfileMapper {
 
     public ProfileResponseDTO mapToResponse(Profile profile) {
         ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
-        if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO same checks
+        if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO function for same checks
             res.setCompany(null);
         } else {
             res.getCompany().setMainShortname(getMainShortname(profile.getCompany()));
@@ -49,7 +52,23 @@ public class ProfileMapper {
         res.setContacts(getContactDTOs(profile));
         res.setAbout(getAbout(profile));
         res.setMainShortname(getMainShortname(profile));
+        res.setRelation(getPossibleRelation(profile));
         return res;
+    }
+
+    private BriefRelationResponseDTO getPossibleRelation(Profile profile) {
+        Profile user = profileProvider.getUserFromAuth();
+        Relation relation = relationRepository.findByOwnerAndProfile(user, profile);
+        if (relation == null) {
+            relation = relationRepository.findByOwnerAndProfile(profile, user);
+            if (relation == null) {
+                return null;
+            }
+        }
+        if (Objects.equals(relation.getProfile().getId(), relation.getOwner().getId())) {
+            return null;
+        }
+        return modelMapper.map(relation, BriefRelationResponseDTO.class);
     }
 
     private List<ContactDTO> getContactDTOs(Profile profile) {

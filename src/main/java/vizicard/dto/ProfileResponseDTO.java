@@ -5,9 +5,7 @@ import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
-import vizicard.model.CloudFile;
 import vizicard.model.ProfileType;
 
 @Data
@@ -36,7 +34,7 @@ public class ProfileResponseDTO {
   @ApiModelProperty(position = 11)
   private ProfileType type;
   @ApiModelProperty(position = 13)
-  private BriefResponseDTO company;
+  private BriefProfileResponseDTO company;
 
   @ApiModelProperty(position = 14)
   private Date lastVizit;
@@ -46,5 +44,8 @@ public class ProfileResponseDTO {
 
   @ApiModelProperty(position = 16)
   private String mainShortname;
+
+  @ApiModelProperty(position = 17)
+  private BriefRelationResponseDTO relation;
 
 }

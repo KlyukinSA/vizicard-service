@@ -23,10 +23,6 @@ public class ServerPortCustomizer
                 return;
             case "dev":
                 factory.setPort(8080);
-                return;
-            default:
-                System.out.println("what to do with new spring profile " + activeProfile + "?\n");
-                System.exit(1);
         }
     }
 

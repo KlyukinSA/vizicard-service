@@ -1,6 +1,5 @@
 package vizicard.service;
 
-import com.mysql.cj.Session;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import vizicard.dto.*;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
-import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
@@ -23,7 +21,6 @@ import vizicard.utils.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +33,6 @@ public class ProfileService {
   private final ShortnameRepository shortnameRepository;
 
   private final ContactUpdater contactUpdater;
-  private final ModelMapper modelMapper;
   private final ProfileProvider profileProvider;
   private final RelationValidator relationValidator;
   private final ProfileMapper profileMapper;
@@ -63,63 +59,17 @@ public class ProfileService {
       relationValidator.stopNotOwnerOf(profile);
     }
     actionService.vizit(profile);
-    return getProfileResponseDTO(profile);
+    return profileMapper.mapToResponse(profile);
   }
 
   public ProfileResponseDTO whoami() {
-    return getProfileResponseDTO(profileProvider.getUserFromAuth());
+    return profileMapper.mapToResponse(profileProvider.getUserFromAuth());
   }
 
   public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
     Profile target = profileProvider.getTarget(id);
     relationValidator.stopNotOwnerOf(target);
-    return getProfileResponseDTO(updateProfile(target, dto));
-  }
-
-  private ProfileResponseDTO getProfileResponseDTO(Profile profile) { // TODO move to ProfileMapper
-    ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
-    if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO same checks
-      res.setCompany(null);
-    } else {
-      res.getCompany().setMainShortname(profileMapper.getMainShortname(profile.getCompany()));
-    }
-    res.setContacts(getContactDTOs(profile));
-    res.setAbout(getAbout(profile));
-    res.setMainShortname(profileMapper.getMainShortname(profile));
-    return res;
-  }
-
-  private ProfileDetailStructResponseDTO getAbout(Profile profile) {
-      ProfileDetailStruct detailStruct = profile.getDetailStruct();
-      if (detailStruct == null) {
-        return null;
-      }
-      return new ProfileDetailStructResponseDTO(
-            detailStruct.getEducation().stream()
-                    .filter(Education::isStatus)
-                    .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
-                    .collect(Collectors.toList()),
-            detailStruct.getExperience().stream()
-                    .filter(Experience::isStatus)
-                    .map((val) -> modelMapper.map(val, ExperienceResponseDTO.class))
-                    .collect(Collectors.toList()),
-            detailStruct.getSkills().stream()
-                    .filter(Skill::isStatus)
-                    .map(Skill::getSkill)
-                    .collect(Collectors.toList())
-            );
-  }
-
-  private List<ContactDTO> getContactDTOs(Profile profile) {
-    if (profile.getContacts() == null) {
-      return new ArrayList<>();
-    }
-    return profile.getContacts().stream()
-            .map((val) -> new ContactDTO(
-                    val.getType().getType(),
-                    val.getContact(),
-                    val.getType().getLogo().getUrl())
-    ).collect(Collectors.toList());
+    return profileMapper.mapToResponse(updateProfile(target, dto));
   }
 
   private void updateContacts(Profile owner, ContactRequest[] list) {
@@ -199,7 +149,7 @@ public class ProfileService {
     Profile user = profileProvider.getUserFromAuth();
     user.setLastVizit(new Date());
     profileRepository.save(user);
-    return getProfileResponseDTO(user);
+    return profileMapper.mapToResponse(user);
   }
 
   public void deleteProfile(Integer id) {
@@ -230,7 +180,7 @@ public class ProfileService {
     return relationRepository.findAllByOwnerAndProfileType(user, ProfileType.GROUP).stream()
             .map(Relation::getProfile)
             .filter(Profile::isStatus)
-            .map(profileMapper::mapBrief)
+            .map(profileMapper::mapToBrief)
             .collect(Collectors.toList());
   }
 
@@ -244,7 +194,7 @@ public class ProfileService {
             .map(Relation::getOwner)
             .filter(Profile::isStatus)
             .filter((val) -> !Objects.equals(val.getId(), ownerId))
-            .map(profileMapper::mapBrief)
+            .map(profileMapper::mapToBrief)
             .collect(Collectors.toList());
   }
 
@@ -279,7 +229,7 @@ public class ProfileService {
       throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    return getProfileResponseDTO(profileProvider.getTarget(id));
+    return profileMapper.mapToResponse(profileProvider.getTarget(id));
   }
 
 }

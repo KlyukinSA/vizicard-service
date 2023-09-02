@@ -1,15 +1,12 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vizicard.dto.LeadGenerationDTO;
 import vizicard.dto.ProfileCreateDTO;
-import vizicard.dto.ProfileUpdateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
@@ -21,7 +18,6 @@ import vizicard.utils.*;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +60,7 @@ public class RelationService {
                 .filter(Relation::isStatus)
                 .filter((val) -> !Objects.equals(val.getProfile().getId(), user.getId()))
                 .filter((val) -> val.getProfile().isStatus())
-                .map((val) -> new RelationResponseDTO(profileMapper.mapBrief(val.getProfile()), val.getCreateAt()))
+                .map((val) -> new RelationResponseDTO(profileMapper.mapToBrief(val.getProfile()), val.getCreateAt()))
                 .collect(Collectors.toList());
     }
 

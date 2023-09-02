@@ -106,9 +106,7 @@ public class RelationService {
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
             if (Objects.equals(target.getId(), author.getId())) return;
-            System.out.println("before find \n");
             Relation relation = relationRepository.findByOwnerAndProfile(target, author);
-            System.out.println("before save \n");
             if (relation == null || !relation.isStatus()) {
                 relationRepository.save(new Relation(target, author, RelationType.OWNER));
             }
@@ -118,7 +116,9 @@ public class RelationService {
             company = profileProvider.getTarget(dto.getCompanyId());
         }
 
-        profileCompanySetter.addRelation(target, company);
+        if (company != null) {
+            profileCompanySetter.addRelation(target, company);
+        }
 
         try {
             emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));

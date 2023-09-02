@@ -38,7 +38,7 @@ public class RelationController {
     }
 
     @PostMapping("/lead")
-    public void leadGenerate(@RequestParam Integer id, @RequestBody ProfileCreateDTO dto) {
+    public void leadGenerate(@RequestParam Integer id, @RequestBody(required = false) ProfileCreateDTO dto) {
         relationService.leadGenerate(id, dto);
     }
 

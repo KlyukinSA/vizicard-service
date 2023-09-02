@@ -27,10 +27,17 @@ public class DataSourceConfig {
 
     @Bean
     DataSource dataSource() {
-        if (activeProfile.equals("prod")) {
-            return getDataSourceWithPath("prod");
+        switch (activeProfile) {
+            case "prod":
+                return getDataSourceWithPath("prod");
+            case "pre_prod":
+                return getDataSourceWithPath("pre_prod");
+            case "dev":
+                return getDataSourceWithPath("dev");
+            default:
+                System.out.println("what to do with new spring profile " + activeProfile + "?\n");
+                return null;
         }
-        return getDataSourceWithPath("dev");
     }
 
     DataSource getDataSourceWithPath(String path) {

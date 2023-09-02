@@ -20,8 +20,8 @@ public class Shortname {
     @Column(nullable = false, unique = true)
     private String shortname;
 
+    @Column(columnDefinition = "ENUM('MAIN', 'DEVICE', 'USUAL')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private ShortnameType type;
 
     public Shortname(Profile owner, String shortname, ShortnameType shortnameType) {

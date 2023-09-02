@@ -17,9 +17,9 @@ public class ContactType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false) // TODO make as id
-    private ContactEnum type;
+    private ContactEnum type; // TODO make as id
 
     @OneToOne
     private CloudFile logo;

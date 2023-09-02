@@ -28,8 +28,8 @@ public class Action {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
+    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private ActionType type;
 
     public Action(Profile actor, Profile page, ActionType type) {

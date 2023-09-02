@@ -18,8 +18,8 @@ public class EducationType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(columnDefinition = "ENUM('PRIMARY', 'SECONDARY', 'HIGHER', 'VOCATIONAL')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private EducationLevel type;
 
     @Column(nullable = false)

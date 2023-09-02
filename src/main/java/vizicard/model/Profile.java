@@ -47,8 +47,8 @@ public class Profile {
   @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
   private final Date createAt = new Date();
 
+  @Column(columnDefinition = "ENUM('USER', 'COMPANY', 'CUSTOM', 'GROUP', 'LEAD_USER', 'LEAD_COMPANY')", nullable = false)
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
   private ProfileType type;
 
   @OneToOne

@@ -34,8 +34,8 @@ public class Relation {
     @Column(nullable = false)
     private boolean status = true;
 
+    @Column(columnDefinition = "ENUM('OWNER', 'EDITOR', 'USUAL')", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private RelationType type;
 
     public Relation(Profile owner, Profile profile, RelationType relationType) {

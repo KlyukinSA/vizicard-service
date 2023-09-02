@@ -3,7 +3,7 @@ package vizicard.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.BriefResponseDTO;
+import vizicard.dto.BriefProfileResponseDTO;
 import vizicard.service.ProfileService;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class GroupController {
 
     @GetMapping("/{id}/members")
     @PreAuthorize("isAuthenticated()")
-    public List<BriefResponseDTO> getAllGroupMembers(@PathVariable("id") Integer groupId) {
+    public List<BriefProfileResponseDTO> getAllGroupMembers(@PathVariable("id") Integer groupId) {
         return profileService.getAllGroupMembers(groupId);
     }
 
@@ -29,7 +29,7 @@ public class GroupController {
 
     @GetMapping("/me/groups")
     @PreAuthorize("isAuthenticated()")
-    public List<BriefResponseDTO> getAllMyGroups() {
+    public List<BriefProfileResponseDTO> getAllMyGroups() {
         return profileService.getAllMyGroups();
     }
 

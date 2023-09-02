@@ -9,43 +9,18 @@ import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.model.ProfileType;
 
 @Data
-public class ProfileResponseDTO {
-
-  @ApiModelProperty(position = 0)
-  private Integer id;
-
-  @ApiModelProperty(position = 2)
-  private String name;
-  @ApiModelProperty(position = 3)
-  private String title;
-  @ApiModelProperty(position = 4)
+public class ProfileResponseDTO extends BriefProfileResponseDTO {
   private String description;
-  @ApiModelProperty(position = 6)
   private String city;
-  @ApiModelProperty(position = 7)
   private List<ContactDTO> contacts;
 
-  @ApiModelProperty(position = 8)
-  private CloudFileDTO avatar;
-
-  @ApiModelProperty(position = 10)
   private Date createAt;
 
-  @ApiModelProperty(position = 11)
-  private ProfileType type;
-  @ApiModelProperty(position = 13)
   private BriefProfileResponseDTO company;
 
-  @ApiModelProperty(position = 14)
   private Date lastVizit;
 
-  @ApiModelProperty(position = 15)
   private ProfileDetailStructResponseDTO about;
 
-  @ApiModelProperty(position = 16)
-  private String mainShortname;
-
-  @ApiModelProperty(position = 17)
   private BriefRelationResponseDTO relation;
-
 }

@@ -79,18 +79,17 @@ public class ProfileService {
     profile.setUsername(username);
     profile = profileRepository.save(profile);
 
-    if (owner == null) {
-      owner = profile;
+    if (owner != null) {
+      relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
     }
-    relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
     return updateProfile(profile, dto);
   }
 
-  public void createMyProfile(ProfileCreateDTO dto) {
+  public Integer createMyProfile(ProfileCreateDTO dto) {
     Profile owner = profileProvider.getUserFromAuth();
-    createProfile(dto, owner, null);
+    return createProfile(dto, owner, null).getId();
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

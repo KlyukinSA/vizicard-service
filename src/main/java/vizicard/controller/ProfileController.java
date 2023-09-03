@@ -65,8 +65,8 @@ public class ProfileController {
 
   @PostMapping
   @PreAuthorize("isAuthenticated()")
-  public void createProfile(@RequestBody ProfileCreateDTO dto) {
-    profileService.createMyProfile(dto);
+  public Integer createProfile(@RequestBody ProfileCreateDTO dto) {
+    return profileService.createMyProfile(dto);
   }
 
   @GetMapping("like")

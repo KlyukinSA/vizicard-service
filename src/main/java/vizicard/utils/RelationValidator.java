@@ -10,6 +10,8 @@ import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 public class RelationValidator {
@@ -19,6 +21,10 @@ public class RelationValidator {
 
     public void stopNotOwnerOf(Profile target) {
         Profile user = profileProvider.getUserFromAuth();
+        if (Objects.equals(user.getId(), target.getId())) {
+            return;
+        }
+
         Relation relation = relationRepository.findByOwnerAndProfile(user, target);
         if (relation == null || !relation.isStatus() || relation.getType() != RelationType.OWNER) {
             throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);

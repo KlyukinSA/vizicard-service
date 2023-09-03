@@ -30,8 +30,6 @@ public class RelationService {
     private final RelationValidator relationValidator;
     private final ProfileCompanySetter profileCompanySetter;
 
-    private final ProfileMapper profileMapper;
-
     private final ActionService actionService;
     private final EmailService emailService;
     private final ProfileService profileService;
@@ -52,16 +50,6 @@ public class RelationService {
         }
         relation.setStatus(false);
         relationRepository.save(relation);
-    }
-
-    public List<RelationResponseDTO> getRelations() {
-        Profile user = profileProvider.getUserFromAuth();
-        return relationRepository.findAllByOwnerOrderByProfileNameAsc(user).stream()
-                .filter(Relation::isStatus)
-                .filter((val) -> !Objects.equals(val.getProfile().getId(), user.getId()))
-                .filter((val) -> val.getProfile().isStatus())
-                .map((val) -> new RelationResponseDTO(profileMapper.mapToBrief(val.getProfile()), val.getCreateAt(), val.getType()))
-                .collect(Collectors.toList());
     }
 
     public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {

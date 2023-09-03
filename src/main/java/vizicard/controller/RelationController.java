@@ -26,12 +26,6 @@ public class RelationController {
         relationService.unrelate(owner, profile);
     }
 
-    @GetMapping("/my")
-    @PreAuthorize("isAuthenticated()")
-    public List<RelationResponseDTO> getRelations() {
-        return relationService.getRelations();
-    }
-
     @PostMapping
     public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
         return relationService.relate(id);

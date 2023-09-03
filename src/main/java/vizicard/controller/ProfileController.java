@@ -13,8 +13,10 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import vizicard.model.Publication;
 import vizicard.service.ProfileService;
+import vizicard.utils.ProfileMapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/profiles")
@@ -22,6 +24,7 @@ import java.util.List;
 public class ProfileController {
 
   private final ProfileService profileService;
+  private final ProfileMapper profileMapper;
 
   @GetMapping("/{shortname}")
   public ProfileResponseDTO searchByShortname(@PathVariable String shortname) {
@@ -70,8 +73,10 @@ public class ProfileController {
   }
 
   @GetMapping("like")
-  public List<Integer> searchLike(@RequestParam String name, @RequestParam(required = false) String type) {
-    return profileService.searchLike(name, type);
+  public List<RelationResponseDTO> searchLike(@RequestParam String name, @RequestParam(required = false) String type) {
+    return profileService.searchLike(name, type).stream()
+            .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
+            .collect(Collectors.toList());
   }
 
 }

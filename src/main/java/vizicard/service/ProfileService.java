@@ -194,7 +194,7 @@ public class ProfileService {
     }
   }
 
-  public List<Integer> searchLike(String name, String type) {
+  public List<Relation> searchLike(String name, String type) {
     Profile user = profileProvider.getUserFromAuth();
     StringBuilder query = new StringBuilder(
             "select relation.id from relation inner join profile on relation.profile_id=profile.id where owner_id=")
@@ -219,7 +219,11 @@ public class ProfileService {
       throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    return ids;
+    return ids.stream()
+            .map((id) -> relationRepository.findById(id).get())
+            .filter(Relation::isStatus)
+            .filter((relation) -> relation.getProfile().isStatus())
+            .collect(Collectors.toList());
   }
 
   private String surround(String s) {

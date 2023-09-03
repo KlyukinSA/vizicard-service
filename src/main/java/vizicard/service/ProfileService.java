@@ -194,32 +194,44 @@ public class ProfileService {
     }
   }
 
-  public ProfileResponseDTO searchLike(String request) {
-    String[] parts = request.split(" ");
-    for (int i = 0; i < parts.length; i++) {
-      if (!parts[i].startsWith("%")) {
-        parts[i] = "%" + parts[i];
+  public ProfileResponseDTO searchLike(String name, String type) {
+    String[] parts = name.split(" ");
+      for (int i = 0; i < parts.length; i++) {
+        parts[i] = surround(parts[i]);
       }
-      if (!parts[i].endsWith("%")) {
-        parts[i] = parts[i] + "%";
-      }
-    }
 
-    StringBuilder query = new StringBuilder("SELECT id FROM profile WHERE name LIKE '" + parts[0] + "'");
+    StringBuilder query = new StringBuilder("SELECT id FROM profile WHERE name LIKE '").append(parts[0]).append("'");
     for (int i = 1; i < parts.length; i++) {
       query.append(" AND name LIKE '").append(parts[i]).append("'");
     }
+
+    if (type != null) {
+      type = surround(type);
+      query.append(" AND type LIKE '").append(type).append("'");
+    }
+
+    System.out.println(query);
 
     Query nativeQuery = entityManager.createNativeQuery(query.toString());
 
     Integer id;
     try {
-      id = (Integer) nativeQuery.getSingleResult();
+      id = (Integer) nativeQuery.getResultList().get(0);
     } catch (Exception e) {
       throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     return profileMapper.mapToResponse(profileProvider.getTarget(id));
+  }
+
+  private String surround(String s) {
+    if (!s.startsWith("%")) {
+      s = "%" + s;
+    }
+    if (!s.endsWith("%")) {
+      s = s + "%";
+    }
+    return s;
   }
 
 }

@@ -70,8 +70,8 @@ public class ProfileController {
   }
 
   @GetMapping("like")
-  public ProfileResponseDTO searchLike(String request) {
-    return profileService.searchLike(request);
+  public ProfileResponseDTO searchLike(@RequestParam String name, @RequestParam(required = false) String type) {
+    return profileService.searchLike(name, type);
   }
 
 }

@@ -200,8 +200,10 @@ public class ProfileService {
             "select relation.id from relation inner join profile on relation.profile_id=profile.id where owner_id=")
             .append(user.getId());
 
-    for (String part : name.split(" ")) {
-      query.append(" and profile.name like '").append(surround(part)).append("'");
+    if (name != null) {
+      for (String part : name.split(" ")) {
+        query.append(" and profile.name like '").append(surround(part)).append("'");
+      }
     }
 
     if (type != null) {

@@ -73,7 +73,7 @@ public class ProfileController {
   }
 
   @GetMapping("like")
-  public List<RelationResponseDTO> searchLike(@RequestParam String name, @RequestParam(required = false) String type) {
+  public List<RelationResponseDTO> searchLike(@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
     return profileService.searchLike(name, type).stream()
             .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
             .collect(Collectors.toList());

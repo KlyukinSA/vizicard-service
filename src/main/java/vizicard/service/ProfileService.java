@@ -194,34 +194,32 @@ public class ProfileService {
     }
   }
 
-  public ProfileResponseDTO searchLike(String name, String type) {
-    String[] parts = name.split(" ");
-      for (int i = 0; i < parts.length; i++) {
-        parts[i] = surround(parts[i]);
-      }
+  public List<Integer> searchLike(String name, String type) {
+    Profile user = profileProvider.getUserFromAuth();
+    StringBuilder query = new StringBuilder(
+            "select relation.id from relation inner join profile on relation.profile_id=profile.id where owner_id=")
+            .append(user.getId());
 
-    StringBuilder query = new StringBuilder("SELECT id FROM profile WHERE name LIKE '").append(parts[0]).append("'");
-    for (int i = 1; i < parts.length; i++) {
-      query.append(" AND name LIKE '").append(parts[i]).append("'");
+    for (String part : name.split(" ")) {
+      query.append(" and profile.name like '").append(surround(part)).append("'");
     }
 
     if (type != null) {
-      type = surround(type);
-      query.append(" AND type LIKE '").append(type).append("'");
+      query.append(" and profile.type like '").append(surround(type)).append("'");
     }
 
-    System.out.println(query);
+    query.append(" order by relation.id desc");
 
     Query nativeQuery = entityManager.createNativeQuery(query.toString());
 
-    Integer id;
+    List<Integer> ids;
     try {
-      id = (Integer) nativeQuery.getResultList().get(0);
+      ids = nativeQuery.getResultList();
     } catch (Exception e) {
       throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    return profileMapper.mapToResponse(profileProvider.getTarget(id));
+    return ids;
   }
 
   private String surround(String s) {

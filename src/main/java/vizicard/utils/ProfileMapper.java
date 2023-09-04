@@ -7,6 +7,7 @@ import vizicard.dto.*;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
+import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.model.Profile;
 import vizicard.model.Relation;
 import vizicard.model.ShortnameType;
@@ -99,7 +100,7 @@ public class ProfileMapper {
                         .collect(Collectors.toList()),
                 detailStruct.getSkills().stream()
                         .filter(Skill::isStatus)
-                        .map(Skill::getSkill)
+                        .map((val) -> new SkillResponseDTO(val.getId(), val.getSkill()))
                         .collect(Collectors.toList())
         );
     }

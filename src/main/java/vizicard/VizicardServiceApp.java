@@ -7,8 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import vizicard.model.detail.EducationLevel;
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactTypeRepository;
+import vizicard.repository.detail.EducationTypeRepository;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private String activeProfile;
 
   private final ContactTypeRepository contactTypeRepository;
+  private final EducationTypeRepository educationTypeRepository;
   private final CloudFileRepository cloudFileRepository;
 
   public static void main(String[] args) {
@@ -31,6 +34,13 @@ public class VizicardServiceApp implements CommandLineRunner {
         System.out.println("adding...");
         fillContactTypes();
       }
+    }
+    if (educationTypeRepository.findAll().size() < EducationLevel.class.getEnumConstants().length) {
+      System.out.println("WHERE ARE EDUCATION TYPES?");
+//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('1', 'PRIMARY', 'НАЧАЛЬНОЕ');
+//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('2', 'SECONDARY', 'СРЕДНЕЕ');
+//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('3', 'HIGHER', 'ВЫСШЕЕ');
+//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('4', 'VOCATIONAL', 'ПРОФЕССИОНАЛЬНОЕ');
     }
   }
 

@@ -26,6 +26,7 @@ public class ContactUpdater {
             contact.setType(contactType);
             contact.setOwner(owner);
             contact.setContact(dto.getContact());
+            owner.getContacts().add(contact); // for createMyProfile()
         }
         contactRepository.save(contact);
     }

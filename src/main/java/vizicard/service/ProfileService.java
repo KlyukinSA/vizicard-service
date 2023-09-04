@@ -87,9 +87,9 @@ public class ProfileService {
     return updateProfile(profile, dto);
   }
 
-  public Integer createMyProfile(ProfileCreateDTO dto) {
+  public Profile createMyProfile(ProfileCreateDTO dto) {
     Profile owner = profileProvider.getUserFromAuth();
-    return createProfile(dto, owner, null).getId();
+    return createProfile(dto, owner, null);
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

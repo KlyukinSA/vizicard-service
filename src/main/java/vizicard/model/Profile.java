@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import vizicard.model.detail.ProfileDetailStruct;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class Profile {
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @LazyCollection(LazyCollectionOption.FALSE)
-  private List<Contact> contacts;
+  private List<Contact> contacts = new ArrayList<>();
 
   @OneToOne
   @OnDelete(action = OnDeleteAction.CASCADE)

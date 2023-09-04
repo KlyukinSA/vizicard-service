@@ -73,9 +73,6 @@ public class ProfileMapper {
     }
 
     private List<ContactDTO> getContactDTOs(Profile profile) {
-        if (profile.getContacts() == null) {
-            return new ArrayList<>();
-        }
         return profile.getContacts().stream()
                 .map((val) -> new ContactDTO(
                         val.getType().getType(),

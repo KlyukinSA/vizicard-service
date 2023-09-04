@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileDetailStructResponseDTO {
-    List<EducationResponseDTO> education;
-    List<ExperienceResponseDTO> experience;
+    List<EducationResponseDTO> educations;
+    List<ExperienceResponseDTO> experiences;
     List<SkillResponseDTO> skills;
 }

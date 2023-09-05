@@ -48,7 +48,7 @@ public class ActionService {
         Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
 
         Function<ActionType, Integer> f = (actionType) ->
-                actionRepository.countByPageAndCreateAtBetweenAndType(user, start, stop, actionType);
+                actionRepository.countByProfileAndCreateAtBetweenAndType(user, start, stop, actionType);
 
         return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
     }

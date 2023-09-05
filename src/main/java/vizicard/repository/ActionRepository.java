@@ -10,5 +10,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface ActionRepository extends JpaRepository<Action, Integer> {
-    Integer countByPageAndCreateAtBetweenAndType(Profile target, Date start, Date stop, ActionType actionType);
+    Integer countByProfileAndCreateAtBetweenAndType(Profile target, Date start, Date stop, ActionType actionType);
 }

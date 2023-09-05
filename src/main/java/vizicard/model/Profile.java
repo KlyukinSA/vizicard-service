@@ -88,11 +88,11 @@ public class Profile {
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<Shortname> shortnames;
 
-  @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<Action> actionsWhereActor;
-  @OneToMany(mappedBy = "page", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<Action> actionsWherePage;

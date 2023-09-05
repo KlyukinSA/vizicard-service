@@ -1,12 +1,9 @@
 package vizicard.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -19,11 +16,11 @@ public class Action {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Profile actor;
+    private Profile owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Profile page;
+    private Profile profile;
 
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
@@ -32,9 +29,9 @@ public class Action {
     @Enumerated(EnumType.STRING)
     private ActionType type;
 
-    public Action(Profile actor, Profile page, ActionType type) {
-        this.actor = actor;
-        this.page = page;
+    public Action(Profile owner, Profile profile, ActionType type) {
+        this.owner = owner;
+        this.profile = profile;
         this.type = type;
     }
 }

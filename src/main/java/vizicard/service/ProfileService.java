@@ -238,4 +238,32 @@ public class ProfileService {
     return s;
   }
 
+  public Profile mergeCustomProfiles(Integer mainId, Integer secondaryId) {
+    if (Objects.equals(mainId, secondaryId)) {
+      throw new CustomException("Can merge only different profiles", HttpStatus.FORBIDDEN);
+    }
+    Profile main = profileProvider.getTarget(mainId);
+    Profile secondary = profileProvider.getTarget(secondaryId);
+    if (main.getType() != ProfileType.CUSTOM || secondary.getType() != ProfileType.CUSTOM) {
+      throw new CustomException("Can merge only ProfileType.CUSTOM", HttpStatus.FORBIDDEN);
+    }
+
+    List<Contact> mainContacts = main.getContacts();
+    Set<ContactEnum> mainContactTypes = mainContacts.stream()
+            .map((val) -> val.getType().getType())
+            .collect(Collectors.toSet());
+    for (Contact contact : secondary.getContacts()) {
+      if (!mainContactTypes.contains(contact.getType().getType())) {
+        contact.setOwner(main);
+        mainContacts.add(contact);
+      }
+    }
+    main.setContacts(mainContacts);
+    profileRepository.save(main);
+
+    secondary.setStatus(false);
+    profileRepository.save(secondary);
+    return main;
+  }
+
 }

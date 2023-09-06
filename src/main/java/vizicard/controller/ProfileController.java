@@ -1,17 +1,14 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import vizicard.model.Publication;
 import vizicard.service.ProfileService;
 import vizicard.utils.ProfileMapper;
 
@@ -77,6 +74,11 @@ public class ProfileController {
     return profileService.searchLike(name, type).stream()
             .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
             .collect(Collectors.toList());
+  }
+
+  @PutMapping("merge")
+  public ProfileResponseDTO mergeCustomProfiles(@RequestParam Integer main, @RequestParam Integer secondary) {
+    return profileMapper.mapToResponse(profileService.mergeCustomProfiles(main, secondary));
   }
 
 }

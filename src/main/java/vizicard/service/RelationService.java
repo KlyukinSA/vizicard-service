@@ -15,6 +15,8 @@ import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +35,8 @@ public class RelationService {
     private final ActionService actionService;
     private final EmailService emailService;
     private final ProfileService profileService;
+
+    private final EntityManager entityManager;
 
     public void unrelate(Integer ownerId, Integer profileId) {
         Profile owner;
@@ -121,6 +125,50 @@ public class RelationService {
 //            res += "\n\n" + author;
 //        }
         return null;
+    }
+
+    public List<Relation> searchLike(String name, String type) {
+        Profile user = profileProvider.getUserFromAuth();
+        StringBuilder query = new StringBuilder(
+                "select relation.id from relation inner join profile on relation.profile_id=profile.id where owner_id=")
+                .append(user.getId());
+
+        if (name != null) {
+            for (String part : name.split(" ")) {
+                query.append(" and profile.name like '").append(surround(part)).append("'");
+            }
+        }
+
+        if (type != null) {
+            query.append(" and profile.type like '").append(surround(type)).append("'");
+        }
+
+        query.append(" order by relation.id desc");
+
+        Query nativeQuery = entityManager.createNativeQuery(query.toString());
+
+        List<Integer> ids;
+        try {
+            ids = nativeQuery.getResultList();
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+
+        return ids.stream()
+                .map((id) -> relationRepository.findById(id).get())
+                .filter(Relation::isStatus)
+                .filter((relation) -> relation.getProfile().isStatus())
+                .collect(Collectors.toList());
+    }
+
+    private String surround(String s) {
+        if (!s.startsWith("%")) {
+            s = "%" + s;
+        }
+        if (!s.endsWith("%")) {
+            s = s + "%";
+        }
+        return s;
     }
 
 }

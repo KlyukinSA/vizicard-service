@@ -69,13 +69,6 @@ public class ProfileController {
     return profileMapper.mapToResponse(profileService.createMyProfile(dto));
   }
 
-  @GetMapping("like")
-  public List<RelationResponseDTO> searchLike(@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
-    return profileService.searchLike(name, type).stream()
-            .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
-            .collect(Collectors.toList());
-  }
-
   @PutMapping("merge")
   public ProfileResponseDTO mergeCustomProfiles(@RequestParam Integer main, @RequestParam Integer secondary) {
     return profileMapper.mapToResponse(profileService.mergeCustomProfiles(main, secondary));

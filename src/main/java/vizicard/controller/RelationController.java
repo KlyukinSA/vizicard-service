@@ -9,9 +9,11 @@ import vizicard.dto.ProfileCreateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
+import vizicard.utils.ProfileMapper;
 
 import javax.imageio.spi.RegisterableService;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/relations")
@@ -19,6 +21,7 @@ import java.util.List;
 public class RelationController {
 
     private final RelationService relationService;
+    private final ProfileMapper profileMapper;
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
@@ -34,6 +37,13 @@ public class RelationController {
     @PostMapping("/lead")
     public void leadGenerate(@RequestParam Integer id, @RequestBody(required = false) ProfileCreateDTO dto) {
         relationService.leadGenerate(id, dto);
+    }
+
+    @GetMapping
+    public List<RelationResponseDTO> searchLike(@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
+        return relationService.searchLike(name, type).stream()
+                .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
+                .collect(Collectors.toList());
     }
 
 }

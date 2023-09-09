@@ -98,10 +98,6 @@ public class RelationService {
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
             if (Objects.equals(target.getId(), author.getId())) return;
-            Relation relation = relationRepository.findByOwnerAndProfile(target, author);
-            if (relation == null || !relation.isStatus()) {
-                relationRepository.save(new Relation(target, author, RelationType.OWNER));
-            }
             company = author.getCompany();
         } else {
             author = profileService.createProfile(dto, target, null);
@@ -114,6 +110,10 @@ public class RelationService {
             } catch (Exception ignored) {}
         }
 
+        Relation relation = relationRepository.findByOwnerAndProfile(target, author);
+        if (relation == null || !relation.isStatus()) {
+            relationRepository.save(new Relation(target, author, RelationType.OWNER));
+        }
         if (company != null) {
             profileCompanySetter.addRelation(target, company);
         }

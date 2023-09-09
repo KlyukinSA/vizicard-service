@@ -6,9 +6,13 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
 import vizicard.repository.ProfileRepository;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Component
 @RequiredArgsConstructor
@@ -17,10 +21,9 @@ public class ProfileProvider {
     private final ProfileRepository profileRepository;
 
     public Profile getUserFromAuth() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            return profileRepository.findById(Integer.valueOf(authentication.getName())).get();
-        } else return null;
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        Profile user = (Profile) request.getAttribute("user");
+        return user;
     }
 
     public Profile getTarget(Integer id) {

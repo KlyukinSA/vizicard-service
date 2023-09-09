@@ -2,6 +2,8 @@ package vizicard.security;
 
 import com.mysql.cj.x.protobuf.MysqlxCursor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import vizicard.model.AppUserRole;
 import vizicard.model.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import vizicard.repository.ProfileRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -28,6 +31,9 @@ public class MyUserDetails implements UserDetailsService {
     if (!profile.isPresent()) {
       throw new UsernameNotFoundException("User '" + username + "' not found");
     }
+
+    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    request.setAttribute("user", profile.get());
 
     return org.springframework.security.core.userdetails.User//
         .withUsername(username)//

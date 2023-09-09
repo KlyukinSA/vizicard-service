@@ -104,7 +104,7 @@ public class RelationService {
             }
             company = author.getCompany();
         } else {
-            profileService.createProfile(dto, target, null);
+            author = profileService.createProfile(dto, target, null);
             company = profileProvider.getTarget(dto.getCompanyId());
         }
 
@@ -113,18 +113,8 @@ public class RelationService {
         }
 
         try {
-            emailService.sendUsual(target.getUsername(), "Вам прислали новый контакт в ViziCard", getLeadGenMessage(dto, author));
+            emailService.sendLead(target, author);
         } catch (Exception ignored) {}
-    }
-
-
-
-    private String getLeadGenMessage(ProfileCreateDTO dto, Profile author) {
-//        String res = dto.toString();
-//        if (author != null) {
-//            res += "\n\n" + author;
-//        }
-        return null;
     }
 
     public List<Relation> searchLike(String name, String type) {

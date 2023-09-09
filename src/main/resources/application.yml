@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: pre_prod
+    active: dev
 
   datasource:
     urlBase: jdbc:mysql://vizicard.ru:3306/
@@ -24,7 +24,7 @@ spring:
     host: smtp.yandex.ru
     port: 587
     username: info@vizicard.ru
-    password: iuUIUhiuhIUHIUhiuh
+    password: dfbdfHBgvgv89iudfhbiu
     properties:
       mail:
         smtp:

@@ -6,6 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import vizicard.model.Profile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -55,4 +56,12 @@ public class EmailService {
         message.setText(text);
         emailSender.send(message);
     }
+
+    public void sendLead(Profile target, Profile author) {
+        String to = target.getUsername();
+        String text = author.getName() + " предложил(а) вам знакомство в ViziCard. Ссылка на страницу: https://app.vizicard.ru/" + author.getId();
+        String subject = "Новое знакомство";
+        sendUsual(to, subject, text);
+    }
+
 }

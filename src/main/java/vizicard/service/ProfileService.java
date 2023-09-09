@@ -133,13 +133,6 @@ public class ProfileService {
     return profile;
   }
 
-  public ProfileResponseDTO updateMyLastVizit() {
-    Profile user = profileProvider.getUserFromAuth();
-    user.setLastVizit(new Date());
-    profileRepository.save(user);
-    return profileMapper.mapToResponse(user);
-  }
-
   public void deleteProfile(Integer id) {
     Profile target = profileProvider.getTarget(id);
     relationValidator.stopNotOwnerOf(target);

@@ -50,13 +50,6 @@ public class ProfileController {
     return profileService.update(id, dto);
   }
 
-  @PutMapping("/me/online")
-  @PreAuthorize("isAuthenticated()")
-  public ProfileResponseDTO updateMyLastVizit() {
-    return profileService.updateMyLastVizit();
-  }
-
-
   @DeleteMapping("{id}")
   @PreAuthorize("isAuthenticated()")
   public void deleteProfile(@PathVariable("id") Integer id) {

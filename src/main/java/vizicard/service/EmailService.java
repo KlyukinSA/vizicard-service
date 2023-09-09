@@ -78,4 +78,11 @@ public class EmailService {
         sendUsual(to, subject, text);
     }
 
+    public void sendSaved(Profile author, Profile target) {
+        String to = getEmailTo(author);
+        String text = "Вы сохранили пользователя по имени " + target.getName() + ". Ссылка на страницу: https://app.vizicard.ru/" + target.getId();
+        String subject = "Сохранение контакта";
+        sendUsual(to, subject, text);
+    }
+
 }

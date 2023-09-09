@@ -93,7 +93,7 @@ public class RelationService {
 
     public void leadGenerate(Integer targetProfileId, ProfileCreateDTO dto) {
         Profile target = profileProvider.getTarget(targetProfileId);
-        Profile company;
+        Profile company = null;
 
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
@@ -105,7 +105,13 @@ public class RelationService {
             company = author.getCompany();
         } else {
             author = profileService.createProfile(dto, target, null);
-            company = profileProvider.getTarget(dto.getCompanyId());
+            if (dto.getCompanyId() != null) {
+                company = profileProvider.getTarget(dto.getCompanyId());
+            }
+            
+            try {
+                emailService.sendSaved(author, target);
+            } catch (Exception ignored) {}
         }
 
         if (company != null) {

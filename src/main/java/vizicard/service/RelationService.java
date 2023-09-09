@@ -62,7 +62,7 @@ public class RelationService {
         Profile owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
             try {
-                emailService.sendRelation(target.getUsername(), owner.getName(), owner.getId());
+                emailService.sendRelation(target, owner);
             } catch (Exception e) {
                 System.out.println("tried to send message from " + owner.getId() + " to " + target.getId() + "\nbut\n");
                 e.printStackTrace();

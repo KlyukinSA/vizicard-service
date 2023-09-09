@@ -6,6 +6,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import vizicard.model.Contact;
+import vizicard.model.ContactEnum;
+import vizicard.model.ContactType;
 import vizicard.model.Profile;
 
 import javax.mail.MessagingException;
@@ -15,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,31 +28,41 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendRelation(String to, String ownerName, Integer ownerId) throws MessagingException {
-        String text = getRelationText(ownerName, String.valueOf(ownerId));
+    public void sendRelation(Profile target, Profile owner) throws MessagingException {
+        String text = getRelationText(owner);
 
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(vizicardEmail);
-        helper.setTo(to);
+        helper.setTo(getEmailTo(target));
         helper.setSubject("Новый контакт");
         helper.setText(text, true);
         emailSender.send(message);
     }
 
-    private String getRelationText(String name, String id) {
+    private String getEmailTo(Profile target) {
+        Optional<Contact> mail = target.getContacts().stream()
+                .filter((val) -> val.getType().getType() == ContactEnum.MAIL)
+                .findFirst();
+        if (mail.isPresent()) {
+            return mail.get().getContact();
+        }
+        return target.getUsername();
+    }
+
+    private String getRelationText(Profile owner) {
         try {
             InputStream is = new ClassPathResource("save-contact-letter.html").getInputStream();
             String raw = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.joining("\n"));
-            return raw.replaceAll("\\$1", name).replaceAll("\\$2", id);
+            return raw.replaceAll("\\$1", owner.getName()).replaceAll("\\$2", String.valueOf(owner.getId()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void sendUsual(String to, String subject, String text) {
+    private void sendUsual(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(vizicardEmail);
         message.setTo(to);
@@ -58,7 +72,7 @@ public class EmailService {
     }
 
     public void sendLead(Profile target, Profile author) {
-        String to = target.getUsername();
+        String to = getEmailTo(target);
         String text = author.getName() + " предложил(а) вам знакомство в ViziCard. Ссылка на страницу: https://app.vizicard.ru/" + author.getId();
         String subject = "Новое знакомство";
         sendUsual(to, subject, text);

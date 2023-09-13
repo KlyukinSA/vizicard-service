@@ -1,17 +1,20 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vizicard.dto.ProfileCreateDTO;
-import vizicard.dto.RelationResponseDTO;
+import vizicard.dto.profile.LeadGenDTO;
+import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
+import vizicard.model.ProfileType;
 import vizicard.model.Relation;
 import vizicard.model.RelationType;
+import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.*;
 
@@ -27,10 +30,12 @@ import java.util.stream.Collectors;
 public class RelationService {
 
     private final RelationRepository relationRepository;
+    private final ProfileRepository profileRepository;
 
     private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
     private final ProfileCompanySetter profileCompanySetter;
+    private final ModelMapper modelMapper;
 
     private final ActionService actionService;
     private final EmailService emailService;
@@ -91,18 +96,27 @@ public class RelationService {
                 .body(new InputStreamResource(new ByteArrayInputStream(vcardFile.getBytes())));
     }
 
-    public void leadGenerate(Integer targetProfileId, ProfileCreateDTO dto) {
+    public void leadGenerate(Integer targetProfileId, LeadGenDTO dto) {
         Profile target = profileProvider.getTarget(targetProfileId);
         Profile company = null;
 
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
-            if (Objects.equals(target.getId(), author.getId())) return;
+            if (Objects.equals(target.getId(), author.getId())) {
+                return;
+            }
             company = author.getCompany();
         } else {
-            author = profileService.createProfile(dto, target, null);
-            if (dto.getCompanyId() != null) {
-                company = profileProvider.getTarget(dto.getCompanyId());
+            ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
+            dto1.setType(ProfileType.LEAD_USER);
+            author = profileService.createProfile(dto1, target, null, null);
+            if (dto.getCompanyName() != null) {
+                ProfileCreateDTO dto2 = new ProfileCreateDTO();
+                dto2.setName(dto.getCompanyName());
+                dto2.setType(ProfileType.LEAD_COMPANY);
+                company = profileService.createProfile(dto2, author, null, null);
+                author.setCompany(company);
+                profileRepository.save(author);
             }
             
             try {

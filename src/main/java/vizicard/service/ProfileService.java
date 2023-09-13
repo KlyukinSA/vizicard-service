@@ -1,18 +1,19 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.*;
+import vizicard.dto.profile.ProfileCreateDTO;
+import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.*;
 import vizicard.utils.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class ProfileService {
   private final ProfileMapper profileMapper;
   private final PasswordEncoder passwordEncoder;
   private final ProfileCompanySetter profileCompanySetter;
+  private final ModelMapper modelMapper;
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
@@ -62,7 +64,7 @@ public class ProfileService {
     return profileMapper.mapToResponse(updateProfile(target, dto));
   }
 
-  private void updateContacts(Profile owner, ContactRequest[] list) {
+  private void updateContacts(Profile owner, List<ContactRequest> list) {
     for (ContactRequest dto : list) {
       if (dto.getType() != null && dto.getContact() != null) {
         contactUpdater.updateContact(owner, dto);
@@ -70,11 +72,12 @@ public class ProfileService {
     }
   }
 
-  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username) {
+  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password) {
     Profile profile = new Profile();
     profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile.setUsername(username);
+    profile.setPassword(password);
     profile = profileRepository.save(profile);
 
     if (owner != null) {
@@ -82,12 +85,12 @@ public class ProfileService {
     }
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
-    return updateProfile(profile, dto);
+    return updateProfile(profile, modelMapper.map(dto, ProfileUpdateDTO.class));
   }
 
   public Profile createMyProfile(ProfileCreateDTO dto) {
     Profile owner = profileProvider.getUserFromAuth();
-    return createProfile(dto, owner, null);
+    return createProfile(dto, owner, null, null);
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

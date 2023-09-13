@@ -9,11 +9,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import vizicard.dto.profile.ProfileCreateDTO;
+import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.service.ProfileService;
 import vizicard.utils.ProfileMapper;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/profiles")

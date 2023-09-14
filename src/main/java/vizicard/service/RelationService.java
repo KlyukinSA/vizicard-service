@@ -66,12 +66,7 @@ public class RelationService {
 
         Profile owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
-            try {
-                emailService.sendRelation(target, owner);
-            } catch (Exception e) {
-                System.out.println("tried to send message from " + owner.getId() + " to " + target.getId() + "\nbut\n");
-                e.printStackTrace();
-            }
+            emailService.sendRelation(owner, target);
 
             Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
             if (relation == null || !relation.isStatus()) {
@@ -79,7 +74,7 @@ public class RelationService {
             }
 
             if (target.getCompany() != null && target.getCompany().isStatus()) {
-                relationRepository.save(new Relation(owner, target.getCompany(), RelationType.USUAL));
+                profileCompanySetter.addRelation(owner, target.getCompany());
             }
         }
 

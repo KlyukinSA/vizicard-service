@@ -17,6 +17,7 @@ import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.ShortnameRepository;
+import vizicard.service.ShortnameService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProfileMapper {
 
-    private final ShortnameRepository shortnameRepository;
+    private final ShortnameService shortnameService;
     private final RelationRepository relationRepository;
 
     private final ModelMapper modelMapper;
@@ -35,12 +36,8 @@ public class ProfileMapper {
 
     public BriefProfileResponseDTO mapToBrief(Profile profile) {
         BriefProfileResponseDTO res = modelMapper.map(profile, BriefProfileResponseDTO.class);
-        res.setMainShortname(getMainShortname(profile));
+        res.setMainShortname(shortnameService.getMainShortname(profile));
         return res;
-    }
-
-    private String getMainShortname(Profile profile) {
-        return shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname();
     }
 
     public ProfileResponseDTO mapToResponse(Profile profile) {
@@ -48,11 +45,11 @@ public class ProfileMapper {
         if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO function for same checks
             res.setCompany(null);
         } else {
-            res.getCompany().setMainShortname(getMainShortname(profile.getCompany()));
+            res.getCompany().setMainShortname(shortnameService.getMainShortname(profile.getCompany()));
         }
         res.setContacts(getContactDTOs(profile));
         res.setAbout(getAbout(profile));
-        res.setMainShortname(getMainShortname(profile));
+        res.setMainShortname(shortnameService.getMainShortname(profile));
         res.setRelation(getPossibleRelation(profile));
         return res;
     }

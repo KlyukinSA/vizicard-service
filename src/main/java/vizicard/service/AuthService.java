@@ -20,7 +20,7 @@ import vizicard.security.JwtTokenProvider;
 public class AuthService {
 
     private final ProfileRepository profileRepository;
-    private final ShortnameRepository shortnameRepository;
+    private final ShortnameService shortnameService;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -32,7 +32,7 @@ public class AuthService {
             Profile profile = profileRepository.findByUsername(dto.getUsername());
             String id = String.valueOf(profile.getId());
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
-            return new AuthResponseDTO(jwtTokenProvider.createToken(id), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
+            return new AuthResponseDTO(jwtTokenProvider.createToken(id), shortnameService.getMainShortname(profile));
         } catch (Exception e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -46,7 +46,7 @@ public class AuthService {
 
             Profile profile = profileService.createProfile(dto1, null, dto.getUsername(), dto.getPassword());
 
-            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname());
+            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortnameService.getMainShortname(profile));
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }

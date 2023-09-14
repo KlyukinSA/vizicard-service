@@ -6,12 +6,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import vizicard.model.Contact;
-import vizicard.model.ContactEnum;
-import vizicard.model.ContactType;
-import vizicard.model.Profile;
+import vizicard.model.*;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,18 +22,24 @@ import java.util.stream.Collectors;
 public class EmailService {
 
     private final JavaMailSender emailSender;
+
+    private final ShortnameService shortnameService;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendRelation(Profile target, Profile owner) throws MessagingException {
-        String text = getRelationText(owner);
-
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(vizicardEmail);
-        helper.setTo(getEmailTo(target));
-        helper.setSubject("Новый контакт");
-        helper.setText(text, true);
-        emailSender.send(message);
+    public void sendRelation(Profile owner, Profile target) {
+        String text = getRelationText(target);
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(vizicardEmail);
+            helper.setTo(getEmailTo(owner));
+            helper.setSubject("Сохранение контакта");
+            helper.setText(text, true);
+            emailSender.send(message);
+        } catch (Exception e) {
+            System.out.println("tried to send message to " + owner.getId() + " about " + target.getId() + "\nbut\n");
+            e.printStackTrace();
+        }
     }
 
     private String getEmailTo(Profile target) {
@@ -50,16 +52,45 @@ public class EmailService {
         return target.getUsername();
     }
 
-    private String getRelationText(Profile owner) {
+    private String getRelationText(Profile profile) {
+        String text = getFileText("save-contact-letter.html");
+        text = replaceArg(text, "name", profile.getName());
+        text = replaceArg(text, "title", profile.getTitle());
+        if (profile.getCompany() == null) {
+            text = replaceArg(text, "company", null);
+        } else {
+            text = replaceArg(text, "company", profile.getCompany().getName());
+        }
+        text = replaceArg(text, "email", getEmailTo(profile));
+        text = replaceArg(text, "phone", getPhone(profile));
+        text = replaceArg(text, "description", profile.getDescription());
+        text = replaceArg(text, "shortname", shortnameService.getMainShortname(profile));
+        return text;
+    }
+
+    private String replaceArg(String text, String arg, String val) {
+        if (val == null) {
+            val = "Не указано";
+        }
+        return text.replace("{" + arg + "}", val);
+    }
+
+    private String getFileText(String fileName) {
         try {
-            InputStream is = new ClassPathResource("save-contact-letter.html").getInputStream();
-            String raw = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+            InputStream is = new ClassPathResource(fileName).getInputStream();
+            return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.joining("\n"));
-            return raw.replaceAll("\\$1", owner.getName()).replaceAll("\\$2", String.valueOf(owner.getId()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getPhone(Profile profile) {
+        Optional<Contact> phone = profile.getContacts().stream()
+                .filter((val) -> val.getType().getType() == ContactEnum.PHONE)
+                .findFirst();
+        return phone.map(Contact::getContact).orElse(null);
     }
 
     private void sendUsual(String to, String subject, String text) {

@@ -38,4 +38,8 @@ public class ShortnameService {
         return true;
     }
 
+    public String getMainShortname(Profile profile) {
+        return shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname();
+    }
+
 }

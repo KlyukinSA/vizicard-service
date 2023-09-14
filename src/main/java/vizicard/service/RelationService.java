@@ -66,7 +66,7 @@ public class RelationService {
 
         Profile owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
-            emailService.sendRelation(owner, target);
+            emailService.sendSaved(owner, target);
 
             Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
             if (relation == null || !relation.isStatus()) {
@@ -113,10 +113,8 @@ public class RelationService {
                 author.setCompany(company);
                 profileRepository.save(author);
             }
-            
-            try {
-                emailService.sendSaved(author, target);
-            } catch (Exception ignored) {}
+            // guest `author` maybe gave his email in LeadGenDTO. now we can send `target` to him
+            emailService.sendSaved(author, target);
         }
 
         Relation relation = relationRepository.findByOwnerAndProfile(target, author);

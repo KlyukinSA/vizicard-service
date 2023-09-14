@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import vizicard.model.*;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,23 +27,29 @@ public class EmailService {
     private final ShortnameService shortnameService;
     private static final String vizicardEmail = "info@vizicard.ru";
 
-    public void sendRelation(Profile owner, Profile target) {
-        String text = getRelationText(target);
+    public void sendSaved(Profile actor, Profile target) {
+        String to = getAddressTo(actor);
+        String subject = "Сохранение контакта";
+        String text = getSaveText(target);
         try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(vizicardEmail);
-            helper.setTo(getEmailTo(owner));
-            helper.setSubject("Сохранение контакта");
-            helper.setText(text, true);
-            emailSender.send(message);
+            sendHtml(to, subject, text);
         } catch (Exception e) {
-            System.out.println("tried to send message to " + owner.getId() + " about " + target.getId() + "\nbut\n");
+            System.out.println("tried to send message to " + actor.getId() + " about " + target.getId() + "\nbut\n");
             e.printStackTrace();
         }
     }
+    
+    public void sendHtml(String to, String subject, String htmlContent) throws MessagingException {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(vizicardEmail);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(htmlContent, true);
+        emailSender.send(message);
+    }
 
-    private String getEmailTo(Profile target) {
+    private String getAddressTo(Profile target) {
         Optional<Contact> mail = target.getContacts().stream()
                 .filter((val) -> val.getType().getType() == ContactEnum.MAIL)
                 .findFirst();
@@ -52,7 +59,7 @@ public class EmailService {
         return target.getUsername();
     }
 
-    private String getRelationText(Profile profile) {
+    private String getSaveText(Profile profile) {
         String text = getFileText("save-contact-letter.html");
         text = replaceArg(text, "name", profile.getName());
         text = replaceArg(text, "title", profile.getTitle());
@@ -61,7 +68,7 @@ public class EmailService {
         } else {
             text = replaceArg(text, "company", profile.getCompany().getName());
         }
-        text = replaceArg(text, "email", getEmailTo(profile));
+        text = replaceArg(text, "email", getAddressTo(profile));
         text = replaceArg(text, "phone", getPhone(profile));
         text = replaceArg(text, "description", profile.getDescription());
         text = replaceArg(text, "shortname", shortnameService.getMainShortname(profile));
@@ -103,16 +110,9 @@ public class EmailService {
     }
 
     public void sendLead(Profile target, Profile author) {
-        String to = getEmailTo(target);
+        String to = getAddressTo(target);
         String text = author.getName() + " предложил(а) вам знакомство в ViziCard. Ссылка на страницу: https://app.vizicard.ru/" + author.getId();
         String subject = "Новое знакомство";
-        sendUsual(to, subject, text);
-    }
-
-    public void sendSaved(Profile author, Profile target) {
-        String to = getEmailTo(author);
-        String text = "Вы сохранили пользователя по имени " + target.getName() + ". Ссылка на страницу: https://app.vizicard.ru/" + target.getId();
-        String subject = "Сохранение контакта";
         sendUsual(to, subject, text);
     }
 

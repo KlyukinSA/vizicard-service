@@ -125,9 +125,7 @@ public class RelationService {
             profileCompanySetter.addRelation(target, company);
         }
 
-        try {
-            emailService.sendLead(target, author);
-        } catch (Exception ignored) {}
+        emailService.sendLead(target, author);
     }
 
     public List<Relation> searchLike(String name, String type) {

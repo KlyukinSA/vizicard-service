@@ -61,6 +61,10 @@ public class EmailService {
 
     private String getSaveText(Profile profile) {
         String text = getFileText("save-contact-letter.html");
+        return substitute(text, profile);
+    }
+
+    private String substitute(String text, Profile profile) { // TODO use org.apache.commons.text.StringSubstitutor
         text = replaceArg(text, "name", profile.getName());
         text = replaceArg(text, "title", profile.getTitle());
         if (profile.getCompany() == null) {
@@ -79,7 +83,7 @@ public class EmailService {
         if (val == null) {
             val = "Не указано";
         }
-        return text.replace("{" + arg + "}", val);
+        return text.replaceAll("\\{" + arg + "}", val);
     }
 
     private String getFileText(String fileName) {
@@ -100,20 +104,13 @@ public class EmailService {
         return phone.map(Contact::getContact).orElse(null);
     }
 
-    private void sendUsual(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(vizicardEmail);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        emailSender.send(message);
-    }
-
-    public void sendLead(Profile target, Profile author) {
+    public void sendLead(Profile target, Profile actor) {
         String to = getAddressTo(target);
-        String text = author.getName() + " предложил(а) вам знакомство в ViziCard. Ссылка на страницу: https://app.vizicard.ru/" + author.getId();
         String subject = "Новое знакомство";
-        sendUsual(to, subject, text);
+        String text = substitute(getFileText("lead-generate-letter.html"), actor);
+        try {
+            sendHtml(to, subject, text);
+        } catch (Exception ignored) {}
     }
 
 }

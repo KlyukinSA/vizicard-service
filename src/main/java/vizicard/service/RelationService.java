@@ -94,6 +94,7 @@ public class RelationService {
     public void leadGenerate(Integer targetProfileId, LeadGenDTO dto) {
         Profile target = profileProvider.getTarget(targetProfileId);
         Profile company = null;
+        RelationType relationType;
 
         Profile author = profileProvider.getUserFromAuth();
         if (author != null) {
@@ -101,6 +102,7 @@ public class RelationService {
                 return;
             }
             company = author.getCompany();
+            relationType = RelationType.USUAL;
         } else {
             ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
             dto1.setType(ProfileType.LEAD_USER);
@@ -115,11 +117,12 @@ public class RelationService {
             }
             // guest `author` maybe gave his email in LeadGenDTO. now we can send `target` to him
             emailService.sendSaved(author, target);
+            relationType = RelationType.OWNER;
         }
 
         Relation relation = relationRepository.findByOwnerAndProfile(target, author);
         if (relation == null || !relation.isStatus()) {
-            relationRepository.save(new Relation(target, author, RelationType.OWNER));
+            relationRepository.save(new Relation(target, author, relationType));
         }
         if (company != null) {
             profileCompanySetter.addRelation(target, company);

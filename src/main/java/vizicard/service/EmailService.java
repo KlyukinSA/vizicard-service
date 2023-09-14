@@ -39,7 +39,7 @@ public class EmailService {
         }
     }
     
-    public void sendHtml(String to, String subject, String htmlContent) throws MessagingException {
+    private void sendHtml(String to, String subject, String htmlContent) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(vizicardEmail);

@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: dev
+
   datasource:
     urlBase: jdbc:mysql://vizicard.ru:3306/
     username: vizicard
@@ -18,10 +21,10 @@ spring:
         id:
           new_generator_mappings: false
   mail:
-    host: smtp.gmail.com
+    host: smtp.yandex.ru
     port: 587
-    username: myadress@gmail.com
-    password: 16161616161616
+    username: info@vizicard.ru
+    password: dfbdfHBgvgv89iudfhbiu
     properties:
       mail:
         smtp:

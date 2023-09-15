@@ -23,3 +23,6 @@ dist/
 nbdist/
 .nb-gradle/
 .vscode/settings.json
+
+src/tests/*
+!src/tests/create-auth-test.sh

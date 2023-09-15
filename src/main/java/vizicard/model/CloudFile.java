@@ -1,12 +1,10 @@
 package vizicard.model;
 
+import com.amazonaws.services.appflow.model.PrefixFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -19,7 +17,11 @@ public class CloudFile {
 
     private String url;
 
-    public CloudFile(String url) {
+    @ManyToOne
+    private Profile owner;
+
+    public CloudFile(String url, Profile owner) {
         this.url = url;
+        this.owner = owner;
     }
 }

@@ -73,9 +73,4 @@ public class SwaggerConfig {
     return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
   }
 
-  @Bean // TODO should be not in SwaggerConfig and not in VizicardServiceApp
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
-  }
-
 }

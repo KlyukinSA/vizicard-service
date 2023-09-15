@@ -14,10 +14,16 @@ public class ServerPortCustomizer
 
     @Override
     public void customize(ConfigurableWebServerFactory factory) {
-        if (activeProfile.equals("dev")) {
-            factory.setPort(8081);
-        } else {
-            factory.setPort(8080);
+        switch (activeProfile) {
+            case "prod":
+                factory.setPort(8082);
+                return;
+            case "pre_prod":
+                factory.setPort(8081);
+                return;
+            case "dev":
+                factory.setPort(8080);
         }
     }
+
 }

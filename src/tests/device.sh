@@ -1,1 +1,0 @@
-curl -X POST "http://localhost:8081/api/users/me/devices?word=strin7" -H  "accept: */*" -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEiLCJpYXQiOjE2OTE1NzgxMDN9.dctyk1Xp-2NQsR12r-rvCkmhvfyafh9zU-87Yg6lA2c'

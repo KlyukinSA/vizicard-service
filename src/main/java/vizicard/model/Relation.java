@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -19,20 +20,28 @@ public class Relation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Profile owner;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Profile profile;
 
-    @CreationTimestamp
-    private Instant createAt;
+    @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
+    private final Date createAt = new Date();
 
-    public Relation(Profile owner, Profile profile) {
+    @Column(nullable = false)
+    private boolean status = true;
+
+    @Column(columnDefinition = "ENUM('OWNER', 'EDITOR', 'USUAL')", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RelationType type;
+
+    public Relation(Profile owner, Profile profile, RelationType relationType) {
         this.owner = owner;
         this.profile = profile;
+        this.type = relationType;
     }
 
 }

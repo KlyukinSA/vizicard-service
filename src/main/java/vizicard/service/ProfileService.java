@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
   private final ProfileRepository profileRepository;
-  private final RelationRepository relationRepository; // TODO GroupService, RelationSaver
+  private final RelationRepository relationRepository; // TODO GroupService
   private final ShortnameRepository shortnameRepository;
 
   private final ContactUpdater contactUpdater;
@@ -30,11 +30,11 @@ public class ProfileService {
   private final RelationValidator relationValidator;
   private final ProfileMapper profileMapper;
   private final PasswordEncoder passwordEncoder;
-  private final ProfileCompanySetter profileCompanySetter;
   private final ModelMapper modelMapper;
 
   private final S3Service s3Service; // TODO CloudFileProvider
   private final ActionService actionService; // TODO ActionSaver
+  private final Relator relator;
 
   public ProfileResponseDTO searchByShortname(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
@@ -77,7 +77,6 @@ public class ProfileService {
     profile.setType(dto.getType());
     profile.setName(dto.getName());
     profile.setUsername(username);
-    profile.setPassword(password);
     profile = profileRepository.save(profile);
 
     if (owner != null) {
@@ -85,7 +84,9 @@ public class ProfileService {
     }
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
-    return updateProfile(profile, modelMapper.map(dto, ProfileUpdateDTO.class));
+    ProfileUpdateDTO dto1 = modelMapper.map(dto, ProfileUpdateDTO.class);
+    dto1.setPassword(password);
+    return updateProfile(profile, dto1);
   }
 
   public Profile createMyProfile(ProfileCreateDTO dto) {
@@ -119,7 +120,9 @@ public class ProfileService {
       if (dto.getCompanyId().equals(0)) {
         profile.setCompany(null);
       } else {
-        profileCompanySetter.setCompany(profile, profileProvider.getTarget(dto.getCompanyId()));
+        Profile company = profileProvider.getTarget(dto.getCompanyId());
+        profile.setCompany(company);
+        relator.relate(profile, company, RelationType.USUAL);
       }
     }
 
@@ -154,7 +157,7 @@ public class ProfileService {
     for (Integer memberId : memberIds) {
       Profile profile = profileProvider.getTarget(memberId);
       if (goodTypes.contains(profile.getType())) {
-        relationRepository.save(new Relation(profile, group, RelationType.USUAL));
+        relator.relate(profile, group, RelationType.USUAL);
       }
     }
   }

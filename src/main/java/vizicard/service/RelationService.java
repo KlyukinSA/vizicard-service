@@ -34,7 +34,6 @@ public class RelationService {
 
     private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
-    private final ProfileCompanySetter profileCompanySetter;
     private final ModelMapper modelMapper;
 
     private final ActionService actionService;
@@ -42,6 +41,7 @@ public class RelationService {
     private final ProfileService profileService;
 
     private final EntityManager entityManager;
+    private final Relator relator;
 
     public void unrelate(Integer ownerId, Integer profileId) {
         Profile owner;
@@ -57,24 +57,22 @@ public class RelationService {
         if (relation == null || !relation.isStatus()) {
             throw new CustomException("No such relation", HttpStatus.CONFLICT);
         }
+
         relation.setStatus(false);
         relationRepository.save(relation);
     }
 
-    public ResponseEntity<?> relate(Integer targetProfileId) throws Exception {
+    public ResponseEntity<?> saveContact(Integer targetProfileId) throws Exception {
         Profile target = profileProvider.getTarget(targetProfileId);
 
         Profile owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
             emailService.sendSaved(owner, target);
 
-            Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
-            if (relation == null || !relation.isStatus()) {
-                relationRepository.save(new Relation(owner, target, RelationType.USUAL));
-            }
+            relator.relate(owner, target, RelationType.USUAL);
 
             if (target.getCompany() != null && target.getCompany().isStatus()) {
-                profileCompanySetter.addRelation(owner, target.getCompany());
+                relator.relate(owner, target.getCompany(), RelationType.USUAL);
             }
         }
 
@@ -120,12 +118,10 @@ public class RelationService {
             relationType = RelationType.OWNER;
         }
 
-        Relation relation = relationRepository.findByOwnerAndProfile(target, author);
-        if (relation == null || !relation.isStatus()) {
-            relationRepository.save(new Relation(target, author, relationType));
-        }
-        if (company != null) {
-            profileCompanySetter.addRelation(target, company);
+        relator.relate(target, author, relationType);
+
+        if (company != null && company.isStatus()) {
+            relator.relate(target, company, RelationType.USUAL);
         }
 
         emailService.sendLead(target, author);

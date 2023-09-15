@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.LeadGenDTO;
-import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.service.RelationService;
 import vizicard.utils.ProfileMapper;
@@ -28,8 +27,8 @@ public class RelationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> relate(@RequestParam Integer id) throws Exception {
-        return relationService.relate(id);
+    public ResponseEntity<?> saveContact(@RequestParam Integer id) throws Exception {
+        return relationService.saveContact(id);
     }
 
     @PostMapping("/lead")

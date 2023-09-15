@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
-public class RelationValidator {
+public class RelationValidator { // TODO move to Service?
 
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;

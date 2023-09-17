@@ -64,13 +64,13 @@ public class ProfileService {
     return profileMapper.mapToResponse(updateProfile(target, dto));
   }
 
-  private void updateContacts(Profile owner, List<ContactRequest> list) {
-    for (ContactRequest dto : list) {
-      if (dto.getType() != null && dto.getContact() != null) {
-        contactUpdater.updateContact(owner, dto);
-      }
-    }
-  }
+//  private void updateContacts(Profile owner, List<ContactRequest> list) {
+//    for (ContactRequest dto : list) {
+//      if (dto.getType() != null && dto.getContact() != null) {
+//        contactUpdater.updateContact(owner, dto);
+//      }
+//    }
+//  }
 
   public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password) {
     Profile profile = new Profile();
@@ -132,9 +132,9 @@ public class ProfileService {
 
     profile = profileRepository.save(profile);
 
-    if (dto.getContacts() != null) {
-      updateContacts(profile, dto.getContacts());
-    }
+//    if (dto.getContacts() != null) {
+//      updateContacts(profile, dto.getContacts());
+//    }
 
     return profile;
   }

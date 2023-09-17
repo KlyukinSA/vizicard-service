@@ -8,18 +8,16 @@ import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
+import vizicard.model.Contact;
 import vizicard.model.Profile;
 import vizicard.model.Relation;
-import vizicard.model.ShortnameType;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
-import vizicard.repository.ShortnameRepository;
 import vizicard.service.ShortnameService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -69,13 +67,18 @@ public class ProfileMapper {
         return modelMapper.map(relation, BriefRelationResponseDTO.class);
     }
 
-    private List<ContactDTO> getContactDTOs(Profile profile) {
+    private List<ContactResponse> getContactDTOs(Profile profile) {
         return profile.getContacts().stream()
-                .map((val) -> new ContactDTO(
+                .filter(Contact::isStatus)
+                .map((val) -> new ContactResponse(
+                        val.getId(),
                         val.getType().getType(),
                         val.getContact(),
-                        val.getType().getLogo().getUrl())
-                ).collect(Collectors.toList());
+                        val.getTitle(),
+                        val.getDescription(),
+                        val.getOrder(),
+                        val.getType().getLogo().getUrl()))
+                .collect(Collectors.toList());
     }
 
     private ProfileDetailStructResponseDTO getAbout(Profile profile) {

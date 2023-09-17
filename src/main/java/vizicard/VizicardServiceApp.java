@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import vizicard.model.detail.EducationLevel;
 import vizicard.repository.CloudFileRepository;
+import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.detail.EducationTypeRepository;
 
@@ -19,6 +20,8 @@ public class VizicardServiceApp implements CommandLineRunner {
   private String activeProfile;
 
   private final ContactTypeRepository contactTypeRepository;
+  private final ContactGroupRepository contactGroupRepository;
+
   private final EducationTypeRepository educationTypeRepository;
   private final CloudFileRepository cloudFileRepository;
 
@@ -46,17 +49,20 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   void fillContactTypes() {
     CloudFile cloudFile = cloudFileRepository.save(new CloudFile("empty", null));
+    ContactGroup contactGroup = contactGroupRepository.save(new ContactGroup(1, ContactGroupEnum.MUSIC, "group", null));
 
     for (ContactEnum contactEnum : ContactEnum.class.getEnumConstants())
     {
-      save(cloudFile, contactEnum);
+      save(cloudFile, contactEnum, contactGroup);
     }
   }
 
-  void save(CloudFile cloudFile, ContactEnum contactEnum) {
+  void save(CloudFile cloudFile, ContactEnum contactEnum, ContactGroup contactGroup) {
     ContactType contactType = new ContactType();
     contactType.setType(contactEnum);
     contactType.setLogo(cloudFile);
+    contactType.setWriting("type");
+    contactType.setGroup(contactGroup);
     contactTypeRepository.save(contactType);
   }
 

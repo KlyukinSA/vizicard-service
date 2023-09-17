@@ -12,5 +12,4 @@ public class CloudFileDTO {
     private Integer id;
     private String url;
     private Integer ownerId;
-
 }

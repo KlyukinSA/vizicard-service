@@ -5,13 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.ContactEnum;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactRequest {
-    private String contact;
-    private String title;
-    private String description;
+public class ContactTypeResponse {
+    private Integer id;
+    private ContactEnum type;
+    private String logoUrl;
+    private String writing;
 }

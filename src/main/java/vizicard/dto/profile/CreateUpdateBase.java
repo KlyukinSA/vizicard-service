@@ -13,5 +13,5 @@ public class CreateUpdateBase {
     private String title;
     private String description;
     private String city;
-    private List<ContactRequest> contacts;
+//    private List<ContactRequest> contacts;
 }

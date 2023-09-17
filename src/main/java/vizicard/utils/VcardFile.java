@@ -9,7 +9,6 @@ import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
 import lombok.Getter;
-import vizicard.dto.ContactDTO;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Profile;

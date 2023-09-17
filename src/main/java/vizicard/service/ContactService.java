@@ -12,7 +12,10 @@ import vizicard.model.Profile;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +89,19 @@ public class ContactService {
         }
         contact.setStatus(false);
         contactRepository.save(contact);
+    }
+
+    public void reorder(Map<Integer, Integer> permutation) {
+        Set<?> set = new HashSet<>(permutation.values());
+        if (set.size() != permutation.keySet().size()) {
+            throw new CustomException("function is not injective", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        for (Map.Entry<Integer, Integer> entry : permutation.entrySet()) {
+            Contact contact = contactRepository.findById(entry.getKey()).get();
+            contact.setOrder(entry.getValue());
+            contactRepository.save(contact); // TODO check owner
+        }
     }
 
 }

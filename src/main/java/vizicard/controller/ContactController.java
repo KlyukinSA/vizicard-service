@@ -12,6 +12,7 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.service.ContactService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -85,5 +86,17 @@ public class ContactController {
 //                .map((val) -> modelMapper.map(val, ContactResponse.class))
 //                .collect(Collectors.toList());
 //    }
+
+    @PutMapping("order")
+    @PreAuthorize("isAuthenticated()")
+    public void reorder(@RequestBody List<ContactReorderDTO> dto) {
+        Map<Integer, Integer> permutation = dto.stream()
+                .collect(Collectors.toMap(
+                        ContactReorderDTO::getId,
+                        ContactReorderDTO::getOrder,
+                        (existing, replacement) -> replacement)); // {throw new CustomException("not function", HttpStatus.UNPROCESSABLE_ENTITY);}
+
+        contactService.reorder(permutation);
+    }
 
 }

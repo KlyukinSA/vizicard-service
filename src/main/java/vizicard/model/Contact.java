@@ -1,5 +1,7 @@
 package vizicard.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,8 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "order"}))
 public class Contact {
 
@@ -26,7 +30,6 @@ public class Contact {
     @Column(nullable = false, length = 200)
     private String contact;
 
-    @Column(nullable = false)
     private String title;
 
     private String description;

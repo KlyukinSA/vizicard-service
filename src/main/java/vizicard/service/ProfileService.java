@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.*;
+import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
@@ -25,7 +26,9 @@ public class ProfileService {
   private final RelationRepository relationRepository; // TODO GroupService
   private final ShortnameRepository shortnameRepository;
 
-  private final ContactUpdater contactUpdater;
+  private final ContactRepository contactRepository;
+  private final ContactTypeRepository contactTypeRepository;
+
   private final ProfileProvider profileProvider;
   private final RelationValidator relationValidator;
   private final ProfileMapper profileMapper;
@@ -63,14 +66,6 @@ public class ProfileService {
     relationValidator.stopNotOwnerOf(target);
     return profileMapper.mapToResponse(updateProfile(target, dto));
   }
-
-//  private void updateContacts(Profile owner, List<ContactRequest> list) {
-//    for (ContactRequest dto : list) {
-//      if (dto.getType() != null && dto.getContact() != null) {
-//        contactUpdater.updateContact(owner, dto);
-//      }
-//    }
-//  }
 
   public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password) {
     Profile profile = new Profile();
@@ -130,12 +125,40 @@ public class ProfileService {
       profile.setPassword(passwordEncoder.encode(dto.getPassword()));
     }
 
+    if (dto.getContacts() != null) {
+      profile = updateContacts(profile, dto.getContacts());
+    }
+
     profile = profileRepository.save(profile);
 
-//    if (dto.getContacts() != null) {
-//      updateContacts(profile, dto.getContacts());
-//    }
+    return profile;
+  }
 
+  private Profile updateContacts(Profile profile, List<ContactInListRequest> contacts) {
+    Set<ContactEnum> types = contacts.stream()
+            .map(ContactInListRequest::getType)
+            .collect(Collectors.toSet());
+    if (types.size() != contacts.size()) {
+      throw new CustomException("Cant update profile when types in list of contacts are not unique", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    for (Contact contact : profile.getContacts()) {
+      contact.setStatus(false);
+//      contactRepository.save(contact);
+    }
+
+    int order = 0;
+    for (ContactInListRequest dto : contacts) {
+      order++;
+      ContactType contactType = contactTypeRepository.findByType(dto.getType());
+      Contact contact = Contact.builder()
+              .owner(profile)
+              .type(contactType)
+              .contact(dto.getContact())
+              .order(order)
+              .build();
+      profile.getContacts().add(contact);
+    }
     return profile;
   }
 

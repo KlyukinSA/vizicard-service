@@ -55,7 +55,11 @@ public class ContactController {
 
         contact = contactService.create(contact);
 
-        ContactResponse contactResponse = modelMapper.map(contactService.create(contact), ContactResponse.class);
+        return toResponse(contact);
+    }
+
+    private ContactResponse toResponse(Contact contact) {
+        ContactResponse contactResponse = modelMapper.map(contact, ContactResponse.class);
         contactResponse.setLogoUrl(contact.getType().getLogo().getUrl());
         return contactResponse;
     }
@@ -67,9 +71,7 @@ public class ContactController {
 
         contact = contactService.update(contact, id);
 
-        ContactResponse contactResponse = modelMapper.map(contactService.create(contact), ContactResponse.class);
-        contactResponse.setLogoUrl(contact.getType().getLogo().getUrl());
-        return contactResponse;
+        return toResponse(contact);
 //        return modelMapper.map(contactService.update(modelMapper.map(dto, Contact.class), id), ContactResponse.class);
     }
 

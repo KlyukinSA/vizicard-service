@@ -1,15 +1,11 @@
 package vizicard.service;
 
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import vizicard.dto.ContactRequest;
 import vizicard.exception.CustomException;
 import vizicard.model.Contact;
-import vizicard.model.ContactType;
-import vizicard.model.Profile;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 

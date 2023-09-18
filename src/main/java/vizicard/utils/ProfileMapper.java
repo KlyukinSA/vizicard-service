@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
+import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.*;
+import vizicard.dto.contact.*;
 import vizicard.model.Contact;
 import vizicard.model.ContactType;
 import vizicard.repository.ContactGroupRepository;

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
+import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 
 @Data

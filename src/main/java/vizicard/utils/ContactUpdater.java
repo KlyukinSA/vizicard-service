@@ -2,10 +2,6 @@ package vizicard.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vizicard.dto.ContactRequest;
-import vizicard.model.Contact;
-import vizicard.model.ContactType;
-import vizicard.model.Profile;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.ContactTypeRepository;
 

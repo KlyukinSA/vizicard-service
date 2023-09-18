@@ -1,4 +1,4 @@
-package vizicard.dto;
+package vizicard.dto.contact;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

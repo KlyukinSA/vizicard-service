@@ -15,6 +15,8 @@ import vizicard.model.*;
 import vizicard.repository.*;
 import vizicard.utils.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Persistence;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +28,7 @@ public class ProfileService {
   private final RelationRepository relationRepository; // TODO GroupService
   private final ShortnameRepository shortnameRepository;
 
-  private final ContactRepository contactRepository;
+//  private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
 
   private final ProfileProvider profileProvider;
@@ -34,10 +36,10 @@ public class ProfileService {
   private final ProfileMapper profileMapper;
   private final PasswordEncoder passwordEncoder;
   private final ModelMapper modelMapper;
+  private final Relator relator;
 
   private final S3Service s3Service; // TODO CloudFileProvider
-  private final ActionService actionService; // TODO ActionSaver
-  private final Relator relator;
+  private final ActionService actionService; // TODO ActionSaver?
 
   public ProfileResponseDTO searchByShortname(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
@@ -126,7 +128,7 @@ public class ProfileService {
     }
 
     if (dto.getContacts() != null) {
-      profile = updateContacts(profile, dto.getContacts());
+      updateContacts(profile, dto.getContacts());
     }
 
     profile = profileRepository.save(profile);
@@ -134,7 +136,7 @@ public class ProfileService {
     return profile;
   }
 
-  private Profile updateContacts(Profile profile, List<ContactInListRequest> contacts) {
+  private void updateContacts(Profile profile, List<ContactInListRequest> contacts) {
     Set<ContactEnum> types = contacts.stream()
             .map(ContactInListRequest::getType)
             .collect(Collectors.toSet());
@@ -144,10 +146,9 @@ public class ProfileService {
 
     for (Contact contact : profile.getContacts()) {
       contact.setStatus(false);
-//      contactRepository.save(contact);
     }
 
-    int order = 0;
+    int order = profile.getContacts().stream().mapToInt(Contact::getOrder).max().orElse(0);
     for (ContactInListRequest dto : contacts) {
       order++;
       ContactType contactType = contactTypeRepository.findByType(dto.getType());
@@ -156,10 +157,10 @@ public class ProfileService {
               .type(contactType)
               .contact(dto.getContact())
               .order(order)
+              .status(true)
               .build();
       profile.getContacts().add(contact);
     }
-    return profile;
   }
 
   public void deleteProfile(Integer id) {

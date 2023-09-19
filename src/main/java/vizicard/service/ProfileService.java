@@ -28,7 +28,7 @@ public class ProfileService {
   private final RelationRepository relationRepository; // TODO GroupService
   private final ShortnameRepository shortnameRepository;
 
-//  private final ContactRepository contactRepository;
+  private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
 
   private final ProfileProvider profileProvider;
@@ -148,18 +148,22 @@ public class ProfileService {
       contact.setStatus(false);
     }
 
-    int order = profile.getContacts().stream().mapToInt(Contact::getOrder).max().orElse(0);
+//    int order = profile.getContacts().stream().mapToInt(Contact::getOrder).max().orElse(0);
+    int order = 0;
     for (ContactInListRequest dto : contacts) {
       order++;
       ContactType contactType = contactTypeRepository.findByType(dto.getType());
-      Contact contact = Contact.builder()
-              .owner(profile)
-              .type(contactType)
-              .contact(dto.getContact())
-              .order(order)
-              .status(true)
-              .build();
-      profile.getContacts().add(contact);
+      Contact contact = contactRepository.findByOwnerAndOrder(profile, order);
+      if (contact == null) {
+        contact = new Contact();
+        contact.setOwner(profile);
+        contact.setOrder(order);
+      } else {
+        contact.setStatus(true);
+      }
+      contact.setType(contactType);
+      contact.setContact(dto.getContact());
+      contactRepository.save(contact);
     }
   }
 

@@ -8,7 +8,5 @@ import vizicard.model.Profile;
 import java.util.List;
 
 public interface ContactRepository extends JpaRepository<Contact, Integer> {
-    Contact findByOwnerAndType(Profile owner, ContactType type);
-
-    List<Contact> findAllByOwner(Profile user);
+    Contact findByOwnerAndOrder(Profile owner, Integer order);
 }

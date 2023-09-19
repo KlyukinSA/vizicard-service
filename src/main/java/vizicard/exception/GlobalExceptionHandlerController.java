@@ -43,8 +43,7 @@ public class GlobalExceptionHandlerController {
 
   @ExceptionHandler(CustomException.class)
   public void handleCustomException(HttpServletResponse res, CustomException ex) throws IOException {
-    System.err.println("Error: " + ex.getMessage());
-    System.err.println(Joiner.on("\n").join(Iterables.limit(asList(ex.getStackTrace()), 10)));
+    logError(ex, 1);
     res.sendError(ex.getHttpStatus().value(), ex.getMessage());
   }
 
@@ -53,9 +52,15 @@ public class GlobalExceptionHandlerController {
     res.sendError(HttpStatus.FORBIDDEN.value(), "Access denied");
   }
 
-//  @ExceptionHandler(Exception.class)
-//  public void handleException(HttpServletResponse res) throws IOException {
-//    res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
-//  }
+  @ExceptionHandler(Exception.class)
+  public void handleException(HttpServletResponse res, Exception ex) throws IOException {
+    logError(ex, 20);
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  }
+
+  private void logError(Exception exception, int limit) {
+    System.err.println("Error: " + exception.getMessage());
+    System.err.println(Joiner.on("\n").join(Iterables.limit(asList(exception.getStackTrace()), limit)));
+  }
 
 }

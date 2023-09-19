@@ -10,8 +10,6 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "order"}))
 public class Contact {
 

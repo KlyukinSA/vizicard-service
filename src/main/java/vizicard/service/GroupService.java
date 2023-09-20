@@ -50,18 +50,13 @@ public class GroupService {
     }
 
     public void addGroupMembers(Integer groupId, List<Integer> memberIds) {
-        Set<ProfileType> goodTypes = new HashSet<>(Arrays.asList(
-                ProfileType.USER, ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY, ProfileType.COMPANY));
-
         Profile group = profileProvider.getTarget(groupId);
         letGroupPass(group);
         relationValidator.stopNotOwnerOf(group);
 
         for (Integer memberId : memberIds) {
             Profile profile = profileProvider.getTarget(memberId);
-            if (goodTypes.contains(profile.getType())) {
-                relator.relate(profile, group, RelationType.USUAL);
-            }
+            relator.relate(profile, group, RelationType.USUAL);
         }
     }
 

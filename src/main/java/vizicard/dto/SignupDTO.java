@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserSignupDTO {
+public class SignupDTO {
 
   @ApiModelProperty(position = 0)
   private String username;

@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.SigninDTO;
 import vizicard.dto.AuthResponseDTO;
-import vizicard.dto.UserSignupDTO;
+import vizicard.dto.SignupDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.ProfileRepository;
-import vizicard.repository.ShortnameRepository;
 import vizicard.security.JwtTokenProvider;
 
 @Service
@@ -38,7 +37,7 @@ public class AuthService {
         }
     }
 
-    public AuthResponseDTO signup(UserSignupDTO dto) {
+    public AuthResponseDTO signup(SignupDTO dto) {
         if (!profileRepository.existsByUsername(dto.getUsername())) {
             ProfileCreateDTO dto1 = new ProfileCreateDTO();
             dto1.setName(dto.getName());

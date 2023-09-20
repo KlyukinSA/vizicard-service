@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import vizicard.dto.SigninDTO;
 import vizicard.dto.AuthResponseDTO;
-import vizicard.dto.UserSignupDTO;
+import vizicard.dto.SignupDTO;
 import vizicard.service.AuthService;
 
 @RestController
@@ -31,7 +31,7 @@ public class AuthController {
             @ApiResponse(code = 400, message = "Something went wrong"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 422, message = "Username is already in use")})
-    public AuthResponseDTO signup(@RequestBody UserSignupDTO dto) {
+    public AuthResponseDTO signup(@RequestBody SignupDTO dto) {
         return authService.signup(dto);
     }
 

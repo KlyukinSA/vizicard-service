@@ -51,7 +51,7 @@ public class GroupService {
 
     public void addGroupMembers(Integer groupId, List<Integer> memberIds) {
         Set<ProfileType> goodTypes = new HashSet<>(Arrays.asList(
-                ProfileType.USER, ProfileType.CUSTOM, ProfileType.COMPANY));
+                ProfileType.USER, ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY, ProfileType.COMPANY));
 
         Profile group = profileProvider.getTarget(groupId);
         letGroupPass(group);

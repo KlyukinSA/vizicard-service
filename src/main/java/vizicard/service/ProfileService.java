@@ -52,7 +52,7 @@ public class ProfileService {
   }
 
   private ProfileResponseDTO search(Profile profile) {
-    if (profile.getType() == ProfileType.CUSTOM || profile.getType() == ProfileType.GROUP) {
+    if (profile.getType() == ProfileType.CUSTOM_USER || profile.getType() == ProfileType.CUSTOM_COMPANY || profile.getType() == ProfileType.GROUP) {
       relationValidator.stopNotOwnerOf(profile);
     }
     actionService.vizit(profile);
@@ -180,26 +180,52 @@ public class ProfileService {
     }
     Profile main = profileProvider.getTarget(mainId);
     Profile secondary = profileProvider.getTarget(secondaryId);
-    if (main.getType() != ProfileType.CUSTOM || secondary.getType() != ProfileType.CUSTOM) {
-      throw new CustomException("Can merge only ProfileType.CUSTOM", HttpStatus.FORBIDDEN);
+    if (!checkCanMerge(main, secondary)) {
+      throw new CustomException("cant merge profiles with this types", HttpStatus.FORBIDDEN);
     }
 
-    List<Contact> mainContacts = main.getContacts();
-    Set<ContactEnum> mainContactTypes = mainContacts.stream()
-            .map((val) -> val.getType().getType())
-            .collect(Collectors.toSet());
-    for (Contact contact : secondary.getContacts()) {
-      if (!mainContactTypes.contains(contact.getType().getType())) {
-        contact.setOwner(main);
-        mainContacts.add(contact);
-      }
-    }
-    main.setContacts(mainContacts);
+    applySecondaryContacts(main, secondary);
+    setCustomType(main);
     profileRepository.save(main);
 
     secondary.setStatus(false);
     profileRepository.save(secondary);
     return main;
+  }
+
+  private void applySecondaryContacts(Profile main, Profile secondary) {
+    List<Contact> mainContacts = main.getContacts();
+    Set<ContactEnum> mainContactTypes = mainContacts.stream()
+            .map((val) -> val.getType().getType())
+            .collect(Collectors.toSet());
+    int order = mainContacts.size();
+    for (Contact contact : secondary.getContacts()) {
+      if (!mainContactTypes.contains(contact.getType().getType())) {
+        order++;
+        contact.setOrder(order);
+        contact.setOwner(main);
+        mainContacts.add(contact);
+      }
+    }
+    main.setContacts(mainContacts);
+  }
+
+  private void setCustomType(Profile main) {
+    if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
+      main.setType(ProfileType.CUSTOM_USER);
+    } else {
+      main.setType(ProfileType.CUSTOM_COMPANY);
+    }
+  }
+
+  private boolean checkCanMerge(Profile main, Profile secondary) {
+    if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
+      return secondary.getType() == ProfileType.CUSTOM_USER || secondary.getType() == ProfileType.LEAD_USER;
+    } else if (main.getType() == ProfileType.CUSTOM_COMPANY || main.getType() == ProfileType.LEAD_COMPANY) {
+      return secondary.getType() == ProfileType.CUSTOM_COMPANY || secondary.getType() == ProfileType.LEAD_COMPANY;
+    } else {
+      return false;
+    }
   }
 
 }

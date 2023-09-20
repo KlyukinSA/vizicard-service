@@ -87,6 +87,12 @@ public class ProfileService {
   }
 
   public Profile createMyProfile(ProfileCreateDTO dto) {
+    Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
+            ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
+            ProfileType.COMPANY, ProfileType.GROUP));
+    if (!relationOrCompanyGroupProfileTypes.contains(dto.getType())) {
+      throw new CustomException("cant create with this type", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
     Profile owner = profileProvider.getUserFromAuth();
     return createProfile(dto, owner, null, null);
   }

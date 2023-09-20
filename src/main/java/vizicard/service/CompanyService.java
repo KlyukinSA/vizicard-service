@@ -10,6 +10,7 @@ import vizicard.dto.profile.WorkerCreateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
 import vizicard.model.ProfileType;
+import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
@@ -17,6 +18,9 @@ import vizicard.utils.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 import vizicard.utils.Relator;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class CompanyService {
     private final ProfileRepository profileRepository;
 
     private final ModelMapper modelMapper;
-    private final RelationValidator relationValidator;
+    private final RelationRepository relationRepository;
     private final Relator relator;
 
     public Profile createWorker(WorkerCreateDTO dto) {
@@ -46,6 +50,15 @@ public class CompanyService {
     private void addToCompany(Profile profile, Profile company) { // TODO use public? (in updateProfile())
         relator.relate(profile, company, RelationType.USUAL);
         profile.setCompany(company);
+    }
+
+    public List<Profile> getAllWorkers() {
+        return relationRepository.findAllByProfileAndOwnerType(
+                profileProvider.getUserFromAuth().getCompany(), ProfileType.WORKER).stream()
+                .filter(Relation::isStatus)
+                .map(Relation::getOwner)
+                .filter(Profile::isStatus)
+                .collect(Collectors.toList());
     }
 
 }

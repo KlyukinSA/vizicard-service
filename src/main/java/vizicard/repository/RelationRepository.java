@@ -12,11 +12,13 @@ import java.util.List;
 public interface RelationRepository extends JpaRepository<Relation, Integer> {
     Relation findByOwnerAndProfile(Profile owner, Profile target);
 
-    List<Relation> findAllByOwnerOrderByProfileNameAsc(Profile owner);
+//    List<Relation> findAllByOwnerOrderByProfileNameAsc(Profile owner);
 
     List<Relation> findAllByProfile(Profile target);
 
     Relation findByTypeAndProfile(RelationType relationType, Profile group);
 
     List<Relation> findAllByOwnerAndProfileType(Profile user, ProfileType profileType);
+
+    List<Relation> findAllByProfileAndOwnerType(Profile company, ProfileType profileType);
 }

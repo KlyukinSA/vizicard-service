@@ -62,6 +62,9 @@ public class Profile {
   @Column(columnDefinition = "TIMESTAMP(0)", nullable = false)
   private Date lastVizit = new Date();
 
+  @OneToOne
+  private Album album;
+
   private ProfileDetailStruct detailStruct;
 
   // SQL settings (OnDeleteAction.CASCADE)

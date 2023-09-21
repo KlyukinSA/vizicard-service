@@ -27,7 +27,7 @@ public class ProfileService {
   private final ProfileRepository profileRepository;
   private final RelationRepository relationRepository; // TODO CreateProfileDTOMapper
   private final ShortnameRepository shortnameRepository;
-
+  private final AlbumRepository albumRepository;
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
 
@@ -80,6 +80,11 @@ public class ProfileService {
       relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
     }
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
+    if (profile.getType() == ProfileType.USER || profile.getType() == ProfileType.COMPANY) {
+      Album album = new Album(profile);
+      albumRepository.save(album);
+      profile.setAlbum(album);
+    }
 
     ProfileUpdateDTO dto1 = modelMapper.map(dto, ProfileUpdateDTO.class);
     dto1.setPassword(password);

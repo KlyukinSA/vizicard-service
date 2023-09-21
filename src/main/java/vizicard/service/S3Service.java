@@ -25,9 +25,7 @@ public class S3Service {
     private final String bucketName = "2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2";
     private final CloudFileRepository cloudFileRepository;
 
-    private final ProfileProvider profileProvider;
-
-    public CloudFile uploadFile(final MultipartFile file) throws AmazonClientException, IOException {
+    public String uploadFile(final MultipartFile file) throws AmazonClientException, IOException {
         String keyName = String.valueOf(UUID.randomUUID());
 
         ObjectMetadata metadata = new ObjectMetadata();
@@ -39,7 +37,7 @@ public class S3Service {
         URL url = s3Client.getUrl(bucketName, keyName);
 //        System.out.println(url);
 
-        return cloudFileRepository.save(new CloudFile(url.toString(), profileProvider.getUserFromAuth()));
+        return url.toString();
     }
 
     public String getUrlById(Integer id) {

@@ -21,13 +21,13 @@ public class S3Controller {
     private final S3Service service;
     private final ModelMapper modelMapper;
 
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public CloudFileDTO uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
-        return modelMapper.map(service.uploadFile(file), CloudFileDTO.class);
-    }
+//    @PostMapping
+//    @PreAuthorize("isAuthenticated()")
+//    public CloudFileDTO uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
+//        return modelMapper.map(service.uploadFile(file), CloudFileDTO.class);
+//    }
 
-    @GetMapping("{id}")
+    @GetMapping("{id}/url")
     public String getUrlById(@RequestParam("id") Integer id) {
         return service.getUrlById(id);
     }

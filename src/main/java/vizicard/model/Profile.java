@@ -100,9 +100,4 @@ public class Profile {
   @LazyCollection(LazyCollectionOption.FALSE)
   private List<Action> actionsWherePage;
 
-  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  @LazyCollection(LazyCollectionOption.FALSE)
-  private List<CloudFile> files;
-
 }

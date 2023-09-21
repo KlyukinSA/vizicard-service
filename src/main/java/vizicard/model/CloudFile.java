@@ -17,11 +17,13 @@ public class CloudFile {
 
     private String url;
 
-    @ManyToOne
-    private Profile owner;
+    @ManyToOne(targetEntity = Album.class)
+    @JoinColumn(nullable = false)
+    private Album album;
 
-    public CloudFile(String url, Profile owner) {
+    public CloudFile(String url, Album album) {
         this.url = url;
-        this.owner = owner;
+        this.album = album;
     }
+
 }

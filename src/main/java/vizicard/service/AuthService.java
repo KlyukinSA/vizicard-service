@@ -31,7 +31,7 @@ public class AuthService {
             Profile profile = profileRepository.findByUsername(dto.getUsername());
             String id = String.valueOf(profile.getId());
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, dto.getPassword()));
-            return new AuthResponseDTO(jwtTokenProvider.createToken(id), shortnameService.getMainShortname(profile));
+            return getResponse(profile);
         } catch (Exception e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -42,13 +42,15 @@ public class AuthService {
             ProfileCreateDTO dto1 = new ProfileCreateDTO();
             dto1.setName(dto.getName());
             dto1.setType(ProfileType.USER);
-
             Profile profile = profileService.createProfile(dto1, null, dto.getUsername(), dto.getPassword());
-
-            return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId())), shortnameService.getMainShortname(profile));
+            return getResponse(profile);
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    AuthResponseDTO getResponse(Profile profile) {
+        return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId()), profile.getType()), shortnameService.getMainShortname(profile));
     }
 
 }

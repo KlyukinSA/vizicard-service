@@ -5,7 +5,6 @@ import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import vizicard.model.AppUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
+import vizicard.model.ProfileType;
 
 @Component
 public class JwtTokenProvider {
@@ -37,9 +37,10 @@ public class JwtTokenProvider {
     secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
-  public String createToken(String id) {
+  public String createToken(String id, ProfileType type) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("id", id);
+    claims.put("type", type);
 
     Date now = new Date();
 

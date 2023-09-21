@@ -125,7 +125,15 @@ public class ProfileService {
       } else {
         Profile company = profileProvider.getTarget(dto.getCompanyId());
         profile.setCompany(company);
-        relator.relate(profile, company, RelationType.USUAL);
+
+        Relation relation = relationRepository.findByOwnerAndProfile(profile, company);
+        RelationType relationType;
+        if (relation != null) {
+          relationType = relation.getType();
+        } else {
+          relationType = RelationType.USUAL;
+        }
+        relator.relate(profile, company, relationType);
       }
     }
 

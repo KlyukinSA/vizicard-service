@@ -21,6 +21,9 @@ public class CloudFile {
     @JoinColumn(nullable = false)
     private Album album;
 
+    @Column(nullable = false)
+    private boolean status = true;
+
     public CloudFile(String url, Album album) {
         this.url = url;
         this.album = album;

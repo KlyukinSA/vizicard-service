@@ -10,6 +10,8 @@ import vizicard.service.AlbumService;
 import vizicard.service.ContactService;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/albums")
@@ -23,6 +25,13 @@ public class AlbumController {
     @PreAuthorize("isAuthenticated()")
     CloudFileDTO addFile(@RequestPart MultipartFile file, @PathVariable Integer id) throws IOException {
         return modelMapper.map(albumService.addFile(file, id), CloudFileDTO.class);
+    }
+
+    @GetMapping("{id}/files")
+    List<CloudFileDTO> getAllFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(id).stream()
+                .map((val) -> modelMapper.map(val, CloudFileDTO.class))
+                .collect(Collectors.toList());
     }
 
 }

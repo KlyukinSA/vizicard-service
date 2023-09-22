@@ -36,6 +36,7 @@ public class ProfileMapper {
     public BriefProfileResponseDTO mapToBrief(Profile profile) {
         BriefProfileResponseDTO res = modelMapper.map(profile, BriefProfileResponseDTO.class);
         res.setMainShortname(shortnameService.getMainShortname(profile));
+        removeDeletedAvatar(res, profile);
         return res;
     }
 
@@ -48,9 +49,15 @@ public class ProfileMapper {
         }
         res.setContacts(getContactDTOs(profile));
         res.setAbout(getAbout(profile));
-        res.setMainShortname(shortnameService.getMainShortname(profile));
         res.setRelation(getPossibleRelation(profile));
+        removeDeletedAvatar(res, profile);
         return res;
+    }
+
+    private void removeDeletedAvatar(BriefProfileResponseDTO dto, Profile profile) {
+        if (profile.getAvatar() != null && !profile.getAvatar().isStatus()) {
+            dto.setAvatar(null);
+        }
     }
 
     private BriefRelationResponseDTO getPossibleRelation(Profile profile) {

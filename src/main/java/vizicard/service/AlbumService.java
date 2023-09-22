@@ -12,8 +12,10 @@ import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,13 @@ public class AlbumService {
         relationValidator.stopNotOwnerOf(album.getOwner());
         String url = s3Service.uploadFile(file);
         return cloudFileRepository.save(new CloudFile(url, album));
+    }
+
+    public List<CloudFile> getAllFiles(Integer id) {
+        Album album = albumRepository.findById(id).get();
+        return cloudFileRepository.findAllByAlbum(album).stream()
+                .filter(CloudFile::isStatus)
+                .collect(Collectors.toList());
     }
 
 }

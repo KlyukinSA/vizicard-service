@@ -38,7 +38,7 @@ public class ProfileService {
   private final ModelMapper modelMapper;
   private final Relator relator;
 
-  private final S3Service s3Service; // TODO CloudFileProvider
+  private final S3Service s3Service; // TODO use CloudFileRepository
   private final ActionService actionService; // TODO ActionSaver?
 
   public ProfileResponseDTO searchByShortname(String shortname) {

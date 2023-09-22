@@ -183,6 +183,7 @@ public class ProfileService {
       contact.setType(contactType);
       contact.setContact(dto.getContact());
       contactRepository.save(contact);
+      profile.getContacts().add(contact);
     }
   }
 

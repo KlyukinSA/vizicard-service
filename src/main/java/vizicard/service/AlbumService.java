@@ -40,4 +40,11 @@ public class AlbumService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteFile(Integer id) {
+        CloudFile file = cloudFileRepository.findById(id).get();
+        relationValidator.stopNotOwnerOf(file.getAlbum().getOwner());
+        file.setStatus(false);
+        cloudFileRepository.save(file);
+    }
+
 }

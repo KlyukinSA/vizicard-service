@@ -1,6 +1,7 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,17 @@ public class AlbumController {
     }
 
     @GetMapping("{id}/files")
+    @PreAuthorize("isAuthenticated()")
     List<CloudFileDTO> getAllFiles(@PathVariable Integer id) {
         return albumService.getAllFiles(id).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @DeleteMapping("any/files/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public void deleteFile(@PathVariable Integer id) {
+        albumService.deleteFile(id);
     }
 
 }

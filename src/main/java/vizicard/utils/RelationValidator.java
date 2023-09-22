@@ -27,7 +27,7 @@ public class RelationValidator { // TODO move to Service?
 
         Relation relation = relationRepository.findByOwnerAndProfile(user, target);
         if (relation == null || !relation.isStatus() || relation.getType() != RelationType.OWNER) {
-            throw new CustomException("You are not the owner of this profile", HttpStatus.FORBIDDEN);
+            throw new CustomException("You are not the owner of this profile (id " + target.getId() + ")", HttpStatus.FORBIDDEN);
         }
     }
 

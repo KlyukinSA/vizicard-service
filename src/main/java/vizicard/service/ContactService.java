@@ -1,5 +1,6 @@
 package vizicard.service;
 
+import com.amazonaws.services.sagemaker.model.ProductionVariant;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import vizicard.exception.CustomException;
 import vizicard.model.Contact;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
+import vizicard.utils.RelationValidator;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -18,8 +20,11 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ContactService {
 
-    private final ProfileProvider profileProvider;
     private final ContactRepository contactRepository;
+
+    private final ProfileProvider profileProvider;
+    private final RelationValidator relationValidator;
+
     private final ModelMapper modelMapper;
 
 //    public void changeContacts(ChangeContactsDTO dto) {
@@ -72,18 +77,14 @@ public class ContactService {
 
     public Contact update(Contact map, Integer id) {
         Contact contact = contactRepository.findById(id).get();
-        if (!Objects.equals(contact.getOwner().getId(), profileProvider.getUserFromAuth().getId())) {
-            throw new CustomException("not owner", HttpStatus.FORBIDDEN);
-        }
+        relationValidator.stopNotOwnerOf(contact.getOwner());
         modelMapper.map(map, contact);
         return contactRepository.save(contact);
     }
 
     public void delete(Integer id) {
         Contact contact = contactRepository.findById(id).get();
-        if (!Objects.equals(contact.getOwner().getId(), profileProvider.getUserFromAuth().getId())) {
-            throw new CustomException("not owner", HttpStatus.FORBIDDEN);
-        }
+        relationValidator.stopNotOwnerOf(contact.getOwner());
         contact.setStatus(false);
         contactRepository.save(contact);
     }

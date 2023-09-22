@@ -17,6 +17,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
+import vizicard.model.Profile;
 import vizicard.model.ProfileType;
 
 @Component
@@ -37,10 +38,12 @@ public class JwtTokenProvider {
     secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
-  public String createToken(String id, ProfileType type) {
+  public String createToken(Profile profile) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("id", id);
-    claims.put("type", type);
+    claims.put("id", String.valueOf(profile.getId()));
+    claims.put("type", profile.getType());
+    claims.put("status", profile.isStatus());
+    claims.put("albumId", profile.getAlbum().getId());
 
     Date now = new Date();
 

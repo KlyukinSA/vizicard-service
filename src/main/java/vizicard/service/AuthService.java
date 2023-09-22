@@ -50,7 +50,10 @@ public class AuthService {
     }
 
     AuthResponseDTO getResponse(Profile profile) {
-        return new AuthResponseDTO(jwtTokenProvider.createToken(String.valueOf(profile.getId()), profile.getType()), shortnameService.getMainShortname(profile));
+        return new AuthResponseDTO(
+                jwtTokenProvider.createToken(profile),
+                shortnameService.getMainShortname(profile)
+        );
     }
 
 }

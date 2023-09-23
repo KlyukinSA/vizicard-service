@@ -5,6 +5,7 @@ import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
 import vizicard.model.ProfileType;
+import vizicard.utils.TokenClaimsFiller;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
   /**
@@ -30,8 +33,8 @@ public class JwtTokenProvider {
   @Value("${security.jwt.token.secret-key:secret-key}")
   private String secretKey;
 
-  @Autowired
-  private MyUserDetails myUserDetails;
+  private final MyUserDetails myUserDetails;
+  private final TokenClaimsFiller tokenClaimsFiller;
 
   @PostConstruct
   protected void init() {
@@ -41,15 +44,10 @@ public class JwtTokenProvider {
   public String createToken(Profile profile) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("id", String.valueOf(profile.getId()));
-    claims.put("type", profile.getType());
-    claims.put("status", profile.isStatus());
-    claims.put("albumId", profile.getAlbum().getId());
-
-    Date now = new Date();
-
+    tokenClaimsFiller.fill(claims, profile);
     return Jwts.builder()
             .setClaims(claims)
-            .setIssuedAt(now)
+            .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
   }

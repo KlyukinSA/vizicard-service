@@ -12,5 +12,6 @@ public class TokenClaimsFiller {
         claims.put("type", profile.getType());
         claims.put("status", profile.isStatus());
         claims.put("albumId", profile.getAlbum().getId());
+        claims.put("pro", profile.getCash() > 0);
     }
 }

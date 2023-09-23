@@ -65,6 +65,8 @@ public class Profile {
   @OneToOne
   private Album album;
 
+  private float cash = 0;
+
   private ProfileDetailStruct detailStruct;
 
   // SQL settings (OnDeleteAction.CASCADE)

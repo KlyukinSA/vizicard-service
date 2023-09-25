@@ -6,7 +6,6 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +18,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
 import vizicard.model.Profile;
-import vizicard.model.ProfileType;
 import vizicard.utils.TokenClaimsFiller;
 
 @Component
@@ -44,7 +42,7 @@ public class JwtTokenProvider {
   public String createToken(Profile profile) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("id", String.valueOf(profile.getId()));
-    tokenClaimsFiller.fill(claims, profile);
+    tokenClaimsFiller.fillAdditional(claims, profile);
     return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(new Date())

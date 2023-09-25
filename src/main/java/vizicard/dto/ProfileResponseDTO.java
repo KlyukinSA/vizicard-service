@@ -22,4 +22,6 @@ public class ProfileResponseDTO extends BriefProfileResponseDTO {
   private ProfileDetailStructResponseDTO about;
 
   private BriefRelationResponseDTO relation;
+
+  private Integer albumId;
 }

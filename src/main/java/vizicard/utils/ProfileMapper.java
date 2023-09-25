@@ -1,7 +1,11 @@
 package vizicard.utils;
 
+import com.amazonaws.services.apigateway.model.GatewayResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
 import vizicard.dto.contact.ContactResponse;
@@ -42,16 +46,29 @@ public class ProfileMapper {
 
     public ProfileResponseDTO mapToResponse(Profile profile) {
         ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
-        if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO function for same checks
-            res.setCompany(null);
-        } else {
-            res.getCompany().setMainShortname(shortnameService.getMainShortname(profile.getCompany()));
-        }
         res.setContacts(getContactDTOs(profile));
         res.setResume(getResume(profile));
         res.setRelation(getPossibleRelation(profile));
         removeDeletedAvatar(res, profile);
+        finishCompany(res, profile);
         return res;
+    }
+
+    private void finishCompany(ProfileResponseDTO res, Profile profile) {
+        if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO function for same checks
+            res.setCompany(null);
+        } else if (!isPro(profile)) {
+            BriefProfileResponseDTO dto = new BriefProfileResponseDTO();
+            dto.setName(profile.getCompany().getName());
+            res.setCompany(dto);
+        } else {
+            res.getCompany().setMainShortname(shortnameService.getMainShortname(profile.getCompany()));
+        }
+    }
+
+    private boolean isPro(Profile profile) {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).anyMatch(au -> au.equals("PRO"));
     }
 
     private void removeDeletedAvatar(BriefProfileResponseDTO dto, Profile profile) {

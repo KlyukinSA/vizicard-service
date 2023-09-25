@@ -48,7 +48,7 @@ public class ProfileMapper {
             res.getCompany().setMainShortname(shortnameService.getMainShortname(profile.getCompany()));
         }
         res.setContacts(getContactDTOs(profile));
-        res.setAbout(getAbout(profile));
+        res.setResume(getResume(profile));
         res.setRelation(getPossibleRelation(profile));
         removeDeletedAvatar(res, profile);
         return res;
@@ -89,7 +89,7 @@ public class ProfileMapper {
                 .collect(Collectors.toList());
     }
 
-    private ProfileDetailStructResponseDTO getAbout(Profile profile) {
+    private ProfileDetailStructResponseDTO getResume(Profile profile) {
         ProfileDetailStruct detailStruct = profile.getDetailStruct();
         if (detailStruct == null) {
             return null;

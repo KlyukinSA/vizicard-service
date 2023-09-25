@@ -19,7 +19,7 @@ public class ProfileResponseDTO extends BriefProfileResponseDTO {
 
   private Date lastVizit;
 
-  private ProfileDetailStructResponseDTO about;
+  private ProfileDetailStructResponseDTO resume;
 
   private BriefRelationResponseDTO relation;
 

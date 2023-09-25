@@ -16,7 +16,7 @@ public class SkillController {
     private final SkillService service;
 
     @PutMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('PRO')")
     public void changeSkills(@RequestBody SkillDTO dto) {
         service.changeSkills(dto);
     }

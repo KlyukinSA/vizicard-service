@@ -1,6 +1,7 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.BriefProfileResponseDTO;
 import vizicard.dto.ProfileResponseDTO;
@@ -22,6 +23,7 @@ public class CompanyController {
     private final ProfileMapper profileMapper;
 
     @PostMapping("workers")
+    @PreAuthorize("hasAuthority('PRO')")
     ProfileResponseDTO createWorker(@RequestBody WorkerCreateDTO dto) {
         return profileMapper.mapToResponse(companyService.createWorker(dto));
     }

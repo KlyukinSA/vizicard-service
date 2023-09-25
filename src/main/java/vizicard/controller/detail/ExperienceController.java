@@ -18,20 +18,20 @@ public class ExperienceController {
     private final ExperienceService service;
 
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public ExperienceResponseDTO createEducation(@RequestBody ExperienceDTO dto) {
+    @PreAuthorize("hasAuthority('PRO')")
+    public ExperienceResponseDTO createExperience(@RequestBody ExperienceDTO dto) {
         return service.createExperience(dto);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public ExperienceResponseDTO updateEducation(@RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
+    public ExperienceResponseDTO updateExperience(@RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
         return service.updateExperience(dto, id);
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public void deleteEducation(@PathVariable("id") Integer id) {
+    public void deleteExperience(@PathVariable("id") Integer id) {
         service.deleteExperience(id);
     }
 

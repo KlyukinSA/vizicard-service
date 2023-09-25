@@ -19,7 +19,7 @@ public class EducationController {
     private final EducationService educationService;
 
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('PRO')")
     public EducationResponseDTO createEducation(@RequestBody EducationDTO dto) {
         return educationService.createEducation(dto);
     }

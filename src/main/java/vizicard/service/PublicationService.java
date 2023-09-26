@@ -3,14 +3,13 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import vizicard.dto.PublicationDTO;
+import vizicard.dto.PublicationCreateDTO;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
 import vizicard.repository.PublicationRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,17 +20,15 @@ public class PublicationService {
     private final ModelMapper modelMapper;
     private final ProfileProvider profileProvider;
 
-    public PublicationDTO createPublication(PublicationDTO dto) {
+    public PublicationCreateDTO createPublication(PublicationCreateDTO dto) {
         Publication publication = new Publication(profileProvider.getUserFromAuth());
         modelMapper.map(dto, publication);
         publicationRepository.save(publication);
         return dto;
     }
 
-    public List<PublicationDTO> getAllMy() {
-        return publicationRepository.findAllByOwner(profileProvider.getUserFromAuth()).stream()
-                .map((val) -> modelMapper.map(val, PublicationDTO.class))
-                .collect(Collectors.toList());
+    public List<Publication> getAllMy() {
+        return publicationRepository.findAllByOwner(profileProvider.getUserFromAuth());
     }
 
     public List<Publication> getOnPage(Integer id) {

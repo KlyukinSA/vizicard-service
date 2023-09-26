@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicationDTO {
+public class PublicationCreateDTO {
     private Integer profileId;
     private String title;
     private String description;

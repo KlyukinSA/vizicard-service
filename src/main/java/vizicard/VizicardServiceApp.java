@@ -2,6 +2,7 @@ package vizicard;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import vizicard.model.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,6 +16,7 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.detail.EducationTypeRepository;
 
 @SpringBootApplication
+@EnableScheduling
 @RequiredArgsConstructor
 public class VizicardServiceApp implements CommandLineRunner {
   @Value("${spring.profiles.active}")

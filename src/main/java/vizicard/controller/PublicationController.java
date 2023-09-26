@@ -1,14 +1,15 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.PublicationDTO;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
+import vizicard.dto.PublicationOnPageResponse;
 import vizicard.service.PublicationService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/publications")
@@ -16,6 +17,7 @@ import java.util.List;
 public class PublicationController {
 
     private final PublicationService publicationService;
+    private final ModelMapper modelMapper;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
@@ -29,10 +31,12 @@ public class PublicationController {
         return publicationService.getAllMy();
     }
 
-    @GetMapping("my-on-page")
+    @GetMapping("on-page")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationDTO> getAllMyOnPage(@RequestParam Integer id) {
-        return publicationService.getAllMyOnPage(id);
+    public List<PublicationOnPageResponse> getOnPage(@RequestParam Integer id) {
+        return publicationService.getOnPage(id).stream()
+                .map(e -> modelMapper.map(e, PublicationOnPageResponse.class))
+                .collect(Collectors.toList());
     }
 
 }

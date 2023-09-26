@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import vizicard.dto.PublicationDTO;
-import vizicard.dto.detail.ExperienceDTO;
-import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
-import vizicard.model.detail.Experience;
 import vizicard.repository.PublicationRepository;
 import vizicard.utils.ProfileProvider;
 
@@ -37,12 +34,9 @@ public class PublicationService {
                 .collect(Collectors.toList());
     }
 
-    public List<PublicationDTO> getAllMyOnPage(Integer id) {
-        Profile user = profileProvider.getUserFromAuth();
+    public List<Publication> getOnPage(Integer id) {
         Profile page = profileProvider.getTarget(id);
-        return publicationRepository.findAllByOwnerAndProfile(user, page).stream()
-                .map((val) -> modelMapper.map(val, PublicationDTO.class))
-                .collect(Collectors.toList());
+        return publicationRepository.findAllByProfile(page);
     }
 
 }

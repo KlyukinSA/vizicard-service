@@ -3,6 +3,7 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,6 @@ import vizicard.model.*;
 import vizicard.repository.*;
 import vizicard.utils.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/publications")
 @RequiredArgsConstructor
 public class PublicationController {
 
@@ -24,21 +23,22 @@ public class PublicationController {
     private final ModelMapper modelMapper;
     private final ProfileMapper profileMapper;
 
-    @PostMapping
+    @PostMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
-    public PublicationCreateDTO createPublication(@RequestBody PublicationCreateDTO dto) {
-        return publicationService.createPublication(dto);
+    public PublicationCreateDTO createPublication(@RequestBody PublicationCreateDTO dto, @PathVariable Integer id) {
+        Publication map = modelMapper.map(dto, Publication.class);
+        return modelMapper.map(publicationService.createPublication(map, id), PublicationCreateDTO.class);
     }
 
-    @GetMapping("my")
+    @GetMapping("publications/my")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getAllMy() {
         return getResponse(publicationService.getAllMy(), Publication::getProfile);
     }
 
-    @GetMapping("on-page")
+    @GetMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationResponse> getOnPage(@RequestParam Integer id) {
+    public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
         return getResponse(publicationService.getOnPage(id), Publication::getOwner);
     }
 

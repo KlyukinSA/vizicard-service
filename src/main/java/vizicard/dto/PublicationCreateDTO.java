@@ -10,7 +10,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublicationCreateDTO {
-    private Integer profileId;
     private String title;
     private String description;
     private Date date;

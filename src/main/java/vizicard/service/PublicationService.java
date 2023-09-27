@@ -1,9 +1,7 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import vizicard.dto.PublicationCreateDTO;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
 import vizicard.repository.PublicationRepository;
@@ -17,14 +15,12 @@ public class PublicationService {
 
     private final PublicationRepository publicationRepository;
 
-    private final ModelMapper modelMapper;
     private final ProfileProvider profileProvider;
 
-    public PublicationCreateDTO createPublication(PublicationCreateDTO dto) {
-        Publication publication = new Publication(profileProvider.getUserFromAuth());
-        modelMapper.map(dto, publication);
-        publicationRepository.save(publication);
-        return dto;
+    public Publication createPublication(Publication publication, Integer id) {
+        publication.setOwner(profileProvider.getUserFromAuth());
+        publication.setProfile(profileProvider.getTarget(id));
+        return publicationRepository.save(publication);
     }
 
     public List<Publication> getAllMy() {

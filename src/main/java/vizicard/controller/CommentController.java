@@ -3,6 +3,7 @@ package vizicard.controller;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CommentCreateDTO;
 import vizicard.dto.PublicationResponse;
@@ -11,11 +12,13 @@ import vizicard.model.Publication;
 import vizicard.service.PublicationService;
 import vizicard.utils.ProfileMapper;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 public class CommentController {
 
@@ -25,7 +28,7 @@ public class CommentController {
 
     @PostMapping("profiles/{id}/comments")
     @PreAuthorize("isAuthenticated()")
-    public CommentCreateDTO createComment(@RequestBody CommentCreateDTO dto, @PathVariable Integer id) {
+    public CommentCreateDTO createComment(@Valid @RequestBody CommentCreateDTO dto, @PathVariable Integer id) {
         return modelMapper.map(publicationService.createPublication(modelMapper.map(dto, Publication.class), id), CommentCreateDTO.class);
     }
 

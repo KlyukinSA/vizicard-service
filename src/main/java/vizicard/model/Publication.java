@@ -29,6 +29,8 @@ public class Publication {
 
     private Date date;
 
+    private Float rating;
+
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.PublicationCreateDTO;
+import vizicard.dto.CommentCreateDTO;
 import vizicard.dto.PublicationResponse;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
@@ -17,34 +17,33 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-public class PublicationController {
+public class CommentController {
 
-    private final PublicationService publicationService;
     private final ModelMapper modelMapper;
+    private final PublicationService publicationService;
     private final ProfileMapper profileMapper;
 
-    @PostMapping("profiles/{id}/publications")
+    @PostMapping("profiles/{id}/comments")
     @PreAuthorize("isAuthenticated()")
-    public PublicationCreateDTO createPublication(@RequestBody PublicationCreateDTO dto, @PathVariable Integer id) {
-        Publication map = modelMapper.map(dto, Publication.class);
-        return modelMapper.map(publicationService.createPublication(map, id), PublicationCreateDTO.class);
+    public CommentCreateDTO createComment(@RequestBody CommentCreateDTO dto, @PathVariable Integer id) {
+        return modelMapper.map(publicationService.createPublication(modelMapper.map(dto, Publication.class), id), CommentCreateDTO.class);
     }
 
-    @GetMapping("publications/my")
+    @GetMapping("comments/my")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getAllMy() {
         return getResponse(publicationService.getAllMy(), Publication::getProfile);
     }
 
-    @GetMapping("profiles/{id}/publications")
+    @GetMapping("profiles/{id}/comments")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
         return getResponse(publicationService.getOnPage(id), Publication::getOwner);
     }
-
+    // TODO publication response list mapper
     private List<PublicationResponse> getResponse(List<Publication> list, Function<Publication, Profile> targetProvider) {
         return list.stream()
-                .filter(publicationService::isUsualPublication)
+                .filter(publicationService::isComment)
                 .map(e -> {
                     PublicationResponse dto = modelMapper.map(e, PublicationResponse.class);
                     dto.setProfile(profileMapper.mapToBrief(targetProvider.apply(e)));
@@ -53,3 +52,4 @@ public class PublicationController {
     }
 
 }
+

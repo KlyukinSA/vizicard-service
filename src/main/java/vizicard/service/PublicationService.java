@@ -32,4 +32,12 @@ public class PublicationService {
         return publicationRepository.findAllByProfile(page);
     }
 
+    public boolean isUsualPublication(Publication publication) {
+        return publication.getRating() == null;
+    }
+
+    public boolean isComment(Publication publication) {
+        return !isUsualPublication(publication);
+    }
+
 }

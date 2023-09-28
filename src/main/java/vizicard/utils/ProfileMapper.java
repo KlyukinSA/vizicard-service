@@ -108,7 +108,7 @@ public class ProfileMapper {
 
     private ProfileDetailStructResponseDTO getResume(Profile profile) {
         ProfileDetailStruct detailStruct = profile.getDetailStruct();
-        if (detailStruct == null) {
+        if (detailStruct == null || !isPro(profile)) {
             return null;
         }
         return new ProfileDetailStructResponseDTO(

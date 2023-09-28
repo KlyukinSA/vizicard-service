@@ -4,6 +4,7 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import vizicard.dto.SigninDTO;
 import vizicard.dto.AuthResponseDTO;
@@ -31,8 +32,8 @@ public class AuthController {
             @ApiResponse(code = 400, message = "Something went wrong"), //
             @ApiResponse(code = 403, message = "Access denied"), //
             @ApiResponse(code = 422, message = "Username is already in use")})
-    public AuthResponseDTO signup(@RequestBody SignupDTO dto) {
-        return authService.signup(dto);
+    public AuthResponseDTO signup(@RequestBody SignupDTO dto, @RequestParam(required = false) Integer referralCreatorId) {
+        return authService.signup(dto, referralCreatorId);
     }
 
 }

@@ -27,7 +27,7 @@ public class CashController {
         Relation created = relationRepository.findByTypeAndProfile(RelationType.CREATED_REFERRAL, user);
         if (created != null) {
             Profile creator = created.getOwner();
-            creator.setCash((float) (creator.getCash() + 0.05 * amount));
+            creator.setReferralBonus((float) (creator.getReferralBonus() + 0.15 * amount));
             profileRepository.save(creator);
         }
     }

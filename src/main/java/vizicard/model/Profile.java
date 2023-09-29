@@ -66,6 +66,7 @@ public class Profile {
   private Album album;
 
   private float cash = 0;
+  private float referralBonus = 0;
 
   private ProfileDetailStruct detailStruct;
 

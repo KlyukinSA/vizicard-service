@@ -24,6 +24,9 @@ public class Shortname {
     @Enumerated(EnumType.STRING)
     private ShortnameType type;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Profile referrer;
+
     public Shortname(Profile owner, String shortname, ShortnameType shortnameType) {
         this.owner = owner;
         this.shortname = shortname;

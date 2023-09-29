@@ -1,9 +1,11 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.dto.DeviceDTO;
 import vizicard.dto.ShortnameDTO;
+import vizicard.exception.CustomException;
 import vizicard.model.Profile;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
@@ -22,20 +24,23 @@ public class ShortnameService {
         return new DeviceDTO(shortname.getId(), shortname.getOwner().getId(), shortname.getShortname());
     }
 
-    public boolean add(ShortnameDTO dto) {
-        if (null != shortnameRepository.findByShortname(dto.getShortname())) {
-            return false;
-        }
+    public Shortname create(String sn, ShortnameType type) {
+        stopUsed(sn);
         Profile user = profileProvider.getUserFromAuth();
-        if (dto.getType() == ShortnameType.MAIN) {
+        if (type == ShortnameType.MAIN) {
             Shortname oldMain = shortnameRepository.findByOwnerAndType(user, ShortnameType.MAIN);
             if (oldMain != null) {
                 oldMain.setType(ShortnameType.USUAL);
                 shortnameRepository.save(oldMain);
             }
         }
-        shortnameRepository.save(new Shortname(user, dto.getShortname(), dto.getType()));
-        return true;
+        return shortnameRepository.save(new Shortname(user, sn, type));
+    }
+
+    public void stopUsed(String sn) {
+        if (null != shortnameRepository.findByShortname(sn)) {
+            throw new CustomException("shortname already in use", HttpStatus.FORBIDDEN);
+        }
     }
 
     public String getMainShortname(Profile profile) {

@@ -91,7 +91,11 @@ public class Profile {
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @LazyCollection(LazyCollectionOption.FALSE)
-  private List<Shortname> shortnames;
+  private List<Shortname> shortnamesWhereOwner;
+  @OneToMany(mappedBy = "referrer", cascade = CascadeType.ALL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @LazyCollection(LazyCollectionOption.FALSE)
+  private List<Shortname> shortnamesWhereReferrer;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
   @OnDelete(action = OnDeleteAction.CASCADE)

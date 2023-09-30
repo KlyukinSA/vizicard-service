@@ -5,8 +5,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.CommentCreateDTO;
-import vizicard.dto.PublicationResponse;
+import vizicard.dto.CommentOfMineResponse;
+import vizicard.dto.publication.CommentCreateDTO;
+import vizicard.dto.publication.CommentResponse;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
@@ -34,21 +35,21 @@ public class CommentController {
 
     @GetMapping("comments/my")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationResponse> getAllMy() {
-        return getResponse(publicationService.getAllMy(), Publication::getProfile);
+    public List<CommentOfMineResponse> getAllMy() {
+        return (List<CommentOfMineResponse>) getResponse(publicationService.getAllMy(), Publication::getProfile, CommentOfMineResponse.class);
     }
 
     @GetMapping("profiles/{id}/comments")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
-        return getResponse(publicationService.getOnPage(id), Publication::getOwner);
+    public List<CommentResponse> getOnPage(@PathVariable Integer id) {
+        return (List<CommentResponse>) getResponse(publicationService.getOnPage(id).stream().filter(Publication::isModerated).collect(Collectors.toList()), Publication::getOwner, CommentResponse.class);
     }
-    // TODO publication response list mapper
-    private List<PublicationResponse> getResponse(List<Publication> list, Function<Publication, Profile> targetProvider) {
+    // TODO publication/comment response list mapper
+    private List<? extends CommentResponse> getResponse(List<Publication> list, Function<Publication, Profile> targetProvider, Class responseClass) {
         return list.stream()
                 .filter(publicationService::isComment)
                 .map(e -> {
-                    PublicationResponse dto = modelMapper.map(e, PublicationResponse.class);
+                    CommentResponse dto = (CommentResponse) modelMapper.map(e, responseClass);
                     dto.setProfile(profileMapper.mapToBrief(targetProvider.apply(e)));
                     return dto;})
                 .collect(Collectors.toList());

@@ -1,4 +1,4 @@
-package vizicard.dto;
+package vizicard.dto.publication;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicationResponse {
-    private BriefProfileResponseDTO profile;
+public class PublicationCreateDTO {
     private String title;
     private String description;
     private Date date;

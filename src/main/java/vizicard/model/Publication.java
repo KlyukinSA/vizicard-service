@@ -30,6 +30,7 @@ public class Publication {
     private Date date;
 
     private Float rating;
+    private boolean moderated = false;
 
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();

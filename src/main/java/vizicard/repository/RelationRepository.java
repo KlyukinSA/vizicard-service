@@ -21,4 +21,6 @@ public interface RelationRepository extends JpaRepository<Relation, Integer> {
     List<Relation> findAllByOwnerAndProfileType(Profile user, ProfileType profileType);
 
     List<Relation> findAllByProfileAndOwnerType(Profile company, ProfileType profileType);
+
+    List<Relation> findAllByTypeAndOwner(RelationType relationType, Profile user);
 }

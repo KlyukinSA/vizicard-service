@@ -246,4 +246,32 @@ public class ProfileService {
     }
   }
 
+  public List<Profile> getSecondaryPrimaryAccounts() {
+    Profile user = profileProvider.getUserFromAuth();
+    Profile primary = getPrimary(user);
+    if (primary == null) {
+      return getProfileWithHisSecondaryAccounts(user);
+    } else {
+      return getProfileWithHisSecondaryAccounts(primary);
+    }
+  }
+
+  private List<Profile> getProfileWithHisSecondaryAccounts(Profile owner) {
+    List<Profile> res = relationRepository.findAllByTypeAndOwner(
+            RelationType.SECONDARY, owner).stream()
+            .map(Relation::getProfile)
+            .filter(Profile::isStatus)
+            .collect(Collectors.toList());
+    res.add(owner);
+    return res;
+  }
+
+  public Profile getPrimary(Profile secondary) {
+    Relation relation = relationRepository.findByTypeAndProfile(RelationType.SECONDARY, secondary);
+    if (relation == null) {
+      return null;
+    }
+    return relation.getOwner();
+  }
+
 }

@@ -158,6 +158,7 @@ public class RelationService {
                 .map((id) -> relationRepository.findById(id).get())
                 .filter(Relation::isStatus)
                 .filter((relation) -> relation.getProfile().isStatus())
+                .filter(relation -> relation.getType() != RelationType.SECONDARY)
                 .collect(Collectors.toList());
     }
 

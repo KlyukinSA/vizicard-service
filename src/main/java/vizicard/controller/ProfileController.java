@@ -15,6 +15,9 @@ import vizicard.model.RelationType;
 import vizicard.service.ProfileService;
 import vizicard.utils.ProfileMapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/profiles")
 @RequiredArgsConstructor
@@ -66,6 +69,13 @@ public class ProfileController {
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO createSecondaryProfile(@RequestBody ProfileCreateDTO dto) {
     return profileMapper.mapToResponse(profileService.createMyProfile(dto, RelationType.SECONDARY));
+  }
+
+  @GetMapping("accounts")
+  public List<BriefProfileResponseDTO> getSecondaryPrimaryAccounts() {
+    return profileService.getSecondaryPrimaryAccounts().stream()
+            .map(profileMapper::mapToBrief)
+            .collect(Collectors.toList());
   }
 
   @PutMapping("merge")

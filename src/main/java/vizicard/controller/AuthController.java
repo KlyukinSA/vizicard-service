@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("sign-in-secondary")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('PRO')")
     public AuthResponseDTO signInSecondary(Integer id) {
         return authService.signInSecondary(id);
     }

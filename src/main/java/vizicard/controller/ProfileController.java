@@ -65,7 +65,7 @@ public class ProfileController {
   }
 
   @PostMapping("secondary")
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("hasAuthority('PRO')")
   public ProfileResponseDTO createSecondaryProfile(@RequestBody ProfileCreateDTO dto) {
     return profileMapper.mapToResponse(profileService.createSecondaryProfile(dto));
   }
@@ -78,6 +78,7 @@ public class ProfileController {
   }
 
   @PutMapping("merge")
+  @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO mergeCustomProfiles(@RequestParam Integer main, @RequestParam Integer secondary) {
     return profileMapper.mapToResponse(profileService.mergeCustomProfiles(main, secondary));
   }

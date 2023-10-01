@@ -36,13 +36,19 @@ public class MyUserDetails implements UserDetailsService {
 
     List<GrantedAuthority> authorities = new ArrayList<>(Arrays.asList(
             AppUserRole.ROLE_CLIENT));
+
     if (profile.get().getCash() > 0) {
       authorities.add((GrantedAuthority) () -> "PRO");
     }
 
+    String password = profile.get().getPassword();
+    if (password == null) {
+      password = "dummy";
+    }
+
     return org.springframework.security.core.userdetails.User
         .withUsername(username)
-        .password(profile.get().getPassword())
+        .password(password)
         .authorities(authorities)
         .accountExpired(false)
         .accountLocked(false)

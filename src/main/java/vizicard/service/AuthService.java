@@ -91,4 +91,13 @@ public class AuthService {
         );
     }
 
+    public AuthResponseDTO signInSecondary(Integer id) {
+        Profile user = profileProvider.getUserFromAuth();
+        Profile secondary = profileProvider.getTarget(id);
+        if (null == relationRepository.findByOwnerAndProfile(user, secondary)) {
+            throw new CustomException("Its not your secondary", HttpStatus.FORBIDDEN);
+        }
+        return getResponse(secondary);
+    }
+
 }

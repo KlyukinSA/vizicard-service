@@ -2,6 +2,7 @@ package vizicard.controller;
 
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,12 @@ public class AuthController {
             @ApiResponse(code = 422, message = "Username is already in use")})
     public AuthResponseDTO signup(@RequestBody SignupDTO dto, @RequestParam(required = false) String shortname, @RequestParam(required = false) Integer referrerId) {
         return authService.signup(dto, shortname, referrerId);
+    }
+
+    @PostMapping("sign-in-secondary")
+    @PreAuthorize("isAuthenticated()")
+    public AuthResponseDTO signInSecondary(Integer id) {
+        return authService.signInSecondary(id);
     }
 
 }

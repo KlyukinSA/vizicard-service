@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import vizicard.dto.ProfileResponseDTO;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.WorkerCreateDTO;
 import vizicard.exception.CustomException;
@@ -14,9 +13,7 @@ import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
-import vizicard.utils.ProfileMapper;
 import vizicard.utils.ProfileProvider;
-import vizicard.utils.RelationValidator;
 import vizicard.utils.Relator;
 
 import java.util.List;
@@ -42,7 +39,7 @@ public class CompanyService {
         }
         ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
         dto1.setType(ProfileType.WORKER);
-        Profile worker = profileService.createProfile(dto1, user, dto.getUsername(), dto.getPassword());
+        Profile worker = profileService.createProfile(dto1, user, dto.getUsername(), dto.getPassword(), RelationType.OWNER);
         addToCompany(worker, company);
         return profileRepository.save(worker);
     }

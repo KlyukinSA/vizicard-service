@@ -49,7 +49,7 @@ public class AuthService {
             ProfileCreateDTO dto1 = new ProfileCreateDTO();
             dto1.setName(dto.getName());
             dto1.setType(ProfileType.USER);
-            Profile profile = profileService.createProfile(dto1, null, dto.getUsername(), dto.getPassword());
+            Profile profile = profileService.createProfile(dto1, null, dto.getUsername(), dto.getPassword(), null);
             refer(profile, shortname, referrerId);
             return getResponse(profile);
         } else {

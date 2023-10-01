@@ -104,12 +104,12 @@ public class RelationService {
         } else {
             ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
             dto1.setType(ProfileType.LEAD_USER);
-            author = profileService.createProfile(dto1, target, null, null);
+            author = profileService.createProfile(dto1, target, null, null, RelationType.OWNER);
             if (dto.getCompanyName() != null) {
                 ProfileCreateDTO dto2 = new ProfileCreateDTO();
                 dto2.setName(dto.getCompanyName());
                 dto2.setType(ProfileType.LEAD_COMPANY);
-                company = profileService.createProfile(dto2, author, null, null);
+                company = profileService.createProfile(dto2, author, null, null, RelationType.OWNER);
                 author.setCompany(company);
                 profileRepository.save(author);
             }

@@ -3,7 +3,6 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +67,7 @@ public class ProfileService {
     return profileMapper.mapToResponse(updateProfile(target, dto));
   }
 
-  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password) {
+  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password, RelationType relationType) {
     Profile profile = new Profile();
     profile.setType(dto.getType());
     profile.setName(dto.getName());
@@ -76,7 +75,7 @@ public class ProfileService {
     profile = profileRepository.save(profile);
 
     if (owner != null) {
-      relationRepository.save(new Relation(owner, profile, RelationType.OWNER));
+      relationRepository.save(new Relation(owner, profile, relationType));
     }
     shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
     if (profile.getType() == ProfileType.USER || profile.getType() == ProfileType.COMPANY) {
@@ -90,7 +89,7 @@ public class ProfileService {
     return updateProfile(profile, dto1);
   }
 
-  public Profile createMyProfile(ProfileCreateDTO dto) {
+  public Profile createMyProfile(ProfileCreateDTO dto, RelationType relationType) {
     Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
             ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
             ProfileType.COMPANY, ProfileType.GROUP));
@@ -98,7 +97,7 @@ public class ProfileService {
       throw new CustomException("cant create with this type", HttpStatus.UNPROCESSABLE_ENTITY);
     }
     Profile owner = profileProvider.getUserFromAuth();
-    return createProfile(dto, owner, null, null);
+    return createProfile(dto, owner, null, null, relationType);
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {

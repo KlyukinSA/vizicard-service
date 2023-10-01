@@ -34,7 +34,7 @@ public class Relation {
     @Column(nullable = false)
     private boolean status = true;
 
-    @Column(columnDefinition = "ENUM('OWNER', 'EDITOR', 'USUAL', 'EMPLOYEE', 'FOLLOWED_REFERRAL', 'CREATED_REFERRAL')", nullable = false)
+    @Column(columnDefinition = "ENUM('OWNER', 'EDITOR', 'USUAL', 'EMPLOYEE', 'FOLLOWED_REFERRAL', 'CREATED_REFERRAL', 'SECONDARY')", nullable = false)
     @Enumerated(EnumType.STRING)
     private RelationType type;
 

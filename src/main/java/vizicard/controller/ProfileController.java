@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
-import vizicard.model.RelationType;
 import vizicard.service.ProfileService;
 import vizicard.utils.ProfileMapper;
 
@@ -62,13 +61,13 @@ public class ProfileController {
   @PostMapping
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO createProfile(@RequestBody ProfileCreateDTO dto) {
-    return profileMapper.mapToResponse(profileService.createMyProfile(dto, RelationType.OWNER));
+    return profileMapper.mapToResponse(profileService.createMyProfile(dto));
   }
 
   @PostMapping("secondary")
   @PreAuthorize("isAuthenticated()")
   public ProfileResponseDTO createSecondaryProfile(@RequestBody ProfileCreateDTO dto) {
-    return profileMapper.mapToResponse(profileService.createMyProfile(dto, RelationType.SECONDARY));
+    return profileMapper.mapToResponse(profileService.createSecondaryProfile(dto));
   }
 
   @GetMapping("accounts")

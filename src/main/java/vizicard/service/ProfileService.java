@@ -89,7 +89,7 @@ public class ProfileService {
     return updateProfile(profile, dto1);
   }
 
-  public Profile createMyProfile(ProfileCreateDTO dto, RelationType relationType) {
+  public Profile createMyProfile(ProfileCreateDTO dto) {
     Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
             ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
             ProfileType.COMPANY, ProfileType.GROUP));
@@ -97,7 +97,7 @@ public class ProfileService {
       throw new CustomException("cant create with this type", HttpStatus.UNPROCESSABLE_ENTITY);
     }
     Profile owner = profileProvider.getUserFromAuth();
-    return createProfile(dto, owner, null, null, relationType);
+    return createProfile(dto, owner, null, null, RelationType.OWNER);
   }
 
   private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
@@ -266,7 +266,7 @@ public class ProfileService {
     return res;
   }
 
-  public Profile getPrimary(Profile secondary) {
+  private Profile getPrimary(Profile secondary) {
     Relation relation = relationRepository.findByTypeAndProfile(RelationType.SECONDARY, secondary);
     if (relation == null) {
       return null;
@@ -274,4 +274,12 @@ public class ProfileService {
     return relation.getOwner();
   }
 
+  public Profile createSecondaryProfile(ProfileCreateDTO dto) {
+    Profile owner = profileProvider.getUserFromAuth();
+    Profile primary = getPrimary(owner);
+    if (primary != null) {
+      owner = primary;
+    }
+    return createProfile(dto, owner, null, null, RelationType.SECONDARY);
+  }
 }

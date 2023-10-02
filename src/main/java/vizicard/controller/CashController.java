@@ -9,26 +9,35 @@ import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
+import vizicard.service.PrimaryService;
 import vizicard.utils.ProfileProvider;
 
 @RestController
 @RequestMapping("/cash")
 @RequiredArgsConstructor
 public class CashController {
+
     private final ProfileRepository profileRepository;
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
+    private final PrimaryService primaryService;
+
     @PostMapping
     public void addCash(float amount) {
         Profile user = profileProvider.getUserFromAuth();
-        user.setCash(user.getCash() + amount);
-        profileRepository.save(user);
 
-        Relation created = relationRepository.findByTypeAndProfile(RelationType.CREATED_REFERRAL, user);
-        if (created != null) {
-            Profile creator = created.getOwner();
-            creator.setReferralBonus((float) (creator.getReferralBonus() + 0.15 * amount));
-            profileRepository.save(creator);
+        Profile profile = primaryService.getPrimaryOrSelf(user);
+        profile.setCash(profile.getCash() + amount);
+        profileRepository.save(profile);
+
+        Relation referrerRelation = relationRepository.findByTypeAndProfile(
+                RelationType.CREATED_REFERRAL, user);
+        if (referrerRelation != null) {
+            Profile referrer = referrerRelation.getOwner();
+
+            profile = primaryService.getPrimaryOrSelf(referrer);
+            profile.setReferralBonus((float) (profile.getReferralBonus() + 0.15 * amount));
+            profileRepository.save(profile);
         }
     }
 }

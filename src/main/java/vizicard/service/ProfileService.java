@@ -38,6 +38,7 @@ public class ProfileService {
 
   private final S3Service s3Service; // TODO use CloudFileRepository
   private final ActionService actionService; // TODO ActionSaver?
+  private final PrimaryService primaryService;
 
   public ProfileResponseDTO searchByShortname(String shortname) {
     Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
@@ -247,13 +248,7 @@ public class ProfileService {
   }
 
   public List<Profile> getSecondaryPrimaryAccounts() {
-    Profile user = profileProvider.getUserFromAuth();
-    Profile primary = getPrimary(user);
-    if (primary == null) {
-      return getProfileWithHisSecondaryAccounts(user);
-    } else {
-      return getProfileWithHisSecondaryAccounts(primary);
-    }
+    return getProfileWithHisSecondaryAccounts(primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth()));
   }
 
   private List<Profile> getProfileWithHisSecondaryAccounts(Profile owner) {
@@ -266,20 +261,9 @@ public class ProfileService {
     return res;
   }
 
-  private Profile getPrimary(Profile secondary) {
-    Relation relation = relationRepository.findByTypeAndProfile(RelationType.SECONDARY, secondary);
-    if (relation == null) {
-      return null;
-    }
-    return relation.getOwner();
-  }
-
   public Profile createSecondaryProfile(ProfileCreateDTO dto) {
-    Profile owner = profileProvider.getUserFromAuth();
-    Profile primary = getPrimary(owner);
-    if (primary != null) {
-      owner = primary;
-    }
+    Profile owner = primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth());
     return createProfile(dto, owner, null, null, RelationType.SECONDARY);
   }
+
 }

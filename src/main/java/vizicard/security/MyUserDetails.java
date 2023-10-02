@@ -1,6 +1,5 @@
 package vizicard.security;
 
-import com.mysql.cj.x.protobuf.MysqlxCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -13,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import vizicard.repository.ProfileRepository;
+import vizicard.service.CashService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -22,6 +22,7 @@ import java.util.*;
 public class MyUserDetails implements UserDetailsService {
 
   private final ProfileRepository profileRepository;
+  private final CashService cashService;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,7 +38,7 @@ public class MyUserDetails implements UserDetailsService {
     List<GrantedAuthority> authorities = new ArrayList<>(Arrays.asList(
             AppUserRole.ROLE_CLIENT));
 
-    if (profile.get().getCash() > 0) {
+    if (cashService.isPro(profile.get())) {
       authorities.add((GrantedAuthority) () -> "PRO");
     }
 

@@ -21,6 +21,7 @@ import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
+import vizicard.service.CashService;
 import vizicard.service.ShortnameService;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class ProfileMapper {
 
     private final ModelMapper modelMapper;
     private final ProfileProvider profileProvider;
+    private final CashService cashService;
 
     public BriefProfileResponseDTO mapToBrief(Profile profile) {
         BriefProfileResponseDTO res = modelMapper.map(profile, BriefProfileResponseDTO.class);
@@ -57,18 +59,13 @@ public class ProfileMapper {
     private void finishCompany(ProfileResponseDTO res, Profile profile) {
         if (profile.getCompany() == null || !profile.getCompany().isStatus()) { // TODO function for same checks
             res.setCompany(null);
-        } else if (!isPro(profile)) {
+        } else if (!cashService.isPro(profile)) {
             BriefProfileResponseDTO dto = new BriefProfileResponseDTO();
             dto.setName(profile.getCompany().getName());
             res.setCompany(dto);
         } else {
             res.getCompany().setMainShortname(shortnameService.getMainShortname(profile.getCompany()));
         }
-    }
-
-    private boolean isPro(Profile profile) {
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).anyMatch(au -> au.equals("PRO"));
     }
 
     private void removeDeletedAvatar(BriefProfileResponseDTO dto, Profile profile) {
@@ -108,7 +105,7 @@ public class ProfileMapper {
 
     private ProfileDetailStructResponseDTO getResume(Profile profile) {
         ProfileDetailStruct detailStruct = profile.getDetailStruct();
-        if (detailStruct == null || !isPro(profile)) {
+        if (detailStruct == null || !cashService.isPro(profile)) {
             return null;
         }
         return new ProfileDetailStructResponseDTO(

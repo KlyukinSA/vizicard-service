@@ -15,21 +15,24 @@ import java.util.List;
 public class CashDecreaseEngine {
 
     private final ProfileRepository profileRepository;
+    private final PrimaryService primaryService;
 
     @Scheduled(fixedRate = 1000*60*60)
-//  @Scheduled(fixedRateString = "${fixedRate.in.milliseconds}")
     private void decreaseGlobalCash() {
-        List<Profile> all = profileRepository.findAll();
-        for (Profile profile : all) {
-            float cash = profile.getCash();
-            if (cash > 0) {
-                cash -= getDecreasePrice(profile);
-                if (cash < 0) {
-                    cash = 0;
-                }
-                profile.setCash(cash);
-                profileRepository.save(profile);
+        profileRepository.findAll().stream()
+                .filter(profile -> null == primaryService.getPrimary(profile))
+                .forEach(this::decrease);
+    }
+
+    private void decrease(Profile profile) {
+        float cash = profile.getCash();
+        if (cash > 0) {
+            cash -= getDecreasePrice(profile);
+            if (cash < 0) {
+                cash = 0;
             }
+            profile.setCash(cash);
+            profileRepository.save(profile);
         }
     }
 

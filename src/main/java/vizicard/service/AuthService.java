@@ -80,8 +80,8 @@ public class AuthService {
         } else {
             return;
         }
-        relationRepository.save(new Relation(referrer, profile, RelationType.CREATED_REFERRAL));
-        relationRepository.save(new Relation(profile, referrer, RelationType.FOLLOWED_REFERRAL));
+        relationRepository.save(new Relation(referrer, profile, RelationType.REFERRER));
+        relationRepository.save(new Relation(profile, referrer, RelationType.REFERRAL));
     }
 
     AuthResponseDTO getResponse(Profile profile) {

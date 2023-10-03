@@ -30,14 +30,40 @@ public class CashController {
         profile.setCash(profile.getCash() + amount);
         profileRepository.save(profile);
 
+//        Relation referrerRelation = relationRepository.findByTypeAndProfile(
+//                RelationType.REFERRER, user);
+//        if (referrerRelation != null) {
+//            Profile referrer = referrerRelation.getOwner();
+//
+//            profile = primaryService.getPrimaryOrSelf(referrer);
+//            profile.setReferralBonus((float) (profile.getReferralBonus() + 0.15 * amount));
+//            profileRepository.save(profile);
+//        }
+        addBonusToReferrer(RelationType.REFERRER, profile, amount);
+        addBonusToReferrer(RelationType.REFERRER_LEVEL2, profile, amount);
+    }
+
+    private void addBonusToReferrer(RelationType referrerLevel, Profile profile, float amount) {
         Relation referrerRelation = relationRepository.findByTypeAndProfile(
-                RelationType.CREATED_REFERRAL, user);
+                referrerLevel, profile);
         if (referrerRelation != null) {
             Profile referrer = referrerRelation.getOwner();
 
             profile = primaryService.getPrimaryOrSelf(referrer);
-            profile.setReferralBonus((float) (profile.getReferralBonus() + 0.15 * amount));
+            profile.setReferralBonus(profile.getReferralBonus()
+                    + getBonusPart(referrerLevel) * amount);
             profileRepository.save(profile);
         }
     }
+
+    private float getBonusPart(RelationType referrerLevel) {
+        if (referrerLevel == RelationType.REFERRER_LEVEL2) {
+            return 0.1F;
+        } else if (referrerLevel == RelationType.REFERRER) {
+            return 0.2F;
+        } else {
+            return 0;
+        }
+    }
+
 }

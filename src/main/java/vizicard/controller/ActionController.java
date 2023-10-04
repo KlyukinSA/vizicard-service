@@ -1,22 +1,22 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.PageActionDTO;
-import vizicard.dto.ReferralStatsDTO;
+import vizicard.dto.action.GraphActionResponse;
+import vizicard.dto.action.PageActionDTO;
+import vizicard.dto.action.ReferralStatsDTO;
+import vizicard.model.ActionType;
 import vizicard.model.Profile;
-import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
 import vizicard.service.ActionService;
-import vizicard.utils.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/analytics")
@@ -73,6 +73,16 @@ public class ActionController {
         res.setWeekBenefit(actionService.getBenefitBetween(now.minus(Duration.ofDays(7)), now, user));
         res.setMonthBenefit(actionService.getBenefitBetween(now.minus(Duration.ofDays(30)), now, user));
         res.setTotalBenefit(actionService.getBenefit(user));
+        return res;
+    }
+
+    @GetMapping("graph")
+    @PreAuthorize("isAuthenticated()")
+    GraphActionResponse getStatsGraph(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to) {
+        GraphActionResponse res = new GraphActionResponse();
+        res.setVizits(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.VIZIT, from, to));
+        res.setSaves(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.SAVE, from, to));
+        res.setClicks(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.CLICK, from, to));
         return res;
     }
 

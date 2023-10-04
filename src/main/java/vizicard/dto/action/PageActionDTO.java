@@ -1,4 +1,4 @@
-package vizicard.dto;
+package vizicard.dto.action;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

@@ -2,7 +2,7 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vizicard.dto.PageActionDTO;
+import vizicard.dto.action.PageActionDTO;
 import vizicard.model.*;
 import vizicard.repository.ActionRepository;
 import vizicard.repository.RelationRepository;
@@ -10,9 +10,7 @@ import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -69,6 +67,20 @@ public class ActionService {
                 .map(Action::getBonus)
                 .mapToDouble(Float::doubleValue)
                 .sum();
+    }
+
+    public List<Integer> getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType actionType, Date from, Date to) {
+        long fromTime = from.getTime();
+        long diff = to.getTime() - fromTime;
+        int days = (int) (diff / (24 * 60 * 60 * 1000));
+        List<Integer> res = new ArrayList<>(Collections.nCopies(1 + days, 0));
+        List<Action> actions = actionRepository.findAllByProfileAndTypeAndCreateAtBetween(profileProvider.getUserFromAuth(), actionType, from, to);
+        for (Action action : actions) {
+            Date createAt = action.getCreateAt();
+            int pos = (int) (((float) days) * (createAt.getTime() - fromTime) / diff);
+            res.set(pos, res.get(pos) + 1);
+        }
+        return res;
     }
 
 //    public List<IActionCount> getProfileStats(Profile profile) {

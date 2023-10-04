@@ -10,6 +10,7 @@ import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 
@@ -70,14 +71,18 @@ public class ActionService {
     }
 
     public List<Integer> getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType actionType, Date from, Date to) {
-        long fromTime = from.getTime();
-        long diff = to.getTime() - fromTime;
-        int days = (int) (diff / (24 * 60 * 60 * 1000));
+        int dayFrom = from.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().getDayOfMonth();
+        int dayTo = to.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate().getDayOfMonth();
+        int days = dayTo - dayFrom;
         List<Integer> res = new ArrayList<>(Collections.nCopies(1 + days, 0));
         List<Action> actions = actionRepository.findAllByProfileAndTypeAndCreateAtBetween(profileProvider.getUserFromAuth(), actionType, from, to);
         for (Action action : actions) {
             Date createAt = action.getCreateAt();
-            int pos = (int) (((float) days) * (createAt.getTime() - fromTime) / diff);
+            int pos = createAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth() - dayFrom;
             res.set(pos, res.get(pos) + 1);
         }
         return res;

@@ -25,9 +25,11 @@ public class Action {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
-    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK')", nullable = false)
+    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK', 'GIVE_BONUS')", nullable = false)
     @Enumerated(EnumType.STRING)
     private ActionType type;
+
+    private float bonus;
 
     public Action(Profile owner, Profile profile, ActionType type) {
         this.owner = owner;

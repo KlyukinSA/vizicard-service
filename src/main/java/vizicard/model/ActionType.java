@@ -1,5 +1,5 @@
 package vizicard.model;
 
 public enum ActionType {
-    VIZIT, SAVE, CLICK;
+    VIZIT, SAVE, CLICK, GIVE_BONUS;
 }

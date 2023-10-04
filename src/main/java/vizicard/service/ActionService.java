@@ -1,18 +1,17 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForInstant;
 import org.springframework.stereotype.Service;
 import vizicard.dto.PageActionDTO;
-import vizicard.model.Action;
-import vizicard.model.ActionType;
-import vizicard.model.Profile;
+import vizicard.model.*;
 import vizicard.repository.ActionRepository;
+import vizicard.repository.RelationRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -23,6 +22,7 @@ public class ActionService {
     private final ActionRepository actionRepository;
 
     private final ProfileProvider profileProvider;
+    private final RelationRepository relationRepository;
 
     public void vizit(Profile page) {
         Profile actor = profileProvider.getUserFromAuth();
@@ -52,5 +52,27 @@ public class ActionService {
 
         return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
     }
+
+    public float getBenefitBetween(Instant minus, Instant now, Profile profile) {
+        Date start = Date.from(minus);
+        Date stop = Date.from(now);
+        return countBenefit(actionRepository.findAllByProfileAndTypeAndCreateAtBetween(
+						profile, ActionType.GIVE_BONUS, start, stop));
+    }
+
+    public float getBenefit(Profile profile) {
+        return countBenefit(actionRepository.findAllByProfileAndType(profile, ActionType.GIVE_BONUS));
+    }
+
+    private float countBenefit(List<Action> actions) {
+        return (float) actions.stream()
+                .map(Action::getBonus)
+                .mapToDouble(Float::doubleValue)
+                .sum();
+    }
+
+//    public List<IActionCount> getProfileStats(Profile profile) {
+//        return actionRepository.countActionStats(profile);
+//    }
 
 }

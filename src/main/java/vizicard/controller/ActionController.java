@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.dto.action.ReferralStatsDTO;
-import vizicard.model.ActionType;
 import vizicard.model.Profile;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
@@ -16,7 +15,7 @@ import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/analytics")
@@ -39,32 +38,9 @@ public class ActionController {
         return actionService.getPageStats();
     }
 
-//    @PostMapping("ip")
-//    public void setAsReferral(Integer id, HttpServletRequest request) {
-//        System.out.println(request.getRemoteAddr());
-//        Profile user = profileProvider.getUserFromAuth();
-//        Profile target = profileProvider.getTarget(id);
-//        relationRepository.save(new Relation(user, target, RelationType.REFERRER_LEVEL2));
-//        relationRepository.save(new Relation(target, user, RelationType.REFERRAL));
-//    }
-
     @GetMapping("referrals")
     public ReferralStatsDTO getReferralsStats() {
         Profile user = profileProvider.getUserFromAuth();
-//        return relationRepository.findAllByProfileAndType(
-//                        profileProvider.getUserFromAuth(), RelationType.REFERRAL).stream()
-//                .filter(Relation::isStatus)
-//                .filter(r -> r.getOwner().isStatus())
-//                .map(r -> {
-//                    ReferralStatsDTO dto = modelMapper.map(new RelationResponseDTO(
-//                            profileMapper.mapToBrief(r.getOwner()),
-//                            r.getCreateAt(),
-//                            relationRepository.findByOwnerAndProfile(r.getProfile(), r.getOwner()).getType()),
-//                            ReferralStatsDTO.class);
-//                    dto.setStats(actionService.getProfileStats(r.getOwner()));
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
         ReferralStatsDTO res = new ReferralStatsDTO();
         res.setRef1Count(relationRepository.findAllByTypeAndOwner(RelationType.REFERRER, user).size());
         res.setRef2Count(relationRepository.findAllByTypeAndOwner(RelationType.REFERRER_LEVEL2, user).size());
@@ -78,12 +54,8 @@ public class ActionController {
 
     @GetMapping("graph")
     @PreAuthorize("isAuthenticated()")
-    GraphActionResponse getStatsGraph(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to) {
-        GraphActionResponse res = new GraphActionResponse();
-        res.setVizits(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.VIZIT, from, to));
-        res.setSaves(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.SAVE, from, to));
-        res.setClicks(actionService.getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType.CLICK, from, to));
-        return res;
+    List<GraphActionResponse> getWeekGraph() {
+        return actionService.getDailyGraph(7);
     }
 
 }

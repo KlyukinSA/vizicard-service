@@ -2,6 +2,7 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.model.*;
 import vizicard.repository.ActionRepository;
@@ -13,6 +14,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -70,26 +73,35 @@ public class ActionService {
                 .sum();
     }
 
-    public List<Integer> getListOfCountOfActionsInDayByActionTypeAndBetween(ActionType actionType, Date from, Date to) {
-        int dayFrom = from.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate().getDayOfMonth();
-        int dayTo = to.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate().getDayOfMonth();
-        int days = dayTo - dayFrom;
-        List<Integer> res = new ArrayList<>(Collections.nCopies(1 + days, 0));
-        List<Action> actions = actionRepository.findAllByProfileAndTypeAndCreateAtBetween(profileProvider.getUserFromAuth(), actionType, from, to);
-        for (Action action : actions) {
-            Date createAt = action.getCreateAt();
-            int pos = createAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getDayOfMonth() - dayFrom;
-            res.set(pos, res.get(pos) + 1);
+	public List<GraphActionResponse> getDailyGraph(int days) {
+        List<GraphActionResponse> res = Stream.generate(GraphActionResponse::new).limit(days).collect(Collectors.toList());
+        Profile user = profileProvider.getUserFromAuth();
+        Date stop = Date.from(Instant.now());
+        Date start = Date.from(Instant.now().minus(Duration.ofDays(days)));
+        int dayStart = start.getDay();
+
+        List<Action> visits = actionRepository.findAllByProfileAndTypeAndCreateAtBetween(
+                user, ActionType.VIZIT, start, stop);
+        List<HashSet<Integer>> visitorSets = Stream.generate(() -> new HashSet<Integer>()).limit(days).collect(Collectors.toList());
+        for (Action visit : visits) {
+            Date createAt = visit.getCreateAt();
+            int pos = createAt.getDay() - dayStart;
+
+            GraphActionResponse response = res.get(pos);
+            if (response.getDate() == null) {
+                response.setDate(createAt);
+            }
+
+            response.setVizits(response.getVizits() + 1);
+
+            if (!visitorSets.get(pos).contains(visit.getOwner().getId())) {
+                visitorSets.get(pos).add(visit.getOwner().getId());
+
+                response.setCoverage(response.getCoverage() + 1);
+            }
+            res.set(pos, response);
         }
         return res;
     }
-
-//    public List<IActionCount> getProfileStats(Profile profile) {
-//        return actionRepository.countActionStats(profile);
-//    }
 
 }

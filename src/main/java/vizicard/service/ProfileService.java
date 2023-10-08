@@ -41,8 +41,11 @@ public class ProfileService {
   private final PrimaryService primaryService;
 
   public ProfileResponseDTO searchByShortname(String shortname) {
-    Profile profile = shortnameRepository.findByShortname(shortname).getOwner();
-    return search(profile);
+    Shortname shortname1 = shortnameRepository.findByShortname(shortname);
+    if (shortname1.getReferrer() != null) {
+      actionService.addPartnership(profileProvider.getUserFromAuth(), shortname1.getReferrer());
+    }
+    return search(shortname1.getOwner());
   }
 
   public ProfileResponseDTO searchById(Integer id) {

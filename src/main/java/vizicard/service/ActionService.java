@@ -105,4 +105,8 @@ public class ActionService {
         return res;
     }
 
+    public Action addPartnership(Profile owner, Profile profile) {
+        return actionRepository.save(new Action(owner, profile, ActionType.PARTNERSHIP));
+    }
+
 }

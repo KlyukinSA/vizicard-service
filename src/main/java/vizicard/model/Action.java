@@ -25,13 +25,13 @@ public class Action {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
-    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK', 'GIVE_BONUS')", nullable = false)
+    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK', 'GIVE_BONUS', 'PARTNERSHIP')", nullable = false)
     @Enumerated(EnumType.STRING)
     private ActionType type;
 
     private float bonus;
 
-    @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')", nullable = false)
+    @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')")
     @Enumerated(EnumType.STRING)
     private ContactEnum resource;
 

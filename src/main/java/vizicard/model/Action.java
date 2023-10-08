@@ -31,6 +31,10 @@ public class Action {
 
     private float bonus;
 
+    @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ContactEnum resource;
+
     public Action(Profile owner, Profile profile, ActionType type) {
         this.owner = owner;
         this.profile = profile;

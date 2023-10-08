@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.dto.action.ReferralStatsDTO;
+import vizicard.model.ContactEnum;
 import vizicard.model.Profile;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
@@ -28,8 +29,8 @@ public class ActionController {
     private final ProfileProvider profileProvider;
 
     @PostMapping("clicks")
-    void addClickAction(@RequestParam Integer id) {
-        actionService.addClickAction(id);
+    void addClickAction(@RequestParam Integer id, ContactEnum resource) {
+        actionService.addClickAction(id, resource);
     }
 
     @GetMapping("me")

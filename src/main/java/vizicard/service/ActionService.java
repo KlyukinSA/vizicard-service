@@ -11,7 +11,6 @@ import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,9 +37,11 @@ public class ActionService {
         actionRepository.save(new Action(owner, target, ActionType.SAVE));
     }
 
-    public void addClickAction(Integer targetProfileId) {
+    public void addClickAction(Integer targetProfileId, ContactEnum resource) {
         Profile target = profileProvider.getTarget(targetProfileId);
-        actionRepository.save(new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK));
+        Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK);
+        click.setResource(resource);
+        actionRepository.save(click);
     }
 
     public PageActionDTO getPageStats() {

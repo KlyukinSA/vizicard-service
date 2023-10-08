@@ -18,7 +18,7 @@ public class ExperienceController {
     private final ExperienceService service;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PRO')")
+    @PreAuthorize("isAuthenticated()")
     public ExperienceResponseDTO createExperience(@RequestBody ExperienceDTO dto) {
         return service.createExperience(dto);
     }

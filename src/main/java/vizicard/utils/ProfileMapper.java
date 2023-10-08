@@ -105,9 +105,6 @@ public class ProfileMapper {
 
     private ProfileDetailStructResponseDTO getResume(Profile profile) {
         ProfileDetailStruct detailStruct = profile.getDetailStruct();
-        if (detailStruct == null || !cashService.isPro(profile)) {
-            return null;
-        }
         return new ProfileDetailStructResponseDTO(
                 detailStruct.getEducation().stream()
                         .filter(Education::isStatus)

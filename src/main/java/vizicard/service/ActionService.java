@@ -109,4 +109,8 @@ public class ActionService {
         return actionRepository.save(new Action(owner, profile, ActionType.PARTNERSHIP));
     }
 
+    public int countUniquePartnershipsByProfile(Profile user) {
+        return actionRepository.countByProfileAndTypeDistinctByOwner(user, ActionType.PARTNERSHIP);
+    }
+
 }

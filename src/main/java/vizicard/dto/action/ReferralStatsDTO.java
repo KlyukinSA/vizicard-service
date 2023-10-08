@@ -12,4 +12,5 @@ public class ReferralStatsDTO {
 	float weekBenefit;
 	float monthBenefit;
 	float totalBenefit;
+	int partnershipCount;
 }

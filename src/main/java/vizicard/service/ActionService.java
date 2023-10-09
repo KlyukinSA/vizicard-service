@@ -28,14 +28,42 @@ public class ActionService {
     private final ProfileProvider profileProvider;
     private final CashService cashService;
 
-    public void addVisitAction(Profile page, Shortname shortname) {
-        Profile actor = profileProvider.getUserFromAuth();
-        if (actor != null && Objects.equals(actor.getId(), page.getId())) {
+    public void addVisitAction(Profile profile, Shortname shortname) {
+        Profile visitor = profileProvider.getUserFromAuth();
+        if (visitor != null && Objects.equals(visitor.getId(), profile.getId())) {
             return;
         }
-        Action action = new Action(actor, page, ActionType.VIZIT, getIp());
+        String ip = getIp();
+
+        if (shortname != null) {
+            Profile partner = shortname.getReferrer();
+            if (partner != null) {
+//                actionRepository.findAllByOwnerAndProfileAndTypeAndIp()
+                List<Action> visits = actionRepository.findAllByProfileAndType(profile, ActionType.VIZIT);
+                if (isUniqueIn(visitor, ip, visits)) {
+                    cashService.giveBonus(partner, 1);
+                }
+            }
+        }
+
+        Action action = new Action(visitor, profile, ActionType.VIZIT, ip);
         action.setShortname(shortname);
         actionRepository.save(action);
+    }
+
+    private boolean isUniqueIn(Profile owner, String ip, List<Action> visits) {
+        for (Action visit : visits) {
+            if (owner == null) {
+                if (visit.getOwner() == null && visit.getIp().equals(ip)) {
+                    return false;
+                }
+            } else if (visit.getOwner() != null) {
+                if (visit.getOwner().getId().equals(owner.getId())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void addSaveAction(Profile owner, Profile target) {
@@ -110,17 +138,6 @@ public class ActionService {
         }
         return res;
     }
-
-//    public Action addPartnership(Profile owner, Profile referrer) {
-//        if (!actionRepository.existsByOwnerAndProfileAndIp(owner, referrer, getIp())) {
-//            cashService.giveBonus(referrer, 1);
-//        }
-//        return actionRepository.save(new Action(owner, referrer, ActionType.PARTNERSHIP, getIp()));
-//    }
-
-//    public int countUniquePartnershipsByProfile(Profile user) {
-//        return actionRepository.countByProfileAndTypeDistinctByOwner(user, ActionType.PARTNERSHIP);
-//    }
 
     private String getIp() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr();

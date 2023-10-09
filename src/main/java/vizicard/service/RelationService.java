@@ -76,7 +76,7 @@ public class RelationService {
             }
         }
 
-        actionService.save(owner, target);
+        actionService.addSaveAction(owner, target);
 
         return getVcardResponse(new VcardFile(target));
     }

@@ -54,7 +54,7 @@ public class ProfileService {
     if (profile.getType() == ProfileType.CUSTOM_USER || profile.getType() == ProfileType.CUSTOM_COMPANY || profile.getType() == ProfileType.GROUP) {
       relationValidator.stopNotOwnerOf(profile);
     }
-    actionService.vizit(profile, shortname);
+    actionService.addVisitAction(profile, shortname);
     return profileMapper.mapToResponse(profile);
   }
 

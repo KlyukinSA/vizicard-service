@@ -28,7 +28,7 @@ public class ActionService {
     private final ProfileProvider profileProvider;
     private final CashService cashService;
 
-    public void vizit(Profile page, Shortname shortname) {
+    public void addVisitAction(Profile page, Shortname shortname) {
         Profile actor = profileProvider.getUserFromAuth();
         if (actor != null && Objects.equals(actor.getId(), page.getId())) {
             return;
@@ -38,7 +38,7 @@ public class ActionService {
         actionRepository.save(action);
     }
 
-    public void save(Profile owner, Profile target) {
+    public void addSaveAction(Profile owner, Profile target) {
         actionRepository.save(new Action(owner, target, ActionType.SAVE, getIp()));
     }
 

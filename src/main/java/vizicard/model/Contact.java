@@ -1,11 +1,12 @@
 package vizicard.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -37,5 +38,9 @@ public class Contact {
 
     @Column(nullable = false)
     private boolean status = true;
+
+    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Action> clicks;
 
 }

@@ -6,7 +6,7 @@ import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.model.*;
 import vizicard.repository.ActionRepository;
-import vizicard.repository.RelationRepository;
+import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;
@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 public class ActionService {
 
     private final ActionRepository actionRepository;
+    private final ContactRepository contactRepository;
 
     private final ProfileProvider profileProvider;
     private final RelationRepository relationRepository;
@@ -37,8 +38,9 @@ public class ActionService {
         actionRepository.save(new Action(owner, target, ActionType.SAVE));
     }
 
-    public void addClickAction(Integer targetProfileId, ContactEnum resource) {
-        Profile target = profileProvider.getTarget(targetProfileId);
+    public void addClickAction(Integer resourceId) {
+        Contact resource = contactRepository.findById(resourceId).get();
+        Profile target = resource.getOwner();
         Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK);
         click.setResource(resource);
         actionRepository.save(click);

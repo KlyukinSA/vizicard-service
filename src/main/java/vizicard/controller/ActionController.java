@@ -29,8 +29,8 @@ public class ActionController {
     private final ProfileProvider profileProvider;
 
     @PostMapping("clicks")
-    void addClickAction(@RequestParam Integer id, ContactEnum resource) {
-        actionService.addClickAction(id, resource);
+    void addClickAction(Integer resourceId) {
+        actionService.addClickAction(resourceId);
     }
 
     @GetMapping("me")

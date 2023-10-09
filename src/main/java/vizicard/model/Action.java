@@ -31,9 +31,11 @@ public class Action {
 
     private float bonus;
 
-    @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')")
-    @Enumerated(EnumType.STRING)
-    private ContactEnum resource;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Contact resource;
+
+    @Column(nullable = false)
+    private String ip;
 
     public Action(Profile owner, Profile profile, ActionType type) {
         this.owner = owner;

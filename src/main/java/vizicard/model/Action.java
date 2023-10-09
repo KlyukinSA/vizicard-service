@@ -25,7 +25,7 @@ public class Action {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
-    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK', 'GIVE_BONUS', 'PARTNERSHIP')", nullable = false)
+    @Column(columnDefinition = "ENUM('VIZIT', 'SAVE', 'CLICK', 'GIVE_BONUS')", nullable = false)
     @Enumerated(EnumType.STRING)
     private ActionType type;
 
@@ -36,6 +36,9 @@ public class Action {
 
     @Column(nullable = false)
     private String ip;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Shortname shortname;
 
     public Action(Profile owner, Profile profile, ActionType type, String ip) {
         this.owner = owner;

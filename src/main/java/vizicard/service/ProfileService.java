@@ -42,22 +42,19 @@ public class ProfileService {
 
   public ProfileResponseDTO searchByShortname(String shortname) {
     Shortname shortname1 = shortnameRepository.findByShortname(shortname);
-    if (shortname1.getReferrer() != null) {
-      actionService.addPartnership(profileProvider.getUserFromAuth(), shortname1.getReferrer());
-    }
-    return search(shortname1.getOwner());
+    return search(shortname1.getOwner(), shortname1);
   }
 
   public ProfileResponseDTO searchById(Integer id) {
     Profile profile = profileProvider.getTarget(id);
-    return search(profile);
+    return search(profile, null);
   }
 
-  private ProfileResponseDTO search(Profile profile) {
+  private ProfileResponseDTO search(Profile profile, Shortname shortname) {
     if (profile.getType() == ProfileType.CUSTOM_USER || profile.getType() == ProfileType.CUSTOM_COMPANY || profile.getType() == ProfileType.GROUP) {
       relationValidator.stopNotOwnerOf(profile);
     }
-    actionService.vizit(profile);
+    actionService.vizit(profile, shortname);
     return profileMapper.mapToResponse(profile);
   }
 

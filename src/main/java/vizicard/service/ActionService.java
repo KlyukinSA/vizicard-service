@@ -28,12 +28,13 @@ public class ActionService {
     private final ProfileProvider profileProvider;
     private final CashService cashService;
 
-    public void vizit(Profile page) {
+    public void vizit(Profile page, Shortname shortname) {
         Profile actor = profileProvider.getUserFromAuth();
         if (actor != null && Objects.equals(actor.getId(), page.getId())) {
             return;
         }
         Action action = new Action(actor, page, ActionType.VIZIT, getIp());
+        action.setShortname(shortname);
         actionRepository.save(action);
     }
 
@@ -110,13 +111,16 @@ public class ActionService {
         return res;
     }
 
-    public Action addPartnership(Profile owner, Profile profile) {
-        return actionRepository.save(new Action(owner, profile, ActionType.PARTNERSHIP));
-    }
+//    public Action addPartnership(Profile owner, Profile referrer) {
+//        if (!actionRepository.existsByOwnerAndProfileAndIp(owner, referrer, getIp())) {
+//            cashService.giveBonus(referrer, 1);
+//        }
+//        return actionRepository.save(new Action(owner, referrer, ActionType.PARTNERSHIP, getIp()));
+//    }
 
-    public int countUniquePartnershipsByProfile(Profile user) {
-        return actionRepository.countByProfileAndTypeDistinctByOwner(user, ActionType.PARTNERSHIP);
-    }
+//    public int countUniquePartnershipsByProfile(Profile user) {
+//        return actionRepository.countByProfileAndTypeDistinctByOwner(user, ActionType.PARTNERSHIP);
+//    }
 
     private String getIp() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr();

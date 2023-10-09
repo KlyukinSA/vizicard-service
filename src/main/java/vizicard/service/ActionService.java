@@ -2,6 +2,8 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.model.*;
@@ -24,24 +26,25 @@ public class ActionService {
     private final ContactRepository contactRepository;
 
     private final ProfileProvider profileProvider;
-    private final RelationRepository relationRepository;
+    private final CashService cashService;
 
     public void vizit(Profile page) {
         Profile actor = profileProvider.getUserFromAuth();
         if (actor != null && Objects.equals(actor.getId(), page.getId())) {
             return;
         }
-        actionRepository.save(new Action(actor, page, ActionType.VIZIT));
+        Action action = new Action(actor, page, ActionType.VIZIT, getIp());
+        actionRepository.save(action);
     }
 
     public void save(Profile owner, Profile target) {
-        actionRepository.save(new Action(owner, target, ActionType.SAVE));
+        actionRepository.save(new Action(owner, target, ActionType.SAVE, getIp()));
     }
 
     public void addClickAction(Integer resourceId) {
         Contact resource = contactRepository.findById(resourceId).get();
         Profile target = resource.getOwner();
-        Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK);
+        Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK, getIp());
         click.setResource(resource);
         actionRepository.save(click);
     }
@@ -113,6 +116,16 @@ public class ActionService {
 
     public int countUniquePartnershipsByProfile(Profile user) {
         return actionRepository.countByProfileAndTypeDistinctByOwner(user, ActionType.PARTNERSHIP);
+    }
+
+    private String getIp() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr();
+    }
+
+    public void addGiveBonusAction(Profile profile, Profile referrer, float bonus) {
+        Action action = new Action(profile, referrer, ActionType.GIVE_BONUS, getIp());
+        action.setBonus(bonus);
+        actionRepository.save(action);
     }
 
 }

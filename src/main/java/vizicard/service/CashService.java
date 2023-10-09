@@ -16,4 +16,10 @@ public class CashService {
 		return profileRepository.findById(primaryService.getPrimaryOrSelf(profile).getId()).get().getCash() > 0; // for UserDetailsService
 	}
 
+	public void giveBonus(Profile profile, float amount) {
+		Profile primary = primaryService.getPrimaryOrSelf(profile);
+		primary.setReferralBonus(primary.getReferralBonus() + amount);
+		profileRepository.save(primary);
+	}
+
 }

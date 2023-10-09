@@ -37,9 +37,10 @@ public class Action {
     @Column(nullable = false)
     private String ip;
 
-    public Action(Profile owner, Profile profile, ActionType type) {
+    public Action(Profile owner, Profile profile, ActionType type, String ip) {
         this.owner = owner;
         this.profile = profile;
         this.type = type;
+        this.ip = ip;
     }
 }

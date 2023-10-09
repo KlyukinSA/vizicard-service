@@ -5,9 +5,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vizicard.model.*;
-import vizicard.repository.ActionRepository;
 import vizicard.repository.ProfileRepository;
 import vizicard.repository.RelationRepository;
+import vizicard.service.ActionService;
+import vizicard.service.CashService;
 import vizicard.service.PrimaryService;
 import vizicard.utils.ProfileProvider;
 
@@ -20,7 +21,8 @@ public class CashController {
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
     private final PrimaryService primaryService;
-    private final ActionRepository actionRepository;
+    private final ActionService actionService;
+    private final CashService cashService;
 
     @PostMapping
     public void addCash(float amount) {
@@ -41,14 +43,8 @@ public class CashController {
             Profile referrer = referrerRelation.getOwner();
 
             float bonus = getBonusPart(referrerLevel) * amount;
-
-            Profile primary = primaryService.getPrimaryOrSelf(referrer);
-            primary.setReferralBonus(primary.getReferralBonus() + bonus);
-            profileRepository.save(primary);
-
-            Action action = new Action(profile, referrer, ActionType.GIVE_BONUS);
-            action.setBonus(bonus);
-            actionRepository.save(action);
+            cashService.giveBonus(referrer, bonus);
+            actionService.addGiveBonusAction(profile, referrer, bonus);
         }
     }
 

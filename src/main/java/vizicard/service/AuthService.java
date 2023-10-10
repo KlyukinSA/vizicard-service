@@ -1,5 +1,6 @@
 package vizicard.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +12,7 @@ import vizicard.dto.AuthResponseDTO;
 import vizicard.dto.SignupDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.repository.ProfileRepository;
-import vizicard.repository.RelationRepository;
-import vizicard.repository.ShortnameRepository;
+import vizicard.repository.*;
 import vizicard.security.JwtTokenProvider;
 import vizicard.utils.ProfileProvider;
 
@@ -32,6 +31,7 @@ public class AuthService {
 
     private final RelationRepository relationRepository;
     private final ShortnameRepository shortnameRepository;
+    private final CloudFileRepository cloudFileRepository;
 
     public AuthResponseDTO signin(SigninDTO dto) {
         try {
@@ -98,6 +98,27 @@ public class AuthService {
             throw new CustomException("Its not your secondary", HttpStatus.FORBIDDEN);
         }
         return getResponse(secondary);
+    }
+
+    public AuthResponseDTO signinOrSignupWithGoogle(GoogleIdToken.Payload payload, String shortname, Integer referrerId) {
+        String password = payload.getSubject(); // userId
+        String username = payload.getEmail();
+        Profile profile = profileRepository.findByUsername(username);
+        if (profile == null) {
+            ProfileCreateDTO dto1 = new ProfileCreateDTO();
+            dto1.setName((String) payload.get("name"));
+            dto1.setType(ProfileType.USER);
+            profile = profileService.createProfile(dto1, null, username, password, null);
+            refer(profile, shortname, referrerId);
+            CloudFile picture = new CloudFile((String) payload.get("picture"), profile.getAlbum());
+            cloudFileRepository.save(picture);
+            profile.setAvatar(picture);
+            profileRepository.save(profile);
+        } else {
+            String id = String.valueOf(profile.getId());
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(id, password));
+        }
+        return getResponse(profile);
     }
 
 }

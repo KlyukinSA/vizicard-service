@@ -42,11 +42,5 @@ security:
   jwt:
     token:
       secret-key: hJKnai8ah2
-
-#UserController:
-#  signin: Authenticates user and returns its JWT token.
-#  signup: Creates user and returns its JWT token
-#  delete: Deletes specific user by username
-#  search: Returns specific user by username
-#  me: Returns current user's data
-#  update: Updates most user's fields
+google-auth:
+  client-id: 815596120055-29cqv2q3t386kf12fjqatqgt4851kt00.apps.googleusercontent.com

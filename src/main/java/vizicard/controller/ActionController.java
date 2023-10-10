@@ -50,7 +50,7 @@ public class ActionController {
         res.setWeekBenefit(actionService.getBenefitBetween(now.minus(Duration.ofDays(7)), now, user));
         res.setMonthBenefit(actionService.getBenefitBetween(now.minus(Duration.ofDays(30)), now, user));
         res.setTotalBenefit(actionService.getBenefit(user));
-//        res.setPartnershipCount(actionService.countUniquePartnershipsByProfile(user));
+        res.setVisitsCount(actionService.countUniqueVisitsWhereShortnameReferrer(user));
         return res;
     }
 

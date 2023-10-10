@@ -19,6 +19,8 @@ public interface ActionRepository extends JpaRepository<Action, Integer> {
     @Query("SELECT COUNT(a.owner) FROM Action AS a WHERE a.profile = ?1 AND a.type = ?2 GROUP BY a.owner")
     int countByProfileAndTypeDistinctByOwner(Profile user, ActionType actionType);
 
+	List<Action> findAllByShortnameReferrerAndType(Profile referrer, ActionType actionType);
+
 //    boolean existsByOwnerAndProfileAndIp(Profile owner, Profile profile, String ip);
 
 //	@Query("SELECT a.type AS type, COUNT(a.type) AS count "

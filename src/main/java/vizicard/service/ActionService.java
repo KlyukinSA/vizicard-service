@@ -149,4 +149,26 @@ public class ActionService {
         actionRepository.save(action);
     }
 
+    public int countUniqueVisitsWhereShortnameReferrer(Profile referrer) {
+//        return actionRepository.countByShortnameReferrerAndTypeUniqueByOwnerAndIp(user, ActionType.VIZIT) select count(DISTINCT a.owner, a.ip) from Action as a join Shortname as s where s.referrer = ?1 and a.type = ?2
+        int res = 0;
+        List<Action> visits = actionRepository.findAllByShortnameReferrerAndType(referrer, ActionType.VIZIT);
+        Set<Integer> ownerIds = new HashSet<>();
+        Set<String> ips = new HashSet<>();
+        for (Action visit : visits) {
+            if (visit.getOwner() != null) {
+                if (!ownerIds.contains(visit.getOwner().getId())) {
+                    res++;
+                    ownerIds.add(visit.getOwner().getId());
+                }
+            } else {
+                if (!ips.contains(visit.getIp())) {
+                    res++;
+                    ips.add(visit.getIp());
+                }
+            }
+        }
+        return res;
+    }
+
 }

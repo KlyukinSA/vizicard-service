@@ -12,5 +12,5 @@ public class ReferralStatsDTO {
 	float weekBenefit;
 	float monthBenefit;
 	float totalBenefit;
-	int partnershipCount;
+	int visitsCount; // количество уникальных визитов, где владелец токена - реферрер короткого имени визпт
 }

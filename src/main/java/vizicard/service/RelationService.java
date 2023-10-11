@@ -172,4 +172,18 @@ public class RelationService {
         return s;
     }
 
+    public List<Relation> getReferralsWithLevelOrAll(Integer level) {
+        Profile user = profileProvider.getUserFromAuth();
+        List<Relation> level1s = relationRepository.findAllByTypeAndOwner(RelationType.REFERRER, user);
+        List<Relation> level2s = relationRepository.findAllByTypeAndOwner(RelationType.REFERRER_LEVEL2, user);
+        if (level == null) {
+            level1s.addAll(level2s);
+            return  level1s;
+        } else if (level == 1) {
+            return level1s;
+        } else {
+            return level2s;
+        }
+    }
+
 }

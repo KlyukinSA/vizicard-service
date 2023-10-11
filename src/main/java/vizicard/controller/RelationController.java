@@ -43,4 +43,11 @@ public class RelationController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("referrals")
+    public List<RelationResponseDTO> getReferralsWithLevelOrAll(@RequestParam(required = false) Integer level) {
+        return relationService.getReferralsWithLevelOrAll(level).stream()
+                .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
+                .collect(Collectors.toList());
+    }
+
 }

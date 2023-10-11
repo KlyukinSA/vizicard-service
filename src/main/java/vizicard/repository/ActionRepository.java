@@ -21,6 +21,8 @@ public interface ActionRepository extends JpaRepository<Action, Integer> {
 
 	List<Action> findAllByShortnameReferrerAndType(Profile referrer, ActionType actionType);
 
+    List<Action> findAllByOwnerAndTypeOrderByCreateAtDesc(Profile owner, ActionType actionType);
+
 //    boolean existsByOwnerAndProfileAndIp(Profile owner, Profile profile, String ip);
 
 //	@Query("SELECT a.type AS type, COUNT(a.type) AS count "

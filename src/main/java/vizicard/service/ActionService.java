@@ -171,4 +171,8 @@ public class ActionService {
         return res;
     }
 
+    public List<Action> getProfilesIVisitedHistory() {
+        return actionRepository.findAllByOwnerAndTypeOrderByCreateAtDesc(profileProvider.getUserFromAuth(), ActionType.VIZIT);
+    }
+
 }

@@ -27,8 +27,8 @@ public class ShortnameController {
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public DeviceDTO findByShortname(String shortname) throws IOException {
-        return shortnameService.findByShortname(shortname);
+    public ShortnameResponse findByShortname(String shortname) throws IOException {
+        return modelMapper.map(shortnameRepository.findByShortname(shortname), ShortnameResponse.class);
     }
 
     @PostMapping("my")

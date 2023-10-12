@@ -19,11 +19,6 @@ public class ShortnameService {
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
 
-    public DeviceDTO findByShortname(String shortname1) {
-        Shortname shortname = shortnameRepository.findByShortname(shortname1);
-        return new DeviceDTO(shortname.getId(), shortname.getOwner().getId(), shortname.getShortname());
-    }
-
     public Shortname create(String sn, ShortnameType type) {
         stopUsed(sn);
         Profile user = profileProvider.getUserFromAuth();

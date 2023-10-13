@@ -11,7 +11,7 @@ import vizicard.dto.publication.CommentResponse;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 
 import javax.validation.Valid;
 import java.util.List;

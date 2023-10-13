@@ -11,7 +11,7 @@ import vizicard.model.Profile;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
 import vizicard.service.ActionService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 
 import java.time.Duration;

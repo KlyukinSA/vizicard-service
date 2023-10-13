@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.service.RelationService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;

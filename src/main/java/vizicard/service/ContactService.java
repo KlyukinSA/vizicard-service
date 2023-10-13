@@ -7,14 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
 import vizicard.model.Contact;
+import vizicard.model.Profile;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -89,19 +87,21 @@ public class ContactService {
         contactRepository.save(contact);
     }
 
-    public void reorder(Map<Integer, Integer> permutation) {
+    public List<Contact> reorder(Map<Integer, Integer> permutation) {
         Set<?> set = new HashSet<>(permutation.values());
         if (set.size() != permutation.keySet().size()) {
             throw new CustomException("function is not injective", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        for (Contact contact : profileProvider.getUserFromAuth().getContacts()) {
+        Profile user = profileProvider.getUserFromAuth();
+        for (Contact contact : user.getContacts()) {
             Integer order = permutation.get(contact.getId());
             if (order != null) {
                 contact.setOrder(order);
             }
             contactRepository.save(contact);
         }
+        return contactRepository.findAllByOwner(user);
     }
 
 }

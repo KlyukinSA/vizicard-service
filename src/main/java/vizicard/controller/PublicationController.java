@@ -9,7 +9,7 @@ import vizicard.dto.publication.PublicationResponse;
 import vizicard.model.Profile;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 
 import java.util.List;
 import java.util.function.Function;

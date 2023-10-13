@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface ContactRepository extends JpaRepository<Contact, Integer> {
     Contact findByOwnerAndOrder(Profile owner, Integer order);
+
+	List<Contact> findAllByOwner(Profile profile);
 }

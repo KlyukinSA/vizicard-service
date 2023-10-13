@@ -1,7 +1,6 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.dto.BriefProfileResponseDTO;
@@ -11,7 +10,7 @@ import vizicard.model.ProfileType;
 import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 import vizicard.utils.Relator;

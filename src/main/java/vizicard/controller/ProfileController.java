@@ -12,7 +12,7 @@ import io.swagger.annotations.Authorization;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.service.ProfileService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -11,6 +11,7 @@ import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
+import vizicard.mapper.ProfileMapper;
 import vizicard.model.*;
 import vizicard.repository.*;
 import vizicard.utils.*;

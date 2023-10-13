@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.contact.*;
+import vizicard.mapper.ContactMapper;
 import vizicard.model.Contact;
 import vizicard.model.ContactType;
 import vizicard.repository.ContactGroupRepository;
@@ -25,6 +26,7 @@ public class ContactController {
 
     private final ContactService contactService;
     private final ModelMapper modelMapper;
+    private final ContactMapper contactMapper;
 
     @GetMapping("types")
     public List<ContactTypeResponse> getAllTypes() {
@@ -91,14 +93,14 @@ public class ContactController {
 
     @PutMapping("order")
     @PreAuthorize("isAuthenticated()")
-    public void reorder(@RequestBody List<ContactReorderDTO> dto) {
+    public List<ContactResponse> reorder(@RequestBody List<ContactReorderDTO> dto) {
         Map<Integer, Integer> permutation = dto.stream()
                 .collect(Collectors.toMap(
                         ContactReorderDTO::getId,
                         ContactReorderDTO::getOrder,
                         (existing, replacement) -> replacement)); // {throw new CustomException("not function", HttpStatus.UNPROCESSABLE_ENTITY);}
 
-        contactService.reorder(permutation);
+        return contactMapper.map(contactService.reorder(permutation));
     }
 
 }

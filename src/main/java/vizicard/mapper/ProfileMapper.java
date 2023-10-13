@@ -1,6 +1,7 @@
-package vizicard.utils;
+package vizicard.mapper;
 
 import com.amazonaws.services.apigateway.model.GatewayResponse;
+import com.amazonaws.services.codegurureviewer.model.transform.CodeArtifactsMarshaller;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
+import vizicard.mapper.ContactMapper;
 import vizicard.model.Contact;
 import vizicard.model.Profile;
 import vizicard.model.Relation;
@@ -23,6 +25,7 @@ import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
 import vizicard.service.CashService;
 import vizicard.service.ShortnameService;
+import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +39,7 @@ public class ProfileMapper {
     private final RelationRepository relationRepository;
 
     private final ModelMapper modelMapper;
+    private final ContactMapper contactMapper;
     private final ProfileProvider profileProvider;
     private final CashService cashService;
 
@@ -48,7 +52,7 @@ public class ProfileMapper {
 
     public ProfileResponseDTO mapToResponse(Profile profile) {
         ProfileResponseDTO res = modelMapper.map(profile, ProfileResponseDTO.class); // TODO map except company and contacts and about
-        res.setContacts(getContactDTOs(profile));
+        res.setContacts(contactMapper.map(profile.getContacts()));
         res.setResume(getResume(profile));
         res.setRelation(getPossibleRelation(profile));
         removeDeletedAvatar(res, profile);
@@ -87,20 +91,6 @@ public class ProfileMapper {
             return null;
         }
         return modelMapper.map(relation, BriefRelationResponseDTO.class);
-    }
-
-    private List<ContactResponse> getContactDTOs(Profile profile) {
-        return profile.getContacts().stream()
-                .filter(Contact::isStatus)
-                .map((val) -> new ContactResponse(
-                        val.getId(),
-                        val.getType().getType(),
-                        val.getContact(),
-                        val.getTitle(),
-                        val.getDescription(),
-                        val.getOrder(),
-                        val.getType().getLogo().getUrl()))
-                .collect(Collectors.toList());
     }
 
     private ProfileDetailStructResponseDTO getResume(Profile profile) {

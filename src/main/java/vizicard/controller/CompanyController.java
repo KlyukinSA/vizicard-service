@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.BriefProfileResponseDTO;
 import vizicard.dto.ProfileResponseDTO;
 import vizicard.dto.profile.WorkerCreateDTO;
-import vizicard.model.Profile;
 import vizicard.service.CompanyService;
-import vizicard.service.ProfileService;
-import vizicard.utils.ProfileMapper;
+import vizicard.mapper.ProfileMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;

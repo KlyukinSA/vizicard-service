@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import vizicard.model.detail.EducationLevel;
+import vizicard.model.detail.EducationType;
 import vizicard.repository.AlbumRepository;
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactGroupRepository;
@@ -37,18 +38,21 @@ public class VizicardServiceApp implements CommandLineRunner {
   public void run(String... params) throws Exception {
     if (contactTypeRepository.findAll().size() < ContactEnum.class.getEnumConstants().length) {
       System.out.println("WHERE ARE CONTACT TYPES?");
-      if (activeProfile.equals("dev")) {
-        System.out.println("adding...");
-        fillContactTypes();
-      }
+      System.out.println("adding...");
+      fillContactTypes();
     }
     if (educationTypeRepository.findAll().size() < EducationLevel.class.getEnumConstants().length) {
       System.out.println("WHERE ARE EDUCATION TYPES?");
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('1', 'PRIMARY', 'НАЧАЛЬНОЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('2', 'SECONDARY', 'СРЕДНЕЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('3', 'HIGHER', 'ВЫСШЕЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('4', 'VOCATIONAL', 'ПРОФЕССИОНАЛЬНОЕ');
+      System.out.println("adding...");
+      fillEducationTypes();
     }
+  }
+
+  private void fillEducationTypes() {
+    educationTypeRepository.save(new EducationType(EducationLevel.PRIMARY, "начальное"));
+    educationTypeRepository.save(new EducationType(EducationLevel.SECONDARY, "среднее"));
+    educationTypeRepository.save(new EducationType(EducationLevel.HIGHER, "высшее"));
+    educationTypeRepository.save(new EducationType(EducationLevel.VOCATIONAL, "профессиональное"));
   }
 
   void fillContactTypes() {
@@ -66,7 +70,7 @@ public class VizicardServiceApp implements CommandLineRunner {
     ContactType contactType = new ContactType();
     contactType.setType(contactEnum);
     contactType.setLogo(logo);
-    contactType.setWriting("type");
+    contactType.setWriting(contactEnum.toString().toLowerCase());
     contactType.setGroup(contactGroup);
     contactTypeRepository.save(contactType);
   }

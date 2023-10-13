@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import vizicard.model.Contact;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,5 +27,10 @@ public class EducationType {
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Education> educations;
+
+    public EducationType(EducationLevel type, String writing) {
+        this.type = type;
+        this.writing = writing;
+    }
 
 }

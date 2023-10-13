@@ -11,6 +11,7 @@ import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,15 +21,17 @@ public class SkillService {
 
     private final ProfileProvider profileProvider;
 
-    public void changeSkills(SkillDTO dto) {
+    public List<Skill> changeSkills(SkillDTO dto) {
         Profile user = profileProvider.getUserFromAuth();
         if (dto.getAdd() != null) {
             for (String s : dto.getAdd()) {
-                Skill detail = new Skill(user, s);
-                try {
-                    repository.save(detail);
-                } catch (Exception ignored) {
+                Skill skill = repository.findBySkillAndOwner(s, user);
+                if (skill != null) {
+                    skill.setStatus(true);
+                } else {
+                    skill = new Skill(user, s);
                 }
+                repository.save(skill);
             }
         }
         if (dto.getDelete() != null) {
@@ -40,6 +43,9 @@ public class SkillService {
                 }
             }
         }
+        return repository.findAllByOwner(user).stream()
+                .filter(Skill::isStatus)
+                .collect(Collectors.toList());
     }
 
 }

@@ -5,12 +5,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.DeviceDTO;
+import vizicard.dto.QRCodeResponse;
 import vizicard.dto.ShortnameDTO;
 import vizicard.dto.ShortnameResponse;
 import vizicard.model.Profile;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
 import vizicard.repository.ShortnameRepository;
+import vizicard.service.QRService;
 import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
@@ -22,6 +24,8 @@ import java.io.IOException;
 public class ShortnameController {
 
     private final ShortnameService shortnameService;
+    private final QRService qrService;
+
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
     private final ModelMapper modelMapper;
@@ -55,6 +59,13 @@ public class ShortnameController {
         } else {
             return profileProvider.getUserFromAuth();
         }
+    }
+
+    @GetMapping("qr")
+    @PreAuthorize("isAuthenticated()")
+    public QRCodeResponse generateQRCodeForMainShortname() throws IOException, InterruptedException {
+        String mainShortname = shortnameService.getMainShortname(profileProvider.getUserFromAuth());
+        return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
     }
 
 }

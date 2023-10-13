@@ -40,6 +40,8 @@ public class EducationService {
         Profile user = profileProvider.getUserFromAuth();
         Education education = educationRepository.findById(id).get();
         if (Objects.equals(education.getOwner().getId(), user.getId())) {
+            education.setType(educationTypeRepository.findById(dto.getTypeId()).get());
+            dto.setTypeId(null);
             modelMapper.map(dto, education);
             educationRepository.save(education);
         }

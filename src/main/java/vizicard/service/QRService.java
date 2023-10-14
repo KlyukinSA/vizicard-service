@@ -1,8 +1,12 @@
 package vizicard.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import vizicard.exception.CustomException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +34,13 @@ public class QRService {
 				.method("POST", HttpRequest.BodyPublishers.ofString(body))
 				.build();
 		HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-		System.out.println(response.body());
-		return response.body();
+		String body1 = response.body();
+		Map<String, Object> jsonElements =  new ObjectMapper().readValue(body1, new TypeReference<>() {});
+		String url = (String) jsonElements.get("imageUrl");
+		if (url == null) {
+			throw new CustomException(body1, HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		return url.substring(2);
 	}
 
 	private String getFileText(String fileName) {

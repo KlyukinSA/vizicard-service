@@ -1,8 +1,8 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -23,9 +23,12 @@ import java.util.stream.Collectors;
 public class EmailService {
 
     private final JavaMailSender emailSender;
-
     private final ShortnameService shortnameService;
-    private static final String vizicardEmail = "info@vizicard.ru";
+
+    @Value("${spring.mail.username}")
+    private String vizicardEmail;
+    @Value("${front-url-base}")
+    private String urlBase;
 
     public void sendSaved(Profile actor, Profile target) {
         String to = getAddressTo(actor);
@@ -65,6 +68,7 @@ public class EmailService {
     }
 
     private String substitute(String text, Profile profile) { // TODO use org.apache.commons.text.StringSubstitutor
+        text = replaceArg(text, "url-base", urlBase);
         text = replaceArg(text, "name", profile.getName());
         text = replaceArg(text, "title", profile.getTitle());
         if (profile.getCompany() == null) {

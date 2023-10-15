@@ -3,6 +3,7 @@ package vizicard.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QRService {
 
+	@Value("${front-url-base}")
+	private String urlBase;
+
 	public String generate(String shortname) throws IOException, InterruptedException {
 		String body = getFileText("qrcode-monkey-request.json");
-		body = body.replace("$1", shortname);
+		body = body.replace("$1", urlBase);
+		body = body.replace("$2", shortname);
 		System.out.println(body);
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create("https://api.qrcode-monkey.com/qr/custom"))

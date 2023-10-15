@@ -24,7 +24,7 @@
     "logo": "",
     "logoMode": "default"
   },
-  "data": "https://vizicard.ru/$1?utm_source=qr",
+  "data": "$1/$2?utm_source=qr",
   "download": "imageUrl",
   "file": "svg",
   "size": 400

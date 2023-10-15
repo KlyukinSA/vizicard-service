@@ -62,7 +62,7 @@ public class Profile {
   @Column(columnDefinition = "TIMESTAMP(0)", nullable = false)
   private Date lastVizit = new Date();
 
-  @OneToOne
+  @OneToOne(mappedBy = "owner")
   private Album album;
 
   private float cash = 0;

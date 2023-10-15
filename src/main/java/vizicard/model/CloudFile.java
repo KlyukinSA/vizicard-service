@@ -15,6 +15,7 @@ public class CloudFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String url;
 
     @ManyToOne(targetEntity = Album.class)

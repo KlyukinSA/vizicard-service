@@ -26,6 +26,7 @@ public class Album {
     private Integer id;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Profile owner;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)

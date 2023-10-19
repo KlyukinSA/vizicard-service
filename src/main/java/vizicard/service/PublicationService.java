@@ -2,7 +2,7 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 import vizicard.model.Publication;
 import vizicard.repository.PublicationRepository;
 import vizicard.utils.ProfileProvider;
@@ -19,7 +19,7 @@ public class PublicationService {
 
     public Publication createPublication(Publication publication, Integer id) {
         publication.setOwner(profileProvider.getUserFromAuth());
-        publication.setProfile(profileProvider.getTarget(id));
+        publication.setCard(profileProvider.getTarget(id));
         return publicationRepository.save(publication);
     }
 
@@ -28,8 +28,8 @@ public class PublicationService {
     }
 
     public List<Publication> getOnPage(Integer id) {
-        Profile page = profileProvider.getTarget(id);
-        return publicationRepository.findAllByProfile(page);
+        Card page = profileProvider.getTarget(id);
+        return publicationRepository.findAllByCard(page);
     }
 
     public boolean isUsualPublication(Publication publication) {

@@ -2,7 +2,7 @@ package vizicard.model.detail;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ public class Experience extends DetailBase {
     @Column(nullable = false)
     private String tasks;
 
-    public Experience(Profile user) {
+    public Experience(Card user) {
         super(user);
     }
 }

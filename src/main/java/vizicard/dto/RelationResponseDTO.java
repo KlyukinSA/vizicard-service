@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RelationResponseDTO {
-    private BriefProfileResponseDTO profile;
+    private BriefCardResponse card;
     private Date createAt;
     private RelationType type;
 }

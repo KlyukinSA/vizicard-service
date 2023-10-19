@@ -2,24 +2,23 @@ package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vizicard.model.Profile;
-import vizicard.repository.ProfileRepository;
+import vizicard.model.Account;
+import vizicard.model.Card;
+import vizicard.repository.AccountRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CashService {
 
-	private final PrimaryService primaryService;
-	private final ProfileRepository profileRepository;
+	private final AccountRepository accountRepository;
 
-	public boolean isPro(Profile profile) {
-		return profileRepository.findById(primaryService.getPrimaryOrSelf(profile).getId()).get().getCash() > 0; // for UserDetailsService
+	public boolean isPro(Account account) {
+		return accountRepository.findById(account.getId()).get().getCash() > 0; // findById is for UserDetailsService
 	}
 
-	public void giveBonus(Profile profile, float amount) {
-		Profile primary = primaryService.getPrimaryOrSelf(profile);
-		primary.setReferralBonus(primary.getReferralBonus() + amount);
-		profileRepository.save(primary);
+	public void giveBonus(Account account, float amount, Card card) {
+		account.setReferralBonus(account.getReferralBonus() + amount);
+		accountRepository.save(account);
 	}
 
 }

@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.DeviceDTO;
 import vizicard.dto.QRCodeResponse;
 import vizicard.dto.ShortnameDTO;
 import vizicard.dto.ShortnameResponse;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
 import vizicard.repository.ShortnameRepository;
@@ -53,18 +52,28 @@ public class ShortnameController {
         return modelMapper.map(shortname, ShortnameResponse.class);
     }
 
-    private Profile getReferrer(Integer invitorId) {
+    private Card getReferrer(Integer invitorId) {
         if (invitorId != null) {
             return profileProvider.getTarget(invitorId);
         } else {
-            return profileProvider.getUserFromAuth();
+            return profileProvider.getUserFromAuth().getMainCard();
         }
+    }
+
+    @PostMapping("{id}/assign-to-main-card")
+    public ShortnameResponse assignToMainCard(@PathVariable Integer id) {
+        return modelMapper.map(shortnameService.assignToMainCard(id), ShortnameResponse.class);
+    }
+
+    @PostMapping("{id}/assign-to-account")
+    public ShortnameResponse assignToAccount(@PathVariable Integer id) {
+        return modelMapper.map(shortnameService.assignToAccount(id), ShortnameResponse.class);
     }
 
     @GetMapping("qr")
     @PreAuthorize("isAuthenticated()")
     public QRCodeResponse generateQRCodeForMainShortname() throws IOException, InterruptedException {
-        String mainShortname = shortnameService.getMainShortname(profileProvider.getUserFromAuth());
+        String mainShortname = shortnameService.getMainShortname(profileProvider.getUserFromAuth().getCurrentCard());
         return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
     }
 

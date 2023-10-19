@@ -1,15 +1,22 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
+import vizicard.dto.profile.ProfileUpdateDTO;
+import vizicard.model.Card;
+import vizicard.model.ContactEnum;
+import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
-import vizicard.mapper.ProfileMapper;
+import vizicard.mapper.CardMapper;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,12 +25,14 @@ import java.util.stream.Collectors;
 public class RelationController {
 
     private final RelationService relationService;
-    private final ProfileMapper profileMapper;
+    private final CardMapper cardMapper;
+    private final ModelMapper modelMapper;
+    private final ProfileService profileService;
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public void unrelate(@RequestParam(required = false) Integer owner, @RequestParam Integer profile) {
-        relationService.unrelate(owner, profile);
+    public void unrelate(@RequestParam Integer cardId) {
+        relationService.unrelate(cardId);
     }
 
     @PostMapping
@@ -33,20 +42,28 @@ public class RelationController {
 
     @PostMapping("/lead")
     public void leadGenerate(@RequestParam Integer id, @RequestBody(required = false) LeadGenDTO dto) {
-        relationService.leadGenerate(id, dto);
+        Card leadCard = new Card();
+        leadCard.setName(dto.getName());
+        Card company = new Card();
+        company.setName(dto.getName());
+        ContactInListRequest contactInListRequest = dto.getContacts().stream().filter(req -> req.getType().equals(ContactEnum.MAIL)).findFirst().orElse(new ContactInListRequest());
+        relationService.leadGenerate(id, leadCard, company, contactInListRequest.getContact());
+        if (leadCard.getId() != null) {
+            profileService.updateProfile(leadCard, modelMapper.map(dto, ProfileUpdateDTO.class));
+        }
     }
 
     @GetMapping
     public List<RelationResponseDTO> searchLike(@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
         return relationService.searchLike(name, type).stream()
-                .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
+                .map((r) -> new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType()))
                 .collect(Collectors.toList());
     }
 
     @GetMapping("referrals")
     public List<RelationResponseDTO> getReferralsWithLevelOrAll(@RequestParam(required = false) Integer level) {
         return relationService.getReferralsWithLevelOrAll(level).stream()
-                .map((r) -> new RelationResponseDTO(profileMapper.mapToBrief(r.getProfile()), r.getCreateAt(), r.getType()))
+                .map((r) -> new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType()))
                 .collect(Collectors.toList());
     }
 

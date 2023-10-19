@@ -11,7 +11,7 @@ import ezvcard.property.Url;
 import lombok.Getter;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +25,7 @@ public class VcardFile {
     private final byte[] bytes;
     private final String name;
 
-    public VcardFile(Profile target) throws IOException {
+    public VcardFile(Card target) throws IOException {
         this.bytes = getVcardBytes(getVcard(target));
         this.name = getVcardFileName(target);
     }
@@ -40,29 +40,29 @@ public class VcardFile {
         return outputStream.toByteArray();
     }
 
-    private VCard getVcard(Profile profile) throws IOException {
+    private VCard getVcard(Card card) throws IOException {
         VCard vcard = new VCard();
-        if (isGoodForVcard(profile.getName())) {
-            vcard.setFormattedName(profile.getName());
+        if (isGoodForVcard(card.getName())) {
+            vcard.setFormattedName(card.getName());
         }
-        if (isGoodForVcard(profile.getTitle())) {
-            vcard.addTitle(profile.getTitle());
+        if (isGoodForVcard(card.getTitle())) {
+            vcard.addTitle(card.getTitle());
         }
-        if (isGoodForVcard(profile.getDescription())) {
-            vcard.addNote(profile.getDescription());
+        if (isGoodForVcard(card.getDescription())) {
+            vcard.addNote(card.getDescription());
         }
-        if (profile.getCompany() != null && profile.getCompany().isStatus() &&
-                isGoodForVcard(profile.getCompany().getName())) {
-            vcard.setOrganization(profile.getCompany().getName());
+        if (card.getCompany() != null && card.getCompany().isStatus() &&
+                isGoodForVcard(card.getCompany().getName())) {
+            vcard.setOrganization(card.getCompany().getName());
         }
-        if (isGoodForVcard(profile.getCity())) {
+        if (isGoodForVcard(card.getCity())) {
             Address address = new Address();
-            address.setLocality(profile.getCity());
+            address.setLocality(card.getCity());
             vcard.addAddress(address);
         }
 
         int group = 0;
-        for (Contact contact : profile.getContacts()) {
+        for (Contact contact : card.getContacts()) {
             ContactEnum contactEnum = contact.getType().getType();
             String string = contact.getContact();
             if (isGoodForVcard(string)) {
@@ -84,8 +84,8 @@ public class VcardFile {
             }
         }
 
-        if (profile.getAvatar() != null) {
-            String url = profile.getAvatar().getUrl();
+        if (card.getAvatar() != null) {
+            String url = card.getAvatar().getUrl();
             InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
             Photo photo = new Photo(inputStream, ImageType.JPEG);
             vcard.addPhoto(photo); // TODO image types
@@ -98,7 +98,7 @@ public class VcardFile {
         return string != null && string.length() > 0;
     }
 
-    private String getVcardFileName(Profile target) {
+    private String getVcardFileName(Card target) {
         return target.getName() + ".vcf";
     }
 

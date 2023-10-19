@@ -30,14 +30,13 @@ public class EmailService {
     @Value("${front-url-base}")
     private String urlBase;
 
-    public void sendSaved(Profile actor, Profile target) {
-        String to = getAddressTo(actor);
+    public void sendSaved(String to, Card target) {
         String subject = "Сохранение контакта";
         String text = getSaveText(target);
         try {
             sendHtml(to, subject, text);
         } catch (Exception e) {
-            System.out.println("tried to send message to " + actor.getId() + " about " + target.getId() + "\nbut\n");
+            System.out.println("tried to send message to " + to + " about " + target.getId() + "\nbut\n");
             e.printStackTrace();
         }
     }
@@ -52,35 +51,36 @@ public class EmailService {
         emailSender.send(message);
     }
 
-    private String getAddressTo(Profile target) {
-        Optional<Contact> mail = target.getContacts().stream()
-                .filter((val) -> val.getType().getType() == ContactEnum.MAIL)
-                .findFirst();
-        if (mail.isPresent()) {
-            return mail.get().getContact();
-        }
-        return target.getUsername();
+    private String getAddressTo(Account target) {
+        Optional<String> mail = getAddressTo(target.getCurrentCard());
+        return mail.orElseGet(target::getUsername);
     }
 
-    private String getSaveText(Profile profile) {
+    private String getSaveText(Card card) {
         String text = getFileText("save-contact-letter.html");
-        return substitute(text, profile);
+        return substitute(text, card);
     }
 
-    private String substitute(String text, Profile profile) { // TODO use org.apache.commons.text.StringSubstitutor
+    private String substitute(String text, Card card) { // TODO use org.apache.commons.text.StringSubstitutor
         text = replaceArg(text, "url-base", urlBase);
-        text = replaceArg(text, "name", profile.getName());
-        text = replaceArg(text, "title", profile.getTitle());
-        if (profile.getCompany() == null) {
+        text = replaceArg(text, "name", card.getName());
+        text = replaceArg(text, "title", card.getTitle());
+        if (card.getCompany() == null) {
             text = replaceArg(text, "company", null);
         } else {
-            text = replaceArg(text, "company", profile.getCompany().getName());
+            text = replaceArg(text, "company", card.getCompany().getName());
         }
-        text = replaceArg(text, "email", getAddressTo(profile));
-        text = replaceArg(text, "phone", getPhone(profile));
-        text = replaceArg(text, "description", profile.getDescription());
-        text = replaceArg(text, "shortname", shortnameService.getMainShortname(profile));
+        text = replaceArg(text, "email", getAddressTo(card).orElse(null));
+        text = replaceArg(text, "phone", getPhone(card));
+        text = replaceArg(text, "description", card.getDescription());
+        text = replaceArg(text, "shortname", shortnameService.getMainShortname(card));
         return text;
+    }
+
+    private Optional<String> getAddressTo(Card card) {
+        return card.getContacts().stream()
+                .filter((val) -> val.getType().getType() == ContactEnum.MAIL)
+                .findFirst().map(Contact::getContact);
     }
 
     private String replaceArg(String text, String arg, String val) {
@@ -101,20 +101,27 @@ public class EmailService {
         }
     }
 
-    private String getPhone(Profile profile) {
-        Optional<Contact> phone = profile.getContacts().stream()
+    private String getPhone(Card card) {
+        Optional<Contact> phone = card.getContacts().stream()
                 .filter((val) -> val.getType().getType() == ContactEnum.PHONE)
                 .findFirst();
         return phone.map(Contact::getContact).orElse(null);
     }
 
-    public void sendLead(Profile target, Profile actor) {
-        String to = getAddressTo(target);
+    public void sendLead(String to, Card actor) {
         String subject = "Новое знакомство";
         String text = substitute(getFileText("lead-generate-letter.html"), actor);
         try {
             sendHtml(to, subject, text);
         } catch (Exception ignored) {}
+    }
+
+    public String resolveEmail(Account account) {
+        return getAddressTo(account);
+    }
+
+    public void sendSaved(Account owner, Card target) {
+        sendSaved(getAddressTo(owner), target);
     }
 
 }

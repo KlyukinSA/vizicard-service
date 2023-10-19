@@ -8,14 +8,14 @@ import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 
 @Data
-public class ProfileResponseDTO extends BriefProfileResponseDTO {
+public class CardResponse extends BriefCardResponse {
   private String description;
   private String city;
   private List<ContactResponse> contacts;
 
   private Date createAt;
 
-  private BriefProfileResponseDTO company;
+  private BriefCardResponse company;
 
   private Date lastVizit;
 

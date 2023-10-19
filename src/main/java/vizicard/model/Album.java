@@ -3,8 +3,6 @@ package vizicard.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -17,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(exclude="owner")
 public class Album {
 
-    public Album(Profile owner) {
+    public Album(Card owner) {
         this.owner = owner;
     }
 
@@ -27,7 +25,7 @@ public class Album {
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Profile owner;
+    private Card owner;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)

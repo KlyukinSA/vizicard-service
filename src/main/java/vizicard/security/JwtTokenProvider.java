@@ -17,7 +17,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
-import vizicard.model.Profile;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.utils.TokenClaimsFiller;
 
 @Component
@@ -39,10 +40,11 @@ public class JwtTokenProvider {
     secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
-  public String createToken(Profile profile) {
+  public String createToken(Account account) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("id", String.valueOf(profile.getId()));
-    tokenClaimsFiller.fillAdditional(claims, profile);
+    claims.put("accountId", String.valueOf(account.getId())); // TODO integer
+    claims.put("cardId", String.valueOf(account.getCurrentCard().getId())); //
+    tokenClaimsFiller.fillAdditional(claims, account);
     return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(new Date())
@@ -55,8 +57,8 @@ public class JwtTokenProvider {
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getId(String token) {
-    return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("id");
+  private String getId(String token) {
+    return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("accountId");
   }
 
   public String resolveToken(HttpServletRequest req) {

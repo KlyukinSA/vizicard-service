@@ -6,10 +6,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.publication.PublicationCreateDTO;
 import vizicard.dto.publication.PublicationResponse;
-import vizicard.model.Profile;
+import vizicard.mapper.PublicationCommentResponseMapper;
+import vizicard.model.Card;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
-import vizicard.mapper.ProfileMapper;
+import vizicard.mapper.CardMapper;
 
 import java.util.List;
 import java.util.function.Function;
@@ -21,7 +22,7 @@ public class PublicationController {
 
     private final PublicationService publicationService;
     private final ModelMapper modelMapper;
-    private final ProfileMapper profileMapper;
+    private final PublicationCommentResponseMapper publicationCommentResponseMapper;
 
     @PostMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
@@ -33,23 +34,13 @@ public class PublicationController {
     @GetMapping("publications/my")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getAllMy() {
-        return getResponse(publicationService.getAllMy(), Publication::getProfile);
+        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getAllMy(), Publication::getCard, PublicationResponse.class);
     }
 
     @GetMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
-        return getResponse(publicationService.getOnPage(id), Publication::getOwner);
-    }
-
-    private List<PublicationResponse> getResponse(List<Publication> list, Function<Publication, Profile> targetProvider) {
-        return list.stream()
-                .filter(publicationService::isUsualPublication)
-                .map(e -> {
-                    PublicationResponse dto = modelMapper.map(e, PublicationResponse.class);
-                    dto.setProfile(profileMapper.mapToBrief(targetProvider.apply(e)));
-                    return dto;})
-                .collect(Collectors.toList());
+        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id), p -> p.getOwner().getMainCard(), PublicationResponse.class);
     }
 
 }

@@ -22,6 +22,7 @@ public class ContactType {
     private ContactEnum type;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CloudFile logo;
 
     @Column(nullable = false)

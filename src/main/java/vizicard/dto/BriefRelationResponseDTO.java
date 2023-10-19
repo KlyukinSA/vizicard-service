@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class BriefRelationResponseDTO {
     private Integer ownerId;
-    private Integer profileId;
+    private Integer cardId;
     private Date createAt;
     private RelationType type;
 }

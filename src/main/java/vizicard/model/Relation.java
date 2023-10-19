@@ -2,18 +2,14 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "profile_id"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "card_id"}))
 public class Relation {
 
     @Id
@@ -22,11 +18,11 @@ public class Relation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Profile owner;
+    private Account owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Profile profile;
+    private Card card;
 
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
@@ -38,9 +34,9 @@ public class Relation {
     @Enumerated(EnumType.STRING)
     private RelationType type;
 
-    public Relation(Profile owner, Profile profile, RelationType relationType) {
+    public Relation(Account owner, Card card, RelationType relationType) {
         this.owner = owner;
-        this.profile = profile;
+        this.card = card;
         this.type = relationType;
     }
 

@@ -20,7 +20,7 @@ public class Contact {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Profile owner;
+    private Card owner;
 
     @ManyToOne
     @JoinColumn(nullable = false)

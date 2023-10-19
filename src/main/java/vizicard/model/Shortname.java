@@ -18,7 +18,10 @@ public class Shortname {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Profile owner;
+    private Account owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Card card;
 
     @Column(nullable = false, unique = true)
     private String shortname;
@@ -28,14 +31,14 @@ public class Shortname {
     private ShortnameType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Profile referrer;
+    private Card referrer;
 
     @OneToMany(mappedBy = "shortname", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Action> visits;
 
-    public Shortname(Profile owner, String shortname, ShortnameType shortnameType) {
-        this.owner = owner;
+    public Shortname(Card card, String shortname, ShortnameType shortnameType) {
+        this.card = card;
         this.shortname = shortname;
         this.type = shortnameType;
     }

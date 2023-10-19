@@ -3,15 +3,11 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import vizicard.dto.*;
 import vizicard.dto.contact.ContactInListRequest;
-import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
-import vizicard.mapper.ProfileMapper;
 import vizicard.model.*;
 import vizicard.repository.*;
 import vizicard.utils.*;
@@ -23,139 +19,137 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProfileService {
 
-  private final ProfileRepository profileRepository;
-  private final RelationRepository relationRepository; // TODO CreateProfileDTOMapper
-  private final ShortnameRepository shortnameRepository;
-  private final AlbumRepository albumRepository;
+  private final CardRepository cardRepository;
+  private final RelationRepository relationRepository;
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
 
   private final ProfileProvider profileProvider;
-  private final RelationValidator relationValidator;
-  private final ProfileMapper profileMapper;
-  private final PasswordEncoder passwordEncoder;
   private final ModelMapper modelMapper;
   private final Relator relator;
 
   private final S3Service s3Service; // TODO use CloudFileRepository
-  private final ActionService actionService; // TODO ActionSaver?
-  private final PrimaryService primaryService;
 
-  public ProfileResponseDTO searchByShortname(String shortname) {
-    Shortname shortname1 = shortnameRepository.findByShortname(shortname);
-    return search(shortname1.getOwner(), shortname1);
-  }
+  private final CardService cardService;
+  private final AuthService authService;
 
-  public ProfileResponseDTO searchById(Integer id) {
-    Profile profile = profileProvider.getTarget(id);
-    return search(profile, null);
-  }
+//  public CardResponse searchByShortname(String shortname) {
+//    Shortname shortname1 = shortnameRepository.findByShortname(shortname);
+//    Card card = shortname1.getCard();
+//    if (card == null) {
+//      card = shortname1.getOwner().getMainCard();
+//    }
+//    return search(card, shortname1);
+//  }
+//
+//  public CardResponse searchById(Integer id) {
+//    Card card = profileProvider.getTarget(id);
+//    return search(card, null);
+//  }
+//
+//  private CardResponse search(Card card, Shortname shortname) {
+//    if (card.getType() == ProfileType.CUSTOM_USER || card.getType() == ProfileType.CUSTOM_COMPANY || card.getType() == ProfileType.GROUP) {
+//      relationValidator.stopNotOwnerOf(card);
+//    }
+//    actionService.addVisitAction(card, shortname);
+//    return cardMapper.mapToResponse(card);
+//  }
 
-  private ProfileResponseDTO search(Profile profile, Shortname shortname) {
-    if (profile.getType() == ProfileType.CUSTOM_USER || profile.getType() == ProfileType.CUSTOM_COMPANY || profile.getType() == ProfileType.GROUP) {
-      relationValidator.stopNotOwnerOf(profile);
-    }
-    actionService.addVisitAction(profile, shortname);
-    return profileMapper.mapToResponse(profile);
-  }
+//  public CardResponse whoami() {
+//    return cardMapper.mapToResponse(profileProvider.getUserFromAuth());
+//  }
 
-  public ProfileResponseDTO whoami() {
-    return profileMapper.mapToResponse(profileProvider.getUserFromAuth());
-  }
+//  public Card update(Integer id, ProfileUpdateDTO dto) {
+//    Card target = profileProvider.getTarget(id);
+//    relationValidator.stopNotOwnerOf(target);
+//    return updateProfile(target, dto);
+//  }
 
-  public ProfileResponseDTO update(Integer id, ProfileUpdateDTO dto) {
-    Profile target = profileProvider.getTarget(id);
-    relationValidator.stopNotOwnerOf(target);
-    return profileMapper.mapToResponse(updateProfile(target, dto));
-  }
+//  public Card createProfile(ProfileCreateDTO dto, Account owner, String username, String password, RelationType relationType) {
+//    Card card = new Card();
+//    card.setType(dto.getType());
+//    card.setName(dto.getName());
+////    card.setUsername(username);
+//    card = cardRepository.save(card);
+//
+//    if (owner != null) {
+//      relationRepository.save(new Relation(owner, card, relationType));
+//    }
+//
+//    cardService.create(card);
+//
+//    ProfileUpdateDTO dto1 = modelMapper.map(dto, ProfileUpdateDTO.class);
+////    dto1.setPassword(password);
+//    return updateProfile(card, dto1);
+//  }
 
-  public Profile createProfile(ProfileCreateDTO dto, Profile owner, String username, String password, RelationType relationType) {
-    Profile profile = new Profile();
-    profile.setType(dto.getType());
-    profile.setName(dto.getName());
-    profile.setUsername(username);
-    profile = profileRepository.save(profile);
+//  public Card createMyProfile(ProfileCreateDTO dto) {
+//    Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
+//            ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
+//            ProfileType.COMPANY, ProfileType.GROUP));
+//    if (!relationOrCompanyGroupProfileTypes.contains(dto.getType())) {
+//      throw new CustomException("cant create with this type", HttpStatus.UNPROCESSABLE_ENTITY);
+//    }
+//    Card card = new Card();
+//    card.setName(dto.getName());
+//    card.setType(dto.getType());
+//    card.setAccount(profileProvider.getUserFromAuth());
+//    cardRepository.save(card);
+//    return updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class));
+//  }
 
-    if (owner != null) {
-      relationRepository.save(new Relation(owner, profile, relationType));
-    }
-    shortnameRepository.save(new Shortname(profile, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
-    if (profile.getType() == ProfileType.USER || profile.getType() == ProfileType.COMPANY) {
-      Album album = new Album(profile);
-      albumRepository.save(album);
-      profile.setAlbum(album);
-    }
-
-    ProfileUpdateDTO dto1 = modelMapper.map(dto, ProfileUpdateDTO.class);
-    dto1.setPassword(password);
-    return updateProfile(profile, dto1);
-  }
-
-  public Profile createMyProfile(ProfileCreateDTO dto) {
-    Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
-            ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
-            ProfileType.COMPANY, ProfileType.GROUP));
-    if (!relationOrCompanyGroupProfileTypes.contains(dto.getType())) {
-      throw new CustomException("cant create with this type", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-    Profile owner = profileProvider.getUserFromAuth();
-    return createProfile(dto, owner, null, null, RelationType.OWNER);
-  }
-
-  private Profile updateProfile(Profile profile, ProfileUpdateDTO dto) {
+  public Card updateProfile(Card card, ProfileUpdateDTO dto) {
     if (dto.getName() != null) { // TODO set modelMapper how to map contacts and cloudFiles
-      profile.setName(dto.getName());
+      card.setName(dto.getName());
     }
     if (dto.getTitle() != null) {
-      profile.setTitle(dto.getTitle());
+      card.setTitle(dto.getTitle());
     }
     if (dto.getDescription() != null) {
-      profile.setDescription(dto.getDescription());
+      card.setDescription(dto.getDescription());
     }
     if (dto.getCity() != null) {
-      profile.setCity(dto.getCity());
+      card.setCity(dto.getCity());
     }
 
     if (dto.getAvatarId() != null) {
       if (dto.getAvatarId().equals(0)) {
-        profile.setAvatar(null);
+        card.setAvatar(null);
       } else {
-        profile.setAvatar(s3Service.getById(dto.getAvatarId()));
+        card.setAvatar(s3Service.getById(dto.getAvatarId()));
       }
     }
 
     if (dto.getCompanyId() != null) {
       if (dto.getCompanyId().equals(0)) {
-        profile.setCompany(null);
+        card.setCompany(null);
       } else {
-        Profile company = profileProvider.getTarget(dto.getCompanyId());
-        profile.setCompany(company);
+        Card company = profileProvider.getTarget(dto.getCompanyId());
+        card.setCompany(company);
 
-        Relation relation = relationRepository.findByOwnerAndProfile(profile, company);
+        Relation relation = relationRepository.findByOwnerAndCard(card.getAccount(), company);
         RelationType relationType;
         if (relation != null) {
           relationType = relation.getType();
         } else {
           relationType = RelationType.USUAL;
         }
-        relator.relate(profile, company, relationType);
+        relator.relate(card.getAccount(), company, relationType);
       }
     }
 
-    if (dto.getPassword() != null) {
-      profile.setPassword(passwordEncoder.encode(dto.getPassword()));
-    }
-
     if (dto.getContacts() != null) {
-      updateContacts(profile, dto.getContacts());
+      updateContacts(card, dto.getContacts());
     }
 
-    profile = profileRepository.save(profile);
+    if (dto.getPassword() != null) {
+      authService.changePassword(card, dto.getPassword());
+    }
 
-    return profile;
+    return cardRepository.save(card);
   }
 
-  private void updateContacts(Profile profile, List<ContactInListRequest> contacts) {
+  private void updateContacts(Card card, List<ContactInListRequest> contacts) {
     Set<ContactEnum> types = contacts.stream()
             .map(ContactInListRequest::getType)
             .collect(Collectors.toSet());
@@ -163,7 +157,7 @@ public class ProfileService {
       throw new CustomException("Cant update profile when types in list of contacts are not unique", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    for (Contact contact : profile.getContacts()) {
+    for (Contact contact : card.getContacts()) {
       contact.setStatus(false);
     }
 
@@ -172,10 +166,10 @@ public class ProfileService {
     for (ContactInListRequest dto : contacts) {
       order++;
       ContactType contactType = contactTypeRepository.findByType(dto.getType());
-      Contact contact = contactRepository.findByOwnerAndOrder(profile, order);
+      Contact contact = contactRepository.findByOwnerAndOrder(card, order);
       if (contact == null) {
         contact = new Contact();
-        contact.setOwner(profile);
+        contact.setOwner(card);
         contact.setOrder(order);
       } else {
         contact.setStatus(true);
@@ -183,37 +177,37 @@ public class ProfileService {
       contact.setType(contactType);
       contact.setContact(dto.getContact());
       contactRepository.save(contact);
-      profile.getContacts().add(contact);
+//      card.getContacts().add(contact);
     }
   }
 
-  public void deleteProfile(Integer id) {
-    Profile target = profileProvider.getTarget(id);
-    relationValidator.stopNotOwnerOf(target);
-    target.setStatus(false);
-    profileRepository.save(target);
-  }
+//  public void deleteProfile(Integer id) {
+//    Card target = profileProvider.getTarget(id);
+//    relationValidator.stopNotOwnerOf(target);
+//    target.setStatus(false);
+//    cardRepository.save(target);
+//  }
 
-  public Profile mergeCustomProfiles(Integer mainId, Integer secondaryId) {
+  public Card mergeCustomProfiles(Integer mainId, Integer secondaryId) {
     if (Objects.equals(mainId, secondaryId)) {
       throw new CustomException("Can merge only different profiles", HttpStatus.FORBIDDEN);
     }
-    Profile main = profileProvider.getTarget(mainId);
-    Profile secondary = profileProvider.getTarget(secondaryId);
+    Card main = profileProvider.getTarget(mainId);
+    Card secondary = profileProvider.getTarget(secondaryId);
     if (!checkCanMerge(main, secondary)) {
       throw new CustomException("cant merge profiles with this types", HttpStatus.FORBIDDEN);
     }
 
     applySecondaryContacts(main, secondary);
     setCustomType(main);
-    profileRepository.save(main);
+    cardRepository.save(main);
 
     secondary.setStatus(false);
-    profileRepository.save(secondary);
+    cardRepository.save(secondary);
     return main;
   }
 
-  private void applySecondaryContacts(Profile main, Profile secondary) {
+  private void applySecondaryContacts(Card main, Card secondary) {
     List<Contact> mainContacts = main.getContacts();
     Set<ContactEnum> mainContactTypes = mainContacts.stream()
             .map((val) -> val.getType().getType())
@@ -230,7 +224,7 @@ public class ProfileService {
     main.setContacts(mainContacts);
   }
 
-  private void setCustomType(Profile main) {
+  private void setCustomType(Card main) {
     if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
       main.setType(ProfileType.CUSTOM_USER);
     } else {
@@ -238,7 +232,7 @@ public class ProfileService {
     }
   }
 
-  private boolean checkCanMerge(Profile main, Profile secondary) {
+  private boolean checkCanMerge(Card main, Card secondary) {
     if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
       return secondary.getType() == ProfileType.CUSTOM_USER || secondary.getType() == ProfileType.LEAD_USER;
     } else if (main.getType() == ProfileType.CUSTOM_COMPANY || main.getType() == ProfileType.LEAD_COMPANY) {
@@ -248,23 +242,23 @@ public class ProfileService {
     }
   }
 
-  public List<Profile> getSecondaryPrimaryAccounts() {
-    return getProfileWithHisSecondaryAccounts(primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth()));
-  }
+//  public List<Card> getSecondaryPrimaryAccounts() {
+//    return getProfileWithHisSecondaryAccounts(primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth()));
+//  }
 
-  private List<Profile> getProfileWithHisSecondaryAccounts(Profile owner) {
-    List<Profile> res = relationRepository.findAllByTypeAndOwner(
-            RelationType.SECONDARY, owner).stream()
-            .map(Relation::getProfile)
-            .filter(Profile::isStatus)
-            .collect(Collectors.toList());
-    res.add(owner);
-    return res;
-  }
+//  private List<Card> getProfileWithHisSecondaryAccounts(Card owner) {
+//    List<Card> res = relationRepository.findAllByTypeAndOwner(
+//            RelationType.SECONDARY, owner).stream()
+//            .map(Relation::getCard)
+//            .filter(Card::isStatus)
+//            .collect(Collectors.toList());
+//    res.add(owner);
+//    return res;
+//  }
 
-  public Profile createSecondaryProfile(ProfileCreateDTO dto) {
-    Profile owner = primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth());
-    return createProfile(dto, owner, null, null, RelationType.SECONDARY);
-  }
+//  public Card createSecondaryProfile(ProfileCreateDTO dto) {
+//    Card owner = primaryService.getPrimaryOrSelf(profileProvider.getUserFromAuth());
+//    return createProfile(dto, owner, null, null, RelationType.SECONDARY);
+//  }
 
 }

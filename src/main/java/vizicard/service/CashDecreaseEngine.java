@@ -3,48 +3,45 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import vizicard.model.Profile;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.model.ProfileType;
 import vizicard.model.Relation;
-import vizicard.repository.ProfileRepository;
-
-import java.util.List;
+import vizicard.repository.AccountRepository;
+import vizicard.repository.CardRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CashDecreaseEngine {
 
-    private final ProfileRepository profileRepository;
-    private final PrimaryService primaryService;
+    private final AccountRepository accountRepository;
 
     @Scheduled(fixedRate = 1000*60*60)
     private void decreaseGlobalCash() {
-        profileRepository.findAll().stream()
-                .filter(profile -> null == primaryService.getPrimary(profile))
-                .forEach(this::decrease);
+        accountRepository.findAll().forEach(this::decrease);
     }
 
-    private void decrease(Profile profile) {
-        float cash = profile.getCash();
+    private void decrease(Account account) {
+        float cash = account.getCash();
         if (cash > 0) {
-            cash -= getDecreasePrice(profile);
+            cash -= getDecreasePrice(account);
             if (cash < 0) {
                 cash = 0;
             }
-            profile.setCash(cash);
-            profileRepository.save(profile);
+            account.setCash(cash);
+            accountRepository.save(account);
         }
     }
 
-    private float getDecreasePrice(Profile profile) {
+    private float getDecreasePrice(Account account) {
         float res = 1;
-        Profile company = profile.getCompany();
+        Card company = account.getMainCard().getCompany();
         if (company != null && company.isStatus()) {
-            res += (float) (0.5 * company.getRelationsWhereProfile().stream()
+            res += (float) (0.5 * company.getRelationsWhereCard().stream()
                     .filter(Relation::isStatus)
                     .map(Relation::getOwner)
-                    .filter(Profile::isStatus)
-                    .filter(owner -> owner.getType() == ProfileType.WORKER)
+                    .filter(Account::isStatus)
+                    .filter(owner -> owner.getMainCard().getType() == ProfileType.WORKER)
                     .count());
         }
         return res;

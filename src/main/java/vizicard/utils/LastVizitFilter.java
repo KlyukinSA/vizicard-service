@@ -2,8 +2,10 @@ package vizicard.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
-import vizicard.model.Profile;
-import vizicard.repository.ProfileRepository;
+import vizicard.model.Account;
+import vizicard.model.Card;
+import vizicard.repository.AccountRepository;
+import vizicard.repository.CardRepository;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,14 +18,14 @@ import java.util.Date;
 public class LastVizitFilter extends GenericFilterBean {
 
     private final ProfileProvider profileProvider;
-    private final ProfileRepository profileRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        Profile user = profileProvider.getUserFromAuth();
+        Account user = profileProvider.getUserFromAuth();
         if (user != null) {
             user.setLastVizit(new Date());
-            profileRepository.save(user);
+            accountRepository.save(user);
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

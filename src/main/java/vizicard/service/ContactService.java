@@ -6,8 +6,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.model.Contact;
-import vizicard.model.Profile;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
@@ -69,7 +70,7 @@ public class ContactService {
 //    }
 
     public Contact create(Contact contact) {
-        contact.setOwner(profileProvider.getUserFromAuth());
+        contact.setOwner(profileProvider.getUserFromAuth().getCurrentCard());
         return contactRepository.save(contact);
     }
 
@@ -93,7 +94,7 @@ public class ContactService {
             throw new CustomException("function is not injective", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         for (Contact contact : user.getContacts()) {
             Integer order = permutation.get(contact.getId());
             if (order != null) {

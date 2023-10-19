@@ -16,11 +16,11 @@ public class Action {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Profile owner;
+    private Account owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Profile profile;
+    private Card card;
 
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
@@ -40,10 +40,11 @@ public class Action {
     @ManyToOne(fetch = FetchType.LAZY)
     private Shortname shortname;
 
-    public Action(Profile owner, Profile profile, ActionType type, String ip) {
+    public Action(Account owner, Card card, ActionType type, String ip) {
         this.owner = owner;
-        this.profile = profile;
+        this.card = card;
         this.type = type;
         this.ip = ip;
     }
+
 }

@@ -3,15 +3,10 @@ package vizicard.service.detail;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
-import vizicard.model.Profile;
-import vizicard.model.detail.Education;
+import vizicard.model.Card;
 import vizicard.model.detail.Experience;
-import vizicard.model.detail.Skill;
-import vizicard.repository.detail.EducationRepository;
 import vizicard.repository.detail.ExperienceRepository;
 import vizicard.utils.ProfileProvider;
 
@@ -27,7 +22,7 @@ public class ExperienceService {
     private final ProfileProvider profileProvider;
 
     public ExperienceResponseDTO createExperience(ExperienceDTO dto) {
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Experience detail = new Experience(user);
         modelMapper.map(dto, detail);
         repository.save(detail);
@@ -35,7 +30,7 @@ public class ExperienceService {
     }
 
     public ExperienceResponseDTO updateExperience(ExperienceDTO dto, Integer id) {
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Experience detail = repository.findById(id).get();
         if (Objects.equals(detail.getOwner().getId(), user.getId())) {
             modelMapper.map(dto, detail);
@@ -45,7 +40,7 @@ public class ExperienceService {
     }
 
     public void deleteExperience(Integer id) {
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Experience detail = repository.findById(id).get();
         if (Objects.equals(detail.getOwner().getId(), user.getId())) {
             detail.setStatus(false);

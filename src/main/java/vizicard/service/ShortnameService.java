@@ -3,10 +3,9 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import vizicard.dto.DeviceDTO;
-import vizicard.dto.ShortnameDTO;
 import vizicard.exception.CustomException;
-import vizicard.model.Profile;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
 import vizicard.repository.ShortnameRepository;
@@ -21,9 +20,9 @@ public class ShortnameService {
 
     public Shortname create(String sn, ShortnameType type) {
         stopUsed(sn);
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         if (type == ShortnameType.MAIN) {
-            Shortname oldMain = shortnameRepository.findByOwnerAndType(user, ShortnameType.MAIN);
+            Shortname oldMain = shortnameRepository.findByCardAndType(user, ShortnameType.MAIN);
             if (oldMain != null) {
                 oldMain.setType(ShortnameType.USUAL);
                 shortnameRepository.save(oldMain);
@@ -38,8 +37,28 @@ public class ShortnameService {
         }
     }
 
-    public String getMainShortname(Profile profile) {
-        return shortnameRepository.findByOwnerAndType(profile, ShortnameType.MAIN).getShortname();
+    public String getMainShortname(Card card) {
+        Shortname shortname = shortnameRepository.findByCardAndType(card, ShortnameType.MAIN);
+        if (shortname == null) {
+            return null;
+        }
+        return shortname.getShortname();
+    }
+
+    public Shortname assignToMainCard(Integer id) {
+        Shortname shortname = shortnameRepository.findById(id).get();
+        Account user = profileProvider.getUserFromAuth();
+        shortname.setCard(user.getMainCard());
+        shortname.setOwner(null);
+        return shortnameRepository.save(shortname);
+    }
+
+    public Shortname assignToAccount(Integer id) {
+        Shortname shortname = shortnameRepository.findById(id).get();
+        Account user = profileProvider.getUserFromAuth();
+        shortname.setCard(null);
+        shortname.setOwner(user);
+        return shortnameRepository.save(shortname);
     }
 
 }

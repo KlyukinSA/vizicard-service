@@ -3,7 +3,7 @@ package vizicard.dto.publication;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.dto.BriefProfileResponseDTO;
+import vizicard.dto.BriefCardResponse;
 
 import java.util.Date;
 
@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublicationResponse {
-    private BriefProfileResponseDTO profile;
+//    private BriefCardResponse card;
     private String title;
     private String description;
     private Date date;

@@ -2,7 +2,7 @@ package vizicard.model.detail;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 
 import javax.persistence.*;
 
@@ -17,12 +17,12 @@ public class DetailBase {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Profile owner;
+    private Card owner;
 
     @Column(nullable = false)
     private boolean status = true;
 
-    public DetailBase(Profile owner) {
+    public DetailBase(Card owner) {
         this.owner = owner;
     }
 

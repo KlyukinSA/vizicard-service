@@ -28,30 +28,31 @@ public class ActionService {
     private final ProfileProvider profileProvider;
     private final CashService cashService;
 
-    public void addVisitAction(Profile profile, Shortname shortname) {
-        Profile visitor = profileProvider.getUserFromAuth();
-        if (visitor != null && Objects.equals(visitor.getId(), profile.getId())) {
+    public void addVisitAction(Card card, Shortname shortname) {
+        Account visitor = profileProvider.getUserFromAuth();
+        if (visitor != null && Objects.equals(visitor.getId(), card.getAccount().getId())) {
             return;
         }
         String ip = getIp();
 
         if (shortname != null) {
-            Profile partner = shortname.getReferrer();
-            if (partner != null) {
+            Card referrer = shortname.getReferrer();
+            if (referrer != null) {
 //                actionRepository.findAllByOwnerAndProfileAndTypeAndIp()
-                List<Action> visits = actionRepository.findAllByProfileAndType(profile, ActionType.VIZIT);
+                List<Action> visits = actionRepository.findAllByCardAndType(card, ActionType.VIZIT);
                 if (isUniqueIn(visitor, ip, visits)) {
-                    cashService.giveBonus(partner, 1);
+                    cashService.giveBonus(referrer.getAccount(), 1, card);
+                    addGiveBonusAction(card, referrer.getAccount(), 1);
                 }
             }
         }
 
-        Action action = new Action(visitor, profile, ActionType.VIZIT, ip);
+        Action action = new Action(visitor, card, ActionType.VIZIT, ip);
         action.setShortname(shortname);
         actionRepository.save(action);
     }
 
-    private boolean isUniqueIn(Profile owner, String ip, List<Action> visits) {
+    private boolean isUniqueIn(Account owner, String ip, List<Action> visits) {
         for (Action visit : visits) {
             if (owner == null) {
                 if (visit.getOwner() == null && visit.getIp().equals(ip)) {
@@ -66,39 +67,39 @@ public class ActionService {
         return true;
     }
 
-    public void addSaveAction(Profile owner, Profile target) {
+    public void addSaveAction(Account owner, Card target) {
         actionRepository.save(new Action(owner, target, ActionType.SAVE, getIp()));
     }
 
     public void addClickAction(Integer resourceId) {
         Contact resource = contactRepository.findById(resourceId).get();
-        Profile target = resource.getOwner();
+        Card target = resource.getOwner();
         Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK, getIp());
         click.setResource(resource);
         actionRepository.save(click);
     }
 
     public PageActionDTO getPageStats() {
-        Profile user = profileProvider.getUserFromAuth();
+        Account user = profileProvider.getUserFromAuth();
 
         Date stop = Date.from(Instant.now());
         Date start = Date.from(Instant.now().minus(Duration.ofDays(7)));
 
         Function<ActionType, Integer> f = (actionType) ->
-                actionRepository.countByProfileAndCreateAtBetweenAndType(user, start, stop, actionType);
+                actionRepository.countByCardAndCreateAtBetweenAndType(user.getCurrentCard(), start, stop, actionType);
 
         return new PageActionDTO(f.apply(ActionType.VIZIT), f.apply(ActionType.SAVE), f.apply(ActionType.CLICK));
     }
 
-    public float getBenefitBetween(Instant minus, Instant now, Profile profile) {
+    public float getBenefitBetween(Instant minus, Instant now, Card card) {
         Date start = Date.from(minus);
         Date stop = Date.from(now);
-        return countBenefit(actionRepository.findAllByProfileAndTypeAndCreateAtBetween(
-						profile, ActionType.GIVE_BONUS, start, stop));
+        return countBenefit(actionRepository.findAllByCardAndTypeAndCreateAtBetween(
+                card, ActionType.GIVE_BONUS, start, stop));
     }
 
-    public float getBenefit(Profile profile) {
-        return countBenefit(actionRepository.findAllByProfileAndType(profile, ActionType.GIVE_BONUS));
+    public float getBenefit(Card card) {
+        return countBenefit(actionRepository.findAllByCardAndType(card, ActionType.GIVE_BONUS));
     }
 
     private float countBenefit(List<Action> actions) {
@@ -110,13 +111,13 @@ public class ActionService {
 
 	public List<GraphActionResponse> getDailyGraph(int days) {
         List<GraphActionResponse> res = Stream.generate(GraphActionResponse::new).limit(days).collect(Collectors.toList());
-        Profile user = profileProvider.getUserFromAuth();
+        Account user = profileProvider.getUserFromAuth();
         Date stop = Date.from(Instant.now());
         Date start = Date.from(Instant.now().minus(Duration.ofDays(days)));
         int dayStart = start.getDay();
 
-        List<Action> visits = actionRepository.findAllByProfileAndTypeAndCreateAtBetween(
-                user, ActionType.VIZIT, start, stop);
+        List<Action> visits = actionRepository.findAllByCardAndTypeAndCreateAtBetween(
+                user.getCurrentCard(), ActionType.VIZIT, start, stop);
         List<HashSet<Integer>> visitorSets = Stream.generate(() -> new HashSet<Integer>()).limit(days).collect(Collectors.toList());
         for (Action visit : visits) {
             Date createAt = visit.getCreateAt();
@@ -143,13 +144,13 @@ public class ActionService {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getRemoteAddr();
     }
 
-    public void addGiveBonusAction(Profile profile, Profile referrer, float bonus) {
-        Action action = new Action(profile, referrer, ActionType.GIVE_BONUS, getIp());
+    public void addGiveBonusAction(Card card, Account referrer, float bonus) {
+        Action action = new Action(card.getAccount(), referrer.getMainCard(), ActionType.GIVE_BONUS, getIp());
         action.setBonus(bonus);
         actionRepository.save(action);
     }
 
-    public int countUniqueVisitsWhereShortnameReferrer(Profile referrer) {
+    public int countUniqueVisitsWhereShortnameReferrer(Card referrer) {
 //        return actionRepository.countByShortnameReferrerAndTypeUniqueByOwnerAndIp(user, ActionType.VIZIT) select count(DISTINCT a.owner, a.ip) from Action as a join Shortname as s where s.referrer = ?1 and a.type = ?2
         int res = 0;
         List<Action> visits = actionRepository.findAllByShortnameReferrerAndType(referrer, ActionType.VIZIT);

@@ -1,13 +1,12 @@
 package vizicard.dto;
 
-import com.amazonaws.services.sagemaker.model.ProblemType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.ProfileType;
 
 @Data
 @NoArgsConstructor
-public class BriefProfileResponseDTO {
+public class BriefCardResponse {
     private Integer id;
     private String name;
     private String title;

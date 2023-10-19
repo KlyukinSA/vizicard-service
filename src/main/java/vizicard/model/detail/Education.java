@@ -2,11 +2,9 @@ package vizicard.model.detail;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.ContactType;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Data
@@ -26,7 +24,7 @@ public class Education extends DetailBase {
     @JoinColumn(nullable = false)
     private EducationType type;
 
-    public Education(Profile user) {
+    public Education(Card user) {
         super(user);
     }
 }

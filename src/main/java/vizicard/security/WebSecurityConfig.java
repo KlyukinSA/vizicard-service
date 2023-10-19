@@ -12,9 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import vizicard.repository.ProfileRepository;
+import vizicard.repository.AccountRepository;
+import vizicard.repository.CardRepository;
 import vizicard.utils.ProfileProvider;
 
 @Configuration
@@ -25,7 +24,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final ProfileProvider profileProvider;
-  private final ProfileRepository profileRepository;
+  private final AccountRepository accountRepository;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -50,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // Apply JWT
     http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
-    http.apply(new LastVizitFilterConfigurer(profileProvider, profileRepository));
+    http.apply(new LastVizitFilterConfigurer(profileProvider, accountRepository));
 
     // Optional, if you want to test the API from a browser
     // http.httpBasic();

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vizicard.model.*;
-import vizicard.repository.ProfileRepository;
+import vizicard.repository.AccountRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.service.ActionService;
 import vizicard.service.CashService;
@@ -17,34 +17,33 @@ import vizicard.utils.ProfileProvider;
 @RequiredArgsConstructor
 public class CashController {
 
-    private final ProfileRepository profileRepository;
+    private final AccountRepository accountRepository;
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
-    private final PrimaryService primaryService;
-    private final ActionService actionService;
     private final CashService cashService;
+    private final ActionService actionService;
 
     @PostMapping
     public void addCash(float amount) {
-        Profile user = profileProvider.getUserFromAuth();
+        Account user = profileProvider.getUserFromAuth();
 
-        Profile profile = primaryService.getPrimaryOrSelf(user);
-        profile.setCash(profile.getCash() + amount);
-        profileRepository.save(profile);
+        user.setCash(user.getCash() + amount);
+        accountRepository.save(user);
 
-        addBonusToReferrer(RelationType.REFERRER, profile, amount);
-        addBonusToReferrer(RelationType.REFERRER_LEVEL2, profile, amount);
+        Card card = user.getMainCard(); // related as main card in signup()
+        addBonusToReferrer(RelationType.REFERRER, card, amount);
+        addBonusToReferrer(RelationType.REFERRER_LEVEL2, card, amount);
     }
 
-    private void addBonusToReferrer(RelationType referrerLevel, Profile profile, float amount) {
-        Relation referrerRelation = relationRepository.findByTypeAndProfile(
-                referrerLevel, profile);
+    private void addBonusToReferrer(RelationType referrerLevel, Card card, float amount) {
+        Relation referrerRelation = relationRepository.findByTypeAndCard(
+                referrerLevel, card);
         if (referrerRelation != null) {
-            Profile referrer = referrerRelation.getOwner();
+            Account referrer = referrerRelation.getOwner();
 
             float bonus = getBonusPart(referrerLevel) * amount;
-            cashService.giveBonus(referrer, bonus);
-            actionService.addGiveBonusAction(profile, referrer, bonus);
+            cashService.giveBonus(referrer, bonus, card);
+            actionService.addGiveBonusAction(card, referrer, amount);
         }
     }
 

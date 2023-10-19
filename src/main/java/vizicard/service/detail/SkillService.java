@@ -1,10 +1,9 @@
 package vizicard.service.detail;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.SkillDTO;
-import vizicard.model.Profile;
+import vizicard.model.Card;
 import vizicard.model.detail.Skill;
 import vizicard.repository.detail.SkillRepository;
 import vizicard.utils.ProfileProvider;
@@ -22,7 +21,7 @@ public class SkillService {
     private final ProfileProvider profileProvider;
 
     public List<Skill> changeSkills(SkillDTO dto) {
-        Profile user = profileProvider.getUserFromAuth();
+        Card user = profileProvider.getUserFromAuth().getCurrentCard();
         if (dto.getAdd() != null) {
             for (String s : dto.getAdd()) {
                 Skill skill = repository.findBySkillAndOwner(s, user);

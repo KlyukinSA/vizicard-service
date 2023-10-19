@@ -1,12 +1,15 @@
 package vizicard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import vizicard.model.Profile;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
 
 public interface ShortnameRepository extends JpaRepository<Shortname, Integer> {
-    Shortname findByShortname(String word);
+    Shortname findByShortname(String sn);
 
-    Shortname findByOwnerAndType(Profile user, ShortnameType type);
+    Shortname findByCardAndType(Card card, ShortnameType type);
+
+    Shortname findByCard(Card card);
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "card_id"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_owner_id", "card_owner_id", "card_id"}))
 public class Relation {
 
     @Id
@@ -18,7 +18,10 @@ public class Relation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Account owner;
+    private Account accountOwner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Card cardOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -34,8 +37,9 @@ public class Relation {
     @Enumerated(EnumType.STRING)
     private RelationType type;
 
-    public Relation(Account owner, Card card, RelationType relationType) {
-        this.owner = owner;
+    public Relation(Account ownerAccount, Card cardOwner, Card card, RelationType relationType) {
+        this.accountOwner = ownerAccount;
+        this.cardOwner = cardOwner;
         this.card = card;
         this.type = relationType;
     }

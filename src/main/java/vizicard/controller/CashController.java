@@ -9,7 +9,6 @@ import vizicard.repository.AccountRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.service.ActionService;
 import vizicard.service.CashService;
-import vizicard.service.PrimaryService;
 import vizicard.utils.ProfileProvider;
 
 @RestController
@@ -39,7 +38,7 @@ public class CashController {
         Relation referrerRelation = relationRepository.findByTypeAndCard(
                 referrerLevel, card);
         if (referrerRelation != null) {
-            Account referrer = referrerRelation.getOwner();
+            Account referrer = referrerRelation.getAccountOwner();
 
             float bonus = getBonusPart(referrerLevel) * amount;
             cashService.giveBonus(referrer, bonus, card);

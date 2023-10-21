@@ -77,8 +77,8 @@ public class AuthService {
         } else {
             return;
         }
-        relationRepository.save(new Relation(referrer.getAccount(), card, RelationType.REFERRER));
-        relationRepository.save(new Relation(card.getAccount(), referrer, RelationType.REFERRAL));
+        relationRepository.save(new Relation(referrer.getAccount(), referrer, card, RelationType.REFERRER));
+        relationRepository.save(new Relation(card.getAccount(), card, referrer, RelationType.REFERRAL));
     }
 
     public Account signinOrSignupWithGoogle(GoogleIdToken.Payload payload, String shortname, Integer referrerId) {

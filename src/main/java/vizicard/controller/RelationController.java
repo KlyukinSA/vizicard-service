@@ -11,6 +11,7 @@ import vizicard.dto.RelationResponseDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.model.Card;
 import vizicard.model.ContactEnum;
+import vizicard.model.Relation;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
 import vizicard.mapper.CardMapper;
@@ -56,15 +57,19 @@ public class RelationController {
     @GetMapping
     public List<RelationResponseDTO> searchLike(@RequestParam(required = false) String name, @RequestParam(required = false) String type) {
         return relationService.searchLike(name, type).stream()
-                .map((r) -> new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType()))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("referrals")
     public List<RelationResponseDTO> getReferralsWithLevelOrAll(@RequestParam(required = false) Integer level) {
         return relationService.getReferralsWithLevelOrAll(level).stream()
-                .map((r) -> new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType()))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private RelationResponseDTO mapToResponse(Relation r) {
+        return new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType(), r.getAccountOwner().getId(), r.getCardOwner().getId());
     }
 
 }

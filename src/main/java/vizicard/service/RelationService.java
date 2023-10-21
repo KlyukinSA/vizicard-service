@@ -1,18 +1,13 @@
 package vizicard.service;
 
-import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vizicard.dto.profile.LeadGenDTO;
-import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.repository.AccountRepository;
 import vizicard.repository.CardRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.*;
@@ -22,7 +17,6 @@ import javax.persistence.Query;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +41,7 @@ public class RelationService {
         Account owner = profileProvider.getUserFromAuth();
         relationValidator.stopNotOwnerOf(card);
 
-        Relation relation = relationRepository.findByOwnerAndCard(owner, card);
+        Relation relation = relationRepository.findByAccountOwnerAndCard(owner, card);
         if (relation == null || !relation.isStatus()) {
             throw new CustomException("No such relation", HttpStatus.CONFLICT);
         }
@@ -63,10 +57,10 @@ public class RelationService {
         if (owner != null && !Objects.equals(target.getAccount().getId(), owner.getId())) {
             emailService.sendSaved(owner, target);
 
-            relator.relate(owner, target, RelationType.USUAL);
+            relator.relate(owner, owner.getCurrentCard(), target, RelationType.USUAL);
 
             if (target.getCompany() != null && target.getCompany().isStatus()) {
-                relator.relate(owner, target.getCompany(), RelationType.USUAL);
+                relator.relate(owner, owner.getCurrentCard(), target.getCompany(), RelationType.USUAL);
             }
         }
 
@@ -108,10 +102,10 @@ public class RelationService {
             relationType = RelationType.OWNER;
         }
 
-        relator.relate(target.getAccount(), leadCard, relationType);
+        relator.relate(target.getAccount(), target, leadCard, relationType);
 
         if (company != null && company.isStatus()) {
-            relator.relate(target.getAccount(), company, RelationType.USUAL);
+            relator.relate(target.getAccount(), target, company, RelationType.USUAL);
         };
 
         emailService.sendLead(email, leadCard);
@@ -164,8 +158,8 @@ public class RelationService {
 
     public List<Relation> getReferralsWithLevelOrAll(Integer level) {
         Account user = profileProvider.getUserFromAuth();
-        List<Relation> level1s = relationRepository.findAllByTypeAndOwner(RelationType.REFERRER, user);
-        List<Relation> level2s = relationRepository.findAllByTypeAndOwner(RelationType.REFERRER_LEVEL2, user);
+        List<Relation> level1s = relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER, user);
+        List<Relation> level2s = relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER_LEVEL2, user);
         if (level == null) {
             level1s.addAll(level2s);
             return  level1s;

@@ -127,14 +127,14 @@ public class ProfileService {
         Card company = profileProvider.getTarget(dto.getCompanyId());
         card.setCompany(company);
 
-        Relation relation = relationRepository.findByOwnerAndCard(card.getAccount(), company);
+        Relation relation = relationRepository.findByAccountOwnerAndCard(card.getAccount(), company);
         RelationType relationType;
         if (relation != null) {
           relationType = relation.getType();
         } else {
           relationType = RelationType.USUAL;
         }
-        relator.relate(card.getAccount(), company, relationType);
+        relator.relate(card.getAccount(), card, company, relationType);
       }
     }
 

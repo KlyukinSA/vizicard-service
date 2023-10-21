@@ -35,7 +35,6 @@ public class S3Service {
         s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
 
         URL url = s3Client.getUrl(bucketName, keyName);
-//        System.out.println(url);
 
         return url.toString();
     }

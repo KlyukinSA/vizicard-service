@@ -9,9 +9,7 @@ import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
-import vizicard.mapper.ContactMapper;
 import vizicard.model.Account;
-import vizicard.model.Contact;
 import vizicard.model.Card;
 import vizicard.model.Relation;
 import vizicard.model.detail.Education;
@@ -80,14 +78,14 @@ public class CardMapper {
 
     private BriefRelationResponseDTO getPossibleRelation(Card card) {
         Account user = profileProvider.getUserFromAuth();
-        Relation relation = relationRepository.findByOwnerAndCard(user, card);
+        Relation relation = relationRepository.findByAccountOwnerAndCard(user, card);
         if (relation == null) {
-            relation = relationRepository.findByOwnerAndCard(card.getAccount(), user.getCurrentCard());
+            relation = relationRepository.findByAccountOwnerAndCard(card.getAccount(), user.getCurrentCard());
             if (relation == null) {
                 return null;
             }
         }
-        if (Objects.equals(relation.getCard().getId(), relation.getOwner().getId())) {
+        if (Objects.equals(relation.getCard().getAccount().getId(), relation.getAccountOwner().getId())) {
             return null;
         }
         return modelMapper.map(relation, BriefRelationResponseDTO.class);

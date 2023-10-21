@@ -28,11 +28,11 @@ public class GroupService {
     public List<BriefCardResponse> getAllGroupMembers(Integer groupId) {
         Card group = profileProvider.getTarget(groupId);
         letGroupPass(group);
-        Integer ownerId = relationRepository.findByTypeAndCard(RelationType.OWNER, group).getOwner().getId();
+        Integer ownerId = relationRepository.findByTypeAndCard(RelationType.OWNER, group).getAccountOwner().getId();
 
         return relationRepository.findAllByCard(group).stream()
                 .filter(Relation::isStatus)
-                .map(Relation::getOwner)
+                .map(Relation::getAccountOwner)
                 .filter(Account::isStatus)
                 .filter(acc -> !Objects.equals(acc.getId(), ownerId))
                 .map(Account::getCurrentCard)
@@ -54,13 +54,13 @@ public class GroupService {
 
         for (Integer memberId : memberIds) {
             Card card = profileProvider.getTarget(memberId);
-            relator.relate(card.getAccount(), group, RelationType.USUAL);
+            relator.relate(card.getAccount(), card, group, RelationType.USUAL);
         }
     }
 
     public List<BriefCardResponse> getAllMyGroups() {
         Account user = profileProvider.getUserFromAuth();
-        return relationRepository.findAllByOwnerAndCardType(user, ProfileType.GROUP).stream()
+        return relationRepository.findAllByAccountOwnerAndCardType(user, ProfileType.GROUP).stream()
                 .map(Relation::getCard)
                 .filter(Card::isStatus)
                 .map(cardMapper::mapToBrief)

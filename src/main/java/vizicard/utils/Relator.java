@@ -14,10 +14,10 @@ public class Relator {
 
     private final RelationRepository relationRepository;
 
-    public Relation relate(Account owner, Card card, RelationType relationType) {
-        Relation relation = relationRepository.findByOwnerAndCard(owner, card);
+    public Relation relate(Account owner, Card cardOwner, Card card, RelationType relationType) {
+        Relation relation = relationRepository.findByAccountOwnerAndCard(owner, card);
         if (relation == null) {
-            return relationRepository.save(new Relation(owner, card, relationType));
+            return relationRepository.save(new Relation(owner, cardOwner, card, relationType));
         } else {
             if (!relation.isStatus()) {
                 relation.setStatus(true);

@@ -32,7 +32,6 @@ public class QRService {
 		String body = getFileText("qrcode-monkey-request.json");
 		body = body.replace("$1", urlBase);
 		body = body.replace("$2", shortname);
-		System.out.println(body);
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create("https://api.qrcode-monkey.com/qr/custom"))
 				.header("content-type", "application/json")

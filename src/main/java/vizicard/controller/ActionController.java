@@ -46,8 +46,8 @@ public class ActionController {
     public ReferralStatsDTO getReferralsStats() {
         Account user = profileProvider.getUserFromAuth();
         ReferralStatsDTO res = new ReferralStatsDTO();
-        res.setRef1Count(relationRepository.findAllByTypeAndOwner(RelationType.REFERRER, user).size());
-        res.setRef2Count(relationRepository.findAllByTypeAndOwner(RelationType.REFERRER_LEVEL2, user).size());
+        res.setRef1Count(relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER, user).size());
+        res.setRef2Count(relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER_LEVEL2, user).size());
         Instant now = Instant.now();
         Card mainCard = user.getMainCard();
         res.setDayBenefit(actionService.getBenefitBetween(now.minus(Duration.ofDays(1)), now, mainCard));

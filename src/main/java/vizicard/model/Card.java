@@ -66,6 +66,10 @@ public class Card {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Relation> relationsWhereCard;
+	@OneToMany(mappedBy = "cardOwner", cascade = CascadeType.ALL)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Relation> relationsWhereCardOwner;
 
 	@OneToMany(mappedBy = "card", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)

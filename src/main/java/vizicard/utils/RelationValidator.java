@@ -25,7 +25,7 @@ public class RelationValidator { // TODO move to Service?
             return;
         }
 
-        Relation relation = relationRepository.findByOwnerAndCard(user, target);
+        Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
         if (relation == null || !relation.isStatus() || relation.getType() != RelationType.OWNER) {
             throw new CustomException("You are not the owner of this card (id " + target.getId() + ")", HttpStatus.FORBIDDEN);
         }

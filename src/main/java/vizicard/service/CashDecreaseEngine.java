@@ -8,7 +8,6 @@ import vizicard.model.Card;
 import vizicard.model.ProfileType;
 import vizicard.model.Relation;
 import vizicard.repository.AccountRepository;
-import vizicard.repository.CardRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +38,7 @@ public class CashDecreaseEngine {
         if (company != null && company.isStatus()) {
             res += (float) (0.5 * company.getRelationsWhereCard().stream()
                     .filter(Relation::isStatus)
-                    .map(Relation::getOwner)
+                    .map(Relation::getAccountOwner)
                     .filter(Account::isStatus)
                     .filter(owner -> owner.getMainCard().getType() == ProfileType.WORKER)
                     .count());

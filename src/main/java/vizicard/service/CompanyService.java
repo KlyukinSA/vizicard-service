@@ -1,15 +1,10 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vizicard.dto.profile.ProfileCreateDTO;
-import vizicard.dto.profile.WorkerCreateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
-import vizicard.repository.AccountRepository;
 import vizicard.repository.CardRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.ProfileProvider;
@@ -36,16 +31,16 @@ public class CompanyService {
         card.setType(ProfileType.WORKER);
         authService.signup(account, card, null, null);
 
-        relator.relate(account, company, RelationType.USUAL);
+        relator.relate(account, card, company, RelationType.USUAL);
         card.setCompany(company);
         return cardRepository.save(card);
     }
 
     public List<Card> getAllWorkers() {
-        return relationRepository.findAllByCardAndOwnerMainCardType(
+        return relationRepository.findAllByCardAndAccountOwnerMainCardType(
                 profileProvider.getUserFromAuth().getCurrentCard().getCompany(), ProfileType.WORKER).stream()
                 .filter(Relation::isStatus)
-                .map(Relation::getOwner)
+                .map(Relation::getAccountOwner)
                 .map(Account::getCurrentCard)
                 .filter(Card::isStatus)
                 .collect(Collectors.toList());

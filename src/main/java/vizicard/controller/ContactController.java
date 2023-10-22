@@ -94,13 +94,9 @@ public class ContactController {
     @PutMapping("order")
     @PreAuthorize("isAuthenticated()")
     public List<ContactResponse> reorder(@RequestBody List<ContactReorderDTO> dto) {
-        Map<Integer, Integer> permutation = dto.stream()
-                .collect(Collectors.toMap(
-                        ContactReorderDTO::getId,
-                        ContactReorderDTO::getOrder,
-                        (existing, replacement) -> replacement)); // {throw new CustomException("not function", HttpStatus.UNPROCESSABLE_ENTITY);}
-
-        return contactMapper.map(contactService.reorder(permutation));
+        List<Integer> ids = dto.stream().map(ContactReorderDTO::getId).collect(Collectors.toList());
+        List<Integer> orders = dto.stream().map(ContactReorderDTO::getOrder).collect(Collectors.toList());
+        return contactMapper.map(contactService.reorder(ids, orders));
     }
 
 }

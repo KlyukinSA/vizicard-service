@@ -1,12 +1,10 @@
 package vizicard.service;
 
-import com.amazonaws.services.sagemaker.model.ProductionVariant;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
-import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.model.Contact;
 import vizicard.repository.ContactRepository;
@@ -14,6 +12,7 @@ import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,51 +25,10 @@ public class ContactService {
 
     private final ModelMapper modelMapper;
 
-//    public void changeContacts(ChangeContactsDTO dto) {
-//        Profile user = profileProvider.getUserFromAuth();
-//        if (dto.getAdd() != null) {
-//            for (ContactRequest dto1 : dto.getAdd()) {
-//                Contact contact = null;
-//
-//                if (dto1.getId() != null) {
-//                    Optional<Contact> optionalContact = contactRepository.findById(dto1.getId());
-//                    if (fits(optionalContact, user)) {
-//                        contact = optionalContact.get();
-//                        modelMapper.map(dto1, contact);
-//                    }
-//                } else {
-//                    contact = modelMapper.map(dto1, Contact.class);
-//                    contact.setOwner(user);
-//                }
-//
-//                try {
-//                    contactRepository.save(contact);
-//                } catch (Exception e) {
-//                    System.out.println("couldnt save contact " + contact);
-//                }
-//            }
-//        }
-//        if (dto.getDelete() != null) {
-//            for (Integer id : dto.getDelete()) {
-//                Optional<Contact> contact = contactRepository.findById(id);
-//                if (fits(contact, user)) {
-//                    contact.get().setStatus(false);
-//                    contactRepository.save(contact.get());
-//                }
-//            }
-//        }
-//    }
-//
-//    private boolean fits(Optional<Contact> contact, Profile user) {
-//        return contact.isPresent() && Objects.equals(contact.get().getOwner().getId(), user.getId());
-//    }
-//
-//    public List<Contact> getMyContacts() {
-//        return contactRepository.findAllByOwner(profileProvider.getUserFromAuth());
-//    }
-
     public Contact create(Contact contact) {
         contact.setOwner(profileProvider.getUserFromAuth().getCurrentCard());
+        contactRepository.save(contact);
+        contact.setOrder(contact.getId());
         return contactRepository.save(contact);
     }
 
@@ -88,21 +46,32 @@ public class ContactService {
         contactRepository.save(contact);
     }
 
-    public List<Contact> reorder(Map<Integer, Integer> permutation) {
-        Set<?> set = new HashSet<>(permutation.values());
-        if (set.size() != permutation.keySet().size()) {
-            throw new CustomException("function is not injective", HttpStatus.UNPROCESSABLE_ENTITY);
+    public List<Contact> reorder(List<Integer> ids, List<Integer> orders) {
+        Set<Integer> currents = ids.stream().map(id -> contactRepository.findById(id).get().getOrder()).collect(Collectors.toSet());
+        Set<Integer> news = new HashSet<>(orders);
+        if (!Objects.equals(currents, news)) {
+            throw new CustomException("set of orders must be equal to set of orders of contacts by ids", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
-        for (Contact contact : user.getContacts()) {
-            Integer order = permutation.get(contact.getId());
-            if (order != null) {
+        Card owner = profileProvider.getUserFromAuth().getCurrentCard();
+        for (int i = 0; i < ids.size(); i++) {
+            Contact contact = contactRepository.findById(ids.get(i)).get();
+            relationValidator.stopNotOwnerOf(contact.getOwner());
+            Integer order = orders.get(i);
+            if (!Objects.equals(contact.getOrder(), order)) {
+                Contact conflict = contactRepository.findByOwnerAndOrder(owner, order);
+                conflict.setOrder(0);
+                contactRepository.save(conflict);
+
+                Integer temp = contact.getOrder();
                 contact.setOrder(order);
+                contactRepository.save(contact);
+
+                conflict.setOrder(temp);
+                contactRepository.save(conflict);
             }
-            contactRepository.save(contact);
         }
-        return contactRepository.findAllByOwner(user);
+        return contactRepository.findAllByOwner(owner);
     }
 
 }

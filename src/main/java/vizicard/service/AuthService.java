@@ -7,18 +7,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vizicard.dto.profile.ProfileCreateDTO;
-import vizicard.dto.SigninDTO;
-import vizicard.dto.AuthResponseDTO;
-import vizicard.dto.SignupDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.*;
-import vizicard.security.JwtTokenProvider;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +30,7 @@ public class AuthService {
     private final RelationRepository relationRepository;
     private final ShortnameRepository shortnameRepository;
     private final CloudFileRepository cloudFileRepository;
+    private final S3Service s3Service;
     private final CardRepository cardRepository;
 
     public Account signin(String username, String password) {
@@ -96,7 +90,8 @@ public class AuthService {
 
         signup(account, card, shortname, referrerId);
 
-        CloudFile picture = new CloudFile((String) payload.get("picture"), card.getAlbum());
+        String url = s3Service.uploadExternal((String) payload.get("picture"));
+        CloudFile picture = new CloudFile(url, card.getAlbum());
         cloudFileRepository.save(picture);
         card.setAvatarId(picture.getId());
         cardRepository.save(card);

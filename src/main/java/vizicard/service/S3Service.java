@@ -3,17 +3,14 @@ package vizicard.service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import vizicard.dto.CloudFileDTO;
-import vizicard.model.CloudFile;
 import vizicard.repository.CloudFileRepository;
-import vizicard.utils.ProfileProvider;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.UUID;
 
@@ -39,8 +36,14 @@ public class S3Service {
         return url.toString();
     }
 
-    public CloudFile getById(Integer id) {
-        return cloudFileRepository.findById(id).get();
+    @SneakyThrows
+    public String uploadExternal(String picture) {
+        BufferedInputStream in = new BufferedInputStream(new URL(picture).openStream());
+        String keyName = String.valueOf(UUID.randomUUID());
+        s3Client.putObject(bucketName, keyName, in, new ObjectMetadata());
+        URL url = s3Client.getUrl(bucketName, keyName);
+
+        return url.toString();
     }
 
 }

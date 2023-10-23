@@ -8,8 +8,10 @@ import ezvcard.property.Address;
 import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Card;
@@ -21,18 +23,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-@Getter
-public class VcardFile {
+@Component
+@RequiredArgsConstructor
+public class VcardFileService {
 
-    @Autowired
-    private CloudFileRepository cloudFileRepository;
+    private final CloudFileRepository cloudFileRepository;
 
-    private final byte[] bytes;
-    private final String name;
+    @Value("${front-url-base}")
+    private String urlBase;
 
-    public VcardFile(Card target) throws IOException {
-        this.bytes = getVcardBytes(getVcard(target));
-        this.name = getVcardFileName(target);
+    @SneakyThrows
+    public byte[] getText(Card target) {
+        return getVcardBytes(getVcard(target));
+    }
+
+    public String getName(Card target) {
+        return getVcardFileName(target);
     }
 
     private byte[] getVcardBytes(VCard vcard) throws IOException {
@@ -65,9 +71,10 @@ public class VcardFile {
             address.setLocality(card.getCity());
             vcard.addAddress(address);
         }
+//        vcard.setProductId(urlBase + " 1.0.0");
 
-        int group = 0;
-//        Function f = (type)
+        int group = 1;
+        addGroupedLink(group, vcard, "CARD-SOURCE", urlBase);
         for (Contact contact : card.getContacts()) {
             ContactEnum contactEnum = contact.getType().getType();
             String string = contact.getContact();
@@ -80,12 +87,7 @@ public class VcardFile {
                     vcard.addUrl(string);
                 } else {
                     group++;
-                    String groupName = "item" + group;
-                    String type = contactEnum.toString();
-                    RawProperty property = vcard.addExtendedProperty("X-ABLABEL", type);
-                    property.setGroup(groupName);
-                    Url url = vcard.addUrl(string);
-                    url.setGroup(groupName);
+                    addGroupedLink(group, vcard, contactEnum.toString(), string);
                 }
             }
         }
@@ -98,6 +100,14 @@ public class VcardFile {
         }
 
         return vcard;
+    }
+
+    private void addGroupedLink(int group, VCard vcard, String type, String target) {
+        String groupName = "item" + group;
+        RawProperty property = vcard.addExtendedProperty("X-ABLABEL", type);
+        property.setGroup(groupName);
+        Url url = vcard.addUrl(target);
+        url.setGroup(groupName);
     }
 
     private boolean isGoodForVcard(String string) {

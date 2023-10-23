@@ -35,6 +35,7 @@ public class RelationService {
     private final EntityManager entityManager;
     private final Relator relator;
     private final CardService cardService;
+    private final VcardFileService vcardFileService;
 
     public void unrelate(Integer cardId) {
         Card card = cardRepository.findById(cardId).get();
@@ -66,15 +67,17 @@ public class RelationService {
 
         actionService.addSaveAction(owner, target);
 
-        return getVcardResponse(new VcardFile(target));
+        return getVcardResponse(target);
     }
 
-    private ResponseEntity<?> getVcardResponse(VcardFile vcardFile) {
+    private ResponseEntity<?> getVcardResponse(Card target) {
+        byte[] text = vcardFileService.getText(target);
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf("text/vcard"))
-                .header("Content-Disposition", "attachment; filename=\"" + vcardFile.getName() + '\"')
-                .contentLength(vcardFile.getBytes().length)
-                .body(new InputStreamResource(new ByteArrayInputStream(vcardFile.getBytes())));
+                .header("Content-Disposition", "attachment; filename=\""
+                        + vcardFileService.getName(target) + '\"')
+                .contentLength(text.length)
+                .body(new InputStreamResource(new ByteArrayInputStream(text)));
     }
 
     public void leadGenerate(Integer targetId, Card leadCard, Card company, String email) {

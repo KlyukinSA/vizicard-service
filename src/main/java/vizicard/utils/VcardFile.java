@@ -9,9 +9,11 @@ import ezvcard.property.Photo;
 import ezvcard.property.RawProperty;
 import ezvcard.property.Url;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Card;
+import vizicard.repository.CloudFileRepository;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +23,9 @@ import java.net.URL;
 
 @Getter
 public class VcardFile {
+
+    @Autowired
+    private CloudFileRepository cloudFileRepository;
 
     private final byte[] bytes;
     private final String name;
@@ -62,6 +67,7 @@ public class VcardFile {
         }
 
         int group = 0;
+//        Function f = (type)
         for (Contact contact : card.getContacts()) {
             ContactEnum contactEnum = contact.getType().getType();
             String string = contact.getContact();
@@ -84,8 +90,8 @@ public class VcardFile {
             }
         }
 
-        if (card.getAvatar() != null) {
-            String url = card.getAvatar().getUrl();
+        if (card.getAvatarId() != null) {
+            String url = cloudFileRepository.findById(card.getAvatarId()).get().getUrl();
             InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
             Photo photo = new Photo(inputStream, ImageType.JPEG);
             vcard.addPhoto(photo); // TODO image types

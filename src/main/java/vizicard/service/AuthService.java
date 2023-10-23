@@ -98,7 +98,7 @@ public class AuthService {
 
         CloudFile picture = new CloudFile((String) payload.get("picture"), card.getAlbum());
         cloudFileRepository.save(picture);
-        card.setAvatar(picture);
+        card.setAvatarId(picture.getId());
         cardRepository.save(card);
         return account;
     }

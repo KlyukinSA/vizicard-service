@@ -25,12 +25,10 @@ public class ProfileService {
   private final ContactTypeRepository contactTypeRepository;
 
   private final ProfileProvider profileProvider;
-  private final ModelMapper modelMapper;
   private final Relator relator;
 
-  private final S3Service s3Service; // TODO use CloudFileRepository
+  private final CloudFileRepository cloudFileRepository;
 
-  private final CardService cardService;
   private final AuthService authService;
 
 //  public CardResponse searchByShortname(String shortname) {
@@ -114,9 +112,12 @@ public class ProfileService {
 
     if (dto.getAvatarId() != null) {
       if (dto.getAvatarId().equals(0)) {
-        card.setAvatar(null);
+        card.setAvatarId(null);
       } else {
-        card.setAvatar(s3Service.getById(dto.getAvatarId()));
+        Optional<CloudFile> cloudFile = cloudFileRepository.findById(dto.getAvatarId());
+        if (cloudFile.isPresent() && cloudFile.get().isStatus()) {
+          card.setAvatarId(cloudFile.get().getId());
+        }
       }
     }
 

@@ -11,11 +11,13 @@ import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.model.Account;
 import vizicard.model.Card;
+import vizicard.model.CloudFile;
 import vizicard.model.Relation;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
+import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.service.CashService;
@@ -24,6 +26,7 @@ import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,6 +36,7 @@ public class CardMapper {
     private final ShortnameService shortnameService;
     private final RelationRepository relationRepository;
     private final ContactRepository contactRepository;
+    private final CloudFileRepository cloudFileRepository;
 
     private final ModelMapper modelMapper;
     private final ContactMapper contactMapper;
@@ -52,8 +56,9 @@ public class CardMapper {
         res.setResume(getResume(card));
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
-        removeDeletedAvatar(res, card);
         finishCompany(res, card);
+        CloudFile cloudFile = cloudFileRepository.findById(card.getAvatarId()).get();
+        res.setAvatar(new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId()));
         removeDeletedAvatar(res, card);
         return res;
     }
@@ -71,7 +76,11 @@ public class CardMapper {
     }
 
     private void removeDeletedAvatar(BriefCardResponse dto, Card card) {
-        if (card.getAvatar() != null && !card.getAvatar().isStatus()) {
+        if (card.getAvatarId() == null) {
+            return;
+        }
+        Optional<CloudFile> optional = cloudFileRepository.findById(card.getAvatarId());
+        if (optional.isPresent() && !optional.get().isStatus()) {
             dto.setAvatar(null);
         }
     }

@@ -38,9 +38,12 @@ public class Card {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Contact> contacts = new ArrayList<>();
 
-	@OneToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private CloudFile avatar;
+//	@OneToOne
+//  ignored         	 @JoinColumn(foreignKey = @javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+//  this sets RESTRICT   @OnDelete(action = OnDeleteAction.NO_ACTION)
+//	private CloudFile avatar;
+
+	private Integer avatarId;
 
 	@Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
 	private final Date createAt = new Date();
@@ -57,6 +60,7 @@ public class Card {
 	private boolean status = true;
 
 	@OneToOne
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Album album;
 
 	private ProfileDetailStruct detailStruct;

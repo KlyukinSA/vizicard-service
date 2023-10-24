@@ -10,10 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import vizicard.model.detail.EducationLevel;
 import vizicard.model.detail.EducationType;
-import vizicard.repository.AlbumRepository;
-import vizicard.repository.CloudFileRepository;
-import vizicard.repository.ContactGroupRepository;
-import vizicard.repository.ContactTypeRepository;
+import vizicard.repository.*;
 import vizicard.repository.detail.EducationTypeRepository;
 
 @SpringBootApplication

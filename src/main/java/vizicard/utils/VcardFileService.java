@@ -4,10 +4,7 @@ import ezvcard.VCard;
 import ezvcard.VCardVersion;
 import ezvcard.io.text.VCardWriter;
 import ezvcard.parameter.ImageType;
-import ezvcard.property.Address;
-import ezvcard.property.Photo;
-import ezvcard.property.RawProperty;
-import ezvcard.property.Url;
+import ezvcard.property.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +42,7 @@ public class VcardFileService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         VCardWriter writer = new VCardWriter(outputStream, VCardVersion.V3_0);
         writer.getVObjectWriter().getFoldedLineWriter().setLineLength(null);
+        writer.setAddProdId(false);
         writer.write(vcard);
         writer.close();
 
@@ -71,7 +69,7 @@ public class VcardFileService {
             address.setLocality(card.getCity());
             vcard.addAddress(address);
         }
-//        vcard.setProductId(urlBase + " 1.0.0");
+        vcard.setProductId(urlBase);
 
         int group = 1;
         addGroupedLink(group, vcard, "CARD-SOURCE", urlBase);

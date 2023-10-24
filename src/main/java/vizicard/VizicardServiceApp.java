@@ -57,22 +57,26 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   void fillContactTypes() {
     Album album = albumRepository.save(new Album());
-    CloudFile logo = cloudFileRepository.save(new CloudFile("empty", album));
     ContactGroup contactGroup = contactGroupRepository.save(new ContactGroup(1, ContactGroupEnum.MUSIC, "group", null));
 
     for (ContactEnum contactEnum : ContactEnum.class.getEnumConstants())
     {
-      save(logo, contactEnum, contactGroup);
+      save(album, contactEnum, contactGroup);
     }
   }
 
-  void save(CloudFile logo, ContactEnum contactEnum, ContactGroup contactGroup) {
+  void save(Album album, ContactEnum contactEnum, ContactGroup contactGroup) {
     ContactType contactType = new ContactType();
     contactType.setType(contactEnum);
-    contactType.setLogo(logo);
     contactType.setWriting(contactEnum.toString().toLowerCase());
+    contactType.setLogo(createLogoFor(contactType.getWriting(), album));
     contactType.setGroup(contactGroup);
     contactTypeRepository.save(contactType);
+  }
+
+  private CloudFile createLogoFor(String writing, Album album) {
+    String keyName = "img_" + writing + ".svg";
+    return cloudFileRepository.save(new CloudFile(keyName, album));
   }
 
 }

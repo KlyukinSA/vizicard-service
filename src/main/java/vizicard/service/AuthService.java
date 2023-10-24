@@ -29,8 +29,7 @@ public class AuthService {
 
     private final RelationRepository relationRepository;
     private final ShortnameRepository shortnameRepository;
-    private final CloudFileRepository cloudFileRepository;
-    private final S3Service s3Service;
+    private final CloudFileService cloudFileService;
     private final CardRepository cardRepository;
 
     public Account signin(String username, String password) {
@@ -90,9 +89,7 @@ public class AuthService {
 
         signup(account, card, shortname, referrerId);
 
-        String url = s3Service.uploadExternal((String) payload.get("picture"));
-        CloudFile picture = new CloudFile(url, card.getAlbum());
-        cloudFileRepository.save(picture);
+        CloudFile picture = cloudFileService.saveExternal((String) payload.get("picture"), card.getAlbum());
         card.setAvatarId(picture.getId());
         cardRepository.save(card);
         return account;

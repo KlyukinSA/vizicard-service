@@ -17,16 +17,15 @@ import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
-import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.service.CashService;
+import vizicard.service.CloudFileService;
 import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,7 +35,7 @@ public class CardMapper {
     private final ShortnameService shortnameService;
     private final RelationRepository relationRepository;
     private final ContactRepository contactRepository;
-    private final CloudFileRepository cloudFileRepository;
+    private final CloudFileService cloudFileService;
 
     private final ModelMapper modelMapper;
     private final ContactMapper contactMapper;
@@ -57,7 +56,7 @@ public class CardMapper {
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card);
-        CloudFile cloudFile = cloudFileRepository.findById(card.getAvatarId()).get();
+        CloudFile cloudFile = cloudFileService.findById(card.getAvatarId());
         res.setAvatar(new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId()));
         removeDeletedAvatar(res, card);
         return res;
@@ -79,8 +78,8 @@ public class CardMapper {
         if (card.getAvatarId() == null) {
             return;
         }
-        Optional<CloudFile> optional = cloudFileRepository.findById(card.getAvatarId());
-        if (optional.isPresent() && !optional.get().isStatus()) {
+        CloudFile cloudFile = cloudFileService.findById(card.getAvatarId());
+        if (cloudFile != null && !card.isStatus()) {
             dto.setAvatar(null);
         }
     }
@@ -101,18 +100,7 @@ public class CardMapper {
     }
 
     private List<ContactResponse> getContactDTOs(Card card) {
-        return contactMapper.map(contactRepository.findAllByOwner(card));
-//        return contactRepository.findAllByOwner(card).stream()
-//                .filter(Contact::isStatus)
-//                .map((val) -> new ContactResponse(
-//                        val.getId(),
-//                        val.getType().getType(),
-//                        val.getContact(),
-//                        val.getTitle(),
-//                        val.getDescription(),
-//                        val.getOrder(),
-//                        val.getType().getLogo().getUrl()))
-//                .collect(Collectors.toList());
+        return contactMapper.mapList(contactRepository.findAllByOwner(card));
     }
 
     private ProfileDetailStructResponseDTO getResume(Card card) {

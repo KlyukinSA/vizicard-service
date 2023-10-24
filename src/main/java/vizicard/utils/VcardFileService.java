@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Card;
-import vizicard.repository.CloudFileRepository;
+import vizicard.service.CloudFileService;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +27,7 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class VcardFileService {
 
-    private final CloudFileRepository cloudFileRepository;
+    private final CloudFileService cloudFileService;
 
     @Value("${front-url-base}")
     private String urlBase;
@@ -93,7 +93,7 @@ public class VcardFileService {
         }
 
         if (card.getAvatarId() != null) {
-            String url = cloudFileRepository.findById(card.getAvatarId()).get().getUrl();
+            String url = cloudFileService.findById(card.getAvatarId()).getUrl();
             InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
             Photo photo = new Photo(inputStream, ImageType.JPEG);
             vcard.addPhoto(photo); // TODO image types

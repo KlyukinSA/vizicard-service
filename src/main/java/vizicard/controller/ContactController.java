@@ -13,7 +13,6 @@ import vizicard.repository.ContactTypeRepository;
 import vizicard.service.ContactService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,24 +56,15 @@ public class ContactController {
 
         contact = contactService.create(contact);
 
-        return toResponse(contact);
-    }
-
-    private ContactResponse toResponse(Contact contact) {
-        ContactResponse contactResponse = modelMapper.map(contact, ContactResponse.class);
-        contactResponse.setLogoUrl(contact.getType().getLogo().getUrl());
-        return contactResponse;
+        return contactMapper.mapToResponse(contact);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public ContactResponse update(@RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
         Contact contact = modelMapper.map(dto, Contact.class);
-
         contact = contactService.update(contact, id);
-
-        return toResponse(contact);
-//        return modelMapper.map(contactService.update(modelMapper.map(dto, Contact.class), id), ContactResponse.class);
+        return contactMapper.mapToResponse(contact);
     }
 
     @DeleteMapping("{id}")
@@ -96,7 +86,7 @@ public class ContactController {
     public List<ContactResponse> reorder(@RequestBody List<ContactReorderDTO> dto) {
         List<Integer> ids = dto.stream().map(ContactReorderDTO::getId).collect(Collectors.toList());
         List<Integer> orders = dto.stream().map(ContactReorderDTO::getOrder).collect(Collectors.toList());
-        return contactMapper.map(contactService.reorder(ids, orders));
+        return contactMapper.mapList(contactService.reorder(ids, orders));
     }
 
 }

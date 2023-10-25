@@ -2,7 +2,7 @@ package vizicard.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.ProfileType;
+import vizicard.model.CardType;
 
 @Data
 @NoArgsConstructor
@@ -12,5 +12,6 @@ public class BriefCardResponse {
     private String title;
     private CloudFileDTO avatar;
     private String mainShortname;
-    private ProfileType type;
+    private CardType type;
+    private boolean custom;
 }

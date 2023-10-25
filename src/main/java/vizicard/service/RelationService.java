@@ -94,10 +94,12 @@ public class RelationService {
             relationType = RelationType.USUAL;
         } else {
             if (company.getName() != null) {
-                company.setType(ProfileType.LEAD_COMPANY);
+                company.setType(CardType.COMPANY);
+                company.setCustom(true);
                 cardService.create(company);
             }
-            leadCard.setType(ProfileType.LEAD_USER);
+            leadCard.setType(CardType.PERSON);
+            leadCard.setCustom(true);
             leadCard.setCompany(company);
             cardService.create(leadCard);
 
@@ -171,6 +173,14 @@ public class RelationService {
         } else {
             return level2s;
         }
+    }
+
+    public Card createRelationCard(Card card) {
+        card.setCustom(true);
+        cardService.createMyCard(card);
+        Account account = profileProvider.getUserFromAuth();
+        relator.relate(account, account.getCurrentCard(), card, RelationType.OWNER);
+        return card;
     }
 
 }

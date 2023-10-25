@@ -5,9 +5,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.CardResponse;
 import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
+import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.dto.profile.ProfileUpdateDTO;
 import vizicard.model.Card;
 import vizicard.model.ContactEnum;
@@ -70,6 +72,17 @@ public class RelationController {
 
     private RelationResponseDTO mapToResponse(Relation r) {
         return new RelationResponseDTO(cardMapper.mapToBrief(r.getCard()), r.getCreateAt(), r.getType(), r.getAccountOwner().getId(), r.getCardOwner().getId());
+    }
+
+    @PostMapping("card")
+    @PreAuthorize("isAuthenticated()")
+    public CardResponse createRelationCard(@RequestBody ProfileCreateDTO dto) {
+        Card card = new Card();
+        card.setName(dto.getName());
+        card.setType(dto.getType());
+        relationService.createRelationCard(card);
+        profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
+        return cardMapper.mapToResponse(card);
     }
 
 }

@@ -14,7 +14,7 @@ public class TokenClaimsFiller {
     private final CashService cashService;
 
     public void fillAdditional(Map<String, Object> claims, Account account) {
-        claims.put("type", account.getCurrentCard().getType());
+        claims.put("type", account.getType());
         claims.put("status", account.getCurrentCard().isStatus()); // TODO acc
         claims.put("pro", cashService.isPro(account));
     }

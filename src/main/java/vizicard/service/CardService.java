@@ -31,7 +31,7 @@ public class CardService {
         shortnameRepository.save(new Shortname(
                 card, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
-        if (card.getType() == ProfileType.USER || card.getType() == ProfileType.COMPANY) {
+        if (card.getType() == CardType.PERSON || card.getType() == CardType.COMPANY) {
             Album album = new Album(card);
             albumRepository.save(album);
             card.setAlbum(album);
@@ -53,7 +53,7 @@ public class CardService {
     }
 
     private Card search(Card card, Shortname shortname) {
-        if (card.getType() == ProfileType.CUSTOM_USER || card.getType() == ProfileType.CUSTOM_COMPANY || card.getType() == ProfileType.GROUP) {
+        if (card.isCustom() || card.getType() == CardType.ROOM) {
             relationValidator.stopNotOwnerOf(card);
         }
         actionService.addVisitAction(card, shortname);
@@ -88,13 +88,13 @@ public class CardService {
         return cardRepository.findAllByAccount(profileProvider.getUserFromAuth());
     }
 
-    public Card createCustom(Card card) {
-        Set<ProfileType> relationOrCompanyGroupProfileTypes = new HashSet<>(Arrays.asList(
-                ProfileType.CUSTOM_USER, ProfileType.CUSTOM_COMPANY,
-                ProfileType.COMPANY, ProfileType.GROUP));
-        if (!relationOrCompanyGroupProfileTypes.contains(card.getType())) {
-            throw new CustomException("cant create card with this type", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+    public Card createMyCard(Card card) {
+//        Set<CardType> relationOrCompanyGroupCardTypes = new HashSet<>(Arrays.asList(
+//                CardType.CUSTOM_USER, CardType.CUSTOM_COMPANY,
+//                CardType.COMPANY, CardType.ROOM));
+//        if (!relationOrCompanyGroupCardTypes.contains(card.getType())) {
+//            throw new CustomException("cant create card with this type", HttpStatus.UNPROCESSABLE_ENTITY);
+//        }
         card.setAccount(profileProvider.getUserFromAuth());
         return create(card);
     }

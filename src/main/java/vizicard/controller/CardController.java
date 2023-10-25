@@ -53,11 +53,12 @@ public class CardController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public CardResponse create(@RequestBody ProfileCreateDTO dto) {
+    public CardResponse createMyCard(@RequestBody ProfileCreateDTO dto) {
         Card card = new Card();
         card.setName(dto.getName());
         card.setType(dto.getType());
-        cardService.createCustom(card);
+        card.setCustom(false);
+        cardService.createMyCard(card);
         profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
         return cardMapper.mapToResponse(card);
     }

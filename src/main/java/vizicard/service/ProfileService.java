@@ -1,7 +1,6 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -225,19 +224,17 @@ public class ProfileService {
     main.setContacts(mainContacts);
   }
 
-  private void setCustomType(Card main) {
-    if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
-      main.setType(ProfileType.CUSTOM_USER);
-    } else {
-      main.setType(ProfileType.CUSTOM_COMPANY);
-    }
+  private void setCustomType(Card card) {
+    card.setCustom(true);
   }
 
   private boolean checkCanMerge(Card main, Card secondary) {
-    if (main.getType() == ProfileType.CUSTOM_USER || main.getType() == ProfileType.LEAD_USER) {
-      return secondary.getType() == ProfileType.CUSTOM_USER || secondary.getType() == ProfileType.LEAD_USER;
-    } else if (main.getType() == ProfileType.CUSTOM_COMPANY || main.getType() == ProfileType.LEAD_COMPANY) {
-      return secondary.getType() == ProfileType.CUSTOM_COMPANY || secondary.getType() == ProfileType.LEAD_COMPANY;
+    if (!(main.isCustom() && secondary.isCustom())) {
+      return false;
+    } else if (main.getType() == CardType.PERSON) {
+      return secondary.getType() == CardType.PERSON;
+    } else if (main.getType() == CardType.COMPANY) {
+      return secondary.getType() == CardType.COMPANY;
     } else {
       return false;
     }

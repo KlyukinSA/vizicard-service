@@ -48,9 +48,12 @@ public class Card {
 	@Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
 	private final Date createAt = new Date();
 
-	@Column(columnDefinition = "ENUM('USER', 'CUSTOM_USER', 'LEAD_USER', 'COMPANY', 'CUSTOM_COMPANY', 'LEAD_COMPANY', 'GROUP', 'WORKER')", nullable = false)
+	@Column(columnDefinition = "ENUM('PERSON', 'COMPANY', 'COMMUNITY', 'ROOM')", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private ProfileType type;
+	private CardType type;
+
+	@Column(nullable = false)
+	private boolean custom;
 
 	@OneToOne
 	@OnDelete(action = OnDeleteAction.CASCADE)

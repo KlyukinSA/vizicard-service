@@ -3,10 +3,7 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import vizicard.model.Account;
-import vizicard.model.Card;
-import vizicard.model.ProfileType;
-import vizicard.model.Relation;
+import vizicard.model.*;
 import vizicard.repository.AccountRepository;
 
 @Service
@@ -40,7 +37,7 @@ public class CashDecreaseEngine {
                     .filter(Relation::isStatus)
                     .map(Relation::getAccountOwner)
                     .filter(Account::isStatus)
-                    .filter(owner -> owner.getMainCard().getType() == ProfileType.WORKER)
+                    .filter(owner -> owner.getType() == AccountType.EMPLOYEE)
                     .count());
         }
         return res;

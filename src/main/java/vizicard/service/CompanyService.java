@@ -28,7 +28,7 @@ public class CompanyService {
         if (company == null) {
             throw new CustomException("you dont have a company in main card", HttpStatus.BAD_REQUEST);
         }
-        card.setType(ProfileType.WORKER);
+        account.setType(AccountType.EMPLOYEE);
         authService.signup(account, card, null, null);
 
         relator.relate(account, card, company, RelationType.USUAL);
@@ -37,8 +37,8 @@ public class CompanyService {
     }
 
     public List<Card> getAllWorkers() {
-        return relationRepository.findAllByCardAndAccountOwnerMainCardType(
-                profileProvider.getUserFromAuth().getCurrentCard().getCompany(), ProfileType.WORKER).stream()
+        return relationRepository.findAllByCardAndAccountOwnerType(
+                profileProvider.getUserFromAuth().getCurrentCard().getCompany(), AccountType.EMPLOYEE).stream()
                 .filter(Relation::isStatus)
                 .map(Relation::getAccountOwner)
                 .map(Account::getCurrentCard)

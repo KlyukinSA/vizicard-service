@@ -45,7 +45,7 @@ public class CardMapper {
     public BriefCardResponse mapToBrief(Card card) {
         BriefCardResponse res = modelMapper.map(card, BriefCardResponse.class);
         res.setMainShortname(shortnameService.getMainShortname(card));
-        removeDeletedAvatar(res, card);
+        res.setAvatar(getAvatar(card));
         return res;
     }
 
@@ -56,10 +56,20 @@ public class CardMapper {
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card);
-        CloudFile cloudFile = cloudFileService.findById(card.getAvatarId());
-        res.setAvatar(new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId()));
-        removeDeletedAvatar(res, card);
+        res.setAvatar(getAvatar(card));
         return res;
+    }
+
+    private CloudFileDTO getAvatar(Card card) {
+        Integer avatarId = card.getAvatarId();
+        if (avatarId != null) {
+            CloudFile cloudFile = cloudFileService.findById(avatarId);
+            if (cloudFile == null || !cloudFile.isStatus()) {
+                return null;
+            }
+            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId());
+        }
+        return null;
     }
 
     private void finishCompany(CardResponse res, Card card) {
@@ -71,16 +81,6 @@ public class CardMapper {
             res.setCompany(dto);
         } else {
             res.getCompany().setMainShortname(shortnameService.getMainShortname(card.getCompany()));
-        }
-    }
-
-    private void removeDeletedAvatar(BriefCardResponse dto, Card card) {
-        if (card.getAvatarId() == null) {
-            return;
-        }
-        CloudFile cloudFile = cloudFileService.findById(card.getAvatarId());
-        if (cloudFile != null && !card.isStatus()) {
-            dto.setAvatar(null);
         }
     }
 

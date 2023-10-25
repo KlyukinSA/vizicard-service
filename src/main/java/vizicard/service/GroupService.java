@@ -42,7 +42,7 @@ public class GroupService {
     }
 
      private void letGroupPass(Card card) {
-        if (card.getType() != ProfileType.GROUP) {
+        if (card.getType() != CardType.ROOM) {
             throw new CustomException("This profile should be a group", HttpStatus.FORBIDDEN);
         }
     }
@@ -60,7 +60,7 @@ public class GroupService {
 
     public List<BriefCardResponse> getAllMyGroups() {
         Account user = profileProvider.getUserFromAuth();
-        return relationRepository.findAllByAccountOwnerAndCardType(user, ProfileType.GROUP).stream()
+        return relationRepository.findAllByAccountOwnerAndCardType(user, CardType.ROOM).stream()
                 .map(Relation::getCard)
                 .filter(Card::isStatus)
                 .map(cardMapper::mapToBrief)

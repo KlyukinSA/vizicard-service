@@ -99,10 +99,14 @@ public class AuthService {
         if (accountRepository.findByUsername(account.getUsername()) != null) {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        card.setType(ProfileType.USER);
+        card.setType(CardType.PERSON);
+        card.setCustom(false);
         cardService.create(card);
 
         account.setPassword(passwordEncoder.encode(account.getPassword()));
+        if (account.getType() == null) {
+            account.setType(AccountType.USER);
+        }
 
         account.setCurrentCard(card);
         account.setMainCard(card);

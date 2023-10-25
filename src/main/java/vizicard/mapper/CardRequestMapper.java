@@ -2,10 +2,6 @@ package vizicard.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vizicard.dto.profile.ProfileCreateDTO;
-import vizicard.model.Card;
-import vizicard.model.Relation;
-import vizicard.model.RelationType;
 
 @Component
 @RequiredArgsConstructor

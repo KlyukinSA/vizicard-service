@@ -1,4 +1,4 @@
-package vizicard.dto;
+package vizicard.dto.profile.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

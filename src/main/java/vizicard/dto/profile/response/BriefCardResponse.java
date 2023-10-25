@@ -1,7 +1,8 @@
-package vizicard.dto;
+package vizicard.dto.profile.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vizicard.dto.CloudFileDTO;
 import vizicard.model.CardType;
 
 @Data

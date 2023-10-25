@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.BriefCardResponse;
-import vizicard.dto.CardResponse;
-import vizicard.dto.profile.ProfileCreateDTO;
-import vizicard.dto.profile.ProfileUpdateDTO;
+import vizicard.dto.profile.response.BriefCardResponse;
+import vizicard.dto.profile.response.CardResponse;
+import vizicard.dto.profile.request.ProfileCreateDTO;
+import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.model.Card;
 import vizicard.service.CardService;
 import vizicard.service.ProfileService;
@@ -66,6 +66,12 @@ public class CardController {
     @GetMapping("current")
     @PreAuthorize("isAuthenticated()")
     public CardResponse whoami() {
+        return cardMapper.mapToResponse(cardService.whoami());
+    }
+
+    @GetMapping("shortname-and-id")
+    @PreAuthorize("isAuthenticated()")
+    public CardResponse getShortInfoAboutCurrentCard() {
         return cardMapper.mapToResponse(cardService.whoami());
     }
 

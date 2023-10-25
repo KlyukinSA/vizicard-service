@@ -1,4 +1,4 @@
-package vizicard.utils;
+package vizicard.service;
 
 import ezvcard.VCard;
 import ezvcard.VCardVersion;

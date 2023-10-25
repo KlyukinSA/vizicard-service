@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import vizicard.dto.contact.ContactInListRequest;
-import vizicard.dto.profile.ProfileUpdateDTO;
+import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.*;

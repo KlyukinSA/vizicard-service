@@ -3,7 +3,7 @@ package vizicard.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import vizicard.dto.BriefCardResponse;
+import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.RelationRepository;

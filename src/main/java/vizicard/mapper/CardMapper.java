@@ -9,6 +9,8 @@ import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
+import vizicard.dto.profile.response.BriefCardResponse;
+import vizicard.dto.profile.response.CardResponse;
 import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.model.CloudFile;

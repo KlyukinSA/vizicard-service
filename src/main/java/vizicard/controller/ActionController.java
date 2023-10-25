@@ -3,7 +3,7 @@ package vizicard.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.BriefCardResponse;
+import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.action.GraphActionResponse;
 import vizicard.dto.action.PageActionDTO;
 import vizicard.dto.action.ReferralStatsDTO;

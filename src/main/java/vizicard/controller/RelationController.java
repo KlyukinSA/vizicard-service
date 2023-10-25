@@ -5,12 +5,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.CardResponse;
+import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.contact.ContactInListRequest;
-import vizicard.dto.profile.LeadGenDTO;
+import vizicard.dto.profile.request.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
-import vizicard.dto.profile.ProfileCreateDTO;
-import vizicard.dto.profile.ProfileUpdateDTO;
+import vizicard.dto.profile.request.ProfileCreateDTO;
+import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.model.Card;
 import vizicard.model.ContactEnum;
 import vizicard.model.Relation;
@@ -19,7 +19,6 @@ import vizicard.service.RelationService;
 import vizicard.mapper.CardMapper;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController

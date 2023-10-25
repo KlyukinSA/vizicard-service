@@ -5,18 +5,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.CommentOfMineResponse;
+import vizicard.dto.publication.CommentOfMineResponse;
 import vizicard.dto.publication.CommentCreateDTO;
 import vizicard.dto.publication.CommentResponse;
 import vizicard.mapper.PublicationCommentResponseMapper;
-import vizicard.model.Card;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
-import vizicard.mapper.CardMapper;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController

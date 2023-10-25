@@ -1,4 +1,4 @@
-package vizicard.dto;
+package vizicard.dto.publication;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

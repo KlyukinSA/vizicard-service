@@ -8,10 +8,12 @@ import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
+import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
 import vizicard.model.Card;
 import vizicard.service.CardService;
 import vizicard.service.ProfileService;
 import vizicard.mapper.CardMapper;
+import vizicard.service.ShortnameService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class CardController {
 
     private final ProfileService profileService;
     private final ModelMapper modelMapper;
+    private final ShortnameService shortnameService;
 
     @GetMapping("{shortname}")
     public CardResponse searchByShortname(@PathVariable String shortname) {
@@ -69,12 +72,6 @@ public class CardController {
         return cardMapper.mapToResponse(cardService.whoami());
     }
 
-    @GetMapping("shortname-and-id")
-    @PreAuthorize("isAuthenticated()")
-    public CardResponse getShortInfoAboutCurrentCard() {
-        return cardMapper.mapToResponse(cardService.whoami());
-    }
-
     @GetMapping("my")
     @PreAuthorize("isAuthenticated()")
     public List<BriefCardResponse> getAllMyCards() {
@@ -87,6 +84,14 @@ public class CardController {
     @PreAuthorize("isAuthenticated()")
     public CardResponse mergeCustomCards(@RequestParam Integer main, @RequestParam Integer secondary) {
         return cardMapper.mapToResponse(profileService.mergeCustomProfiles(main, secondary)); //
+    }
+
+    @GetMapping("id-type-shortname")
+    @PreAuthorize("isAuthenticated()")
+    public IdAndTypeAndMainShortnameDTO getIdAndTypeAndMainShortnameOfCurrentCard() {
+        Card card = cardService.whoami();
+        return new IdAndTypeAndMainShortnameDTO(
+                card.getId(), card.getType(), shortnameService.getMainShortname(card));
     }
 
 }

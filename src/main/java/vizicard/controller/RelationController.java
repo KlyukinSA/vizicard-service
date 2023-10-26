@@ -42,14 +42,14 @@ public class RelationController {
         return relationService.saveContact(id);
     }
 
-    @PostMapping("/lead")
-    public void leadGenerate(@RequestParam Integer id, @RequestBody(required = false) LeadGenDTO dto) {
+    @PostMapping("/exchange")
+    public void leadGenerate(@RequestParam Integer id, @RequestBody LeadGenDTO dto) {
         Card leadCard = new Card();
         leadCard.setName(dto.getName());
         Card company = new Card();
-        company.setName(dto.getName());
-        ContactInListRequest contactInListRequest = dto.getContacts().stream().filter(req -> req.getType().equals(ContactEnum.MAIL)).findFirst().orElse(new ContactInListRequest());
-        relationService.leadGenerate(id, leadCard, company, contactInListRequest.getContact());
+        company.setName(dto.getCompanyName());
+        ContactInListRequest emailContactDTO = dto.getContacts().stream().filter(req -> req.getType().equals(ContactEnum.MAIL)).findFirst().orElse(new ContactInListRequest());
+        relationService.leadGenerate(id, leadCard, company, emailContactDTO.getContact());
         if (leadCard.getId() != null) {
             profileService.updateProfile(leadCard, modelMapper.map(dto, ProfileUpdateDTO.class));
         }

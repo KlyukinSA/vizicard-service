@@ -52,17 +52,16 @@ public class RelationService {
         relationRepository.save(relation);
     }
 
-    public ResponseEntity<?> saveContact(Integer targetId) throws Exception {
+    public ResponseEntity<?> saveContact(Integer targetId) {
         Card target = profileProvider.getTarget(targetId);
-
         Account owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getAccount().getId(), owner.getId())) {
             emailService.sendSaved(owner, target);
-            relator.relate(owner, owner.getCurrentCard(), target, RelationType.USUAL);
+
+            relator.relate(owner, owner.getCurrentCard(), target, RelationType.SAVE);
+            exchange(target, owner.getCurrentCard());
         }
-
         actionService.addSaveAction(owner, target);
-
         return getVcardResponse(target);
     }
 
@@ -78,39 +77,25 @@ public class RelationService {
 
     public void leadGenerate(Integer targetId, Card leadCard, Card company, String email) {
         Card target = profileProvider.getTarget(targetId);
-        Account account = profileProvider.getUserFromAuth();
-        RelationType relationType;
-        if (account != null) {
-            if (Objects.equals(target.getAccount().getId(), account.getId())) {
-                return;
-            }
-            leadCard = account.getCurrentCard();
-            company = companyService.getCompanyOf(leadCard);
-            email = emailService.resolveEmail(account);
-            relationType = RelationType.USUAL;
-        } else {
-            if (company.getName() != null) {
-                company.setType(CardType.COMPANY);
-                company.setCustom(true);
-                cardService.create(company);
-            }
-            leadCard.setType(CardType.PERSON);
-            leadCard.setCustom(true);
-            cardService.create(leadCard);
 
-            companyService.setFor(leadCard, company);
-
-            emailService.sendSaved(email, target);
-            relationType = RelationType.OWNER;
+        if (company.getName() != null) {
+            company.setType(CardType.COMPANY);
+            company.setCustom(true);
+            cardService.create(company);
         }
+        leadCard.setType(CardType.PERSON);
+        leadCard.setCustom(true);
+        cardService.create(leadCard);
+        relationRepository.save(new Relation(target.getAccount(), leadCard, company, RelationType.MEMBER));
 
-        relator.relate(target.getAccount(), target, leadCard, relationType);
+        emailService.sendSaved(email, target);
+        emailService.sendLead(target.getAccount(), leadCard);
 
-        if (company != null && company.isStatus()) {
-            relator.relate(target.getAccount(), target, company, RelationType.USUAL);
-        };
+        exchange(target, leadCard);
+    }
 
-        emailService.sendLead(email, leadCard);
+    private void exchange(Card target, Card actor) {
+        relator.relate(target.getAccount(), target, actor, RelationType.EXCHANGE);
     }
 
     public List<Relation> searchLike(String name, String type) {

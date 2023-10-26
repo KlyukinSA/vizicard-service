@@ -38,7 +38,7 @@ public class EmailService {
             sendHtml(to, subject, text);
         } catch (Exception e) {
             System.out.println("tried to send message to " + to + " about " + target.getId() + "\nbut\n");
-            e.printStackTrace();
+            e.printStackTrace(); // TODO catch in sendHtml and print only message
         }
     }
     
@@ -118,12 +118,12 @@ public class EmailService {
         } catch (Exception ignored) {}
     }
 
-    public String resolveEmail(Account account) {
-        return getAddressTo(account);
-    }
-
     public void sendSaved(Account owner, Card target) {
         sendSaved(getAddressTo(owner), target);
+    }
+
+    public void sendLead(Account target, Card actor) {
+        sendLead(getAddressTo(target), actor);
     }
 
 }

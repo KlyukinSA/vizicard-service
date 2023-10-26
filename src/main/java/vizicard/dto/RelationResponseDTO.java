@@ -15,6 +15,6 @@ public class RelationResponseDTO {
     private BriefCardResponse card;
     private Date createAt;
     private RelationType type;
-    private Integer ownerAccountId;
-    private Integer ownerCardId;
+    private Integer accountOwnerId;
+    private Integer cardOwnerId;
 }

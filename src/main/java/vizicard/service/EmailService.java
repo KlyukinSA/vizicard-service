@@ -24,6 +24,7 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
     private final ShortnameService shortnameService;
+    private final CompanyService companyService;
 
     @Value("${spring.mail.username}")
     private String vizicardEmail;
@@ -65,10 +66,11 @@ public class EmailService {
         text = replaceArg(text, "url-base", urlBase);
         text = replaceArg(text, "name", card.getName());
         text = replaceArg(text, "title", card.getTitle());
-        if (card.getCompany() == null) {
+        Card company = companyService.getCompanyOf(card);
+        if (company == null) {
             text = replaceArg(text, "company", null);
         } else {
-            text = replaceArg(text, "company", card.getCompany().getName());
+            text = replaceArg(text, "company", company.getName());
         }
         text = replaceArg(text, "email", getAddressTo(card).orElse(null));
         text = replaceArg(text, "phone", getPhone(card));

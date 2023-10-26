@@ -49,7 +49,7 @@ public class CardController {
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public CardResponse update(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
-        Card card = cardService.prepareToUpdate(id); // TODO create update(Card sourceMap, Integer destId)
+        Card card = cardService.prepareToUpdate(id); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
         profileService.updateProfile(card, dto); //
         return cardMapper.mapToResponse(card);
     }

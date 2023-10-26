@@ -55,10 +55,6 @@ public class Card {
 	@Column(nullable = false)
 	private boolean custom;
 
-	@OneToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	private Card company;
-
 	@Column(nullable = false)
 	private boolean status = true;
 

@@ -29,6 +29,7 @@ public class ProfileService {
   private final CloudFileRepository cloudFileRepository;
 
   private final AuthService authService;
+  private final CompanyService companyService;
 
 //  public CardResponse searchByShortname(String shortname) {
 //    Shortname shortname1 = shortnameRepository.findByShortname(shortname);
@@ -122,19 +123,10 @@ public class ProfileService {
 
     if (dto.getCompanyId() != null) {
       if (dto.getCompanyId().equals(0)) {
-        card.setCompany(null);
+        companyService.unsetFor(card);
       } else {
         Card company = profileProvider.getTarget(dto.getCompanyId());
-        card.setCompany(company);
-
-        Relation relation = relationRepository.findByAccountOwnerAndCard(card.getAccount(), company);
-        RelationType relationType;
-        if (relation != null) {
-          relationType = relation.getType();
-        } else {
-          relationType = RelationType.USUAL;
-        }
-        relator.relate(card.getAccount(), card, company, relationType);
+        companyService.setFor(card, company);
       }
     }
 

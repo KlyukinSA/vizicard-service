@@ -19,4 +19,5 @@ public interface RelationRepository extends JpaRepository<Relation, Integer> {
 
     List<Relation> findAllByTypeAndAccountOwner(RelationType relationType, Account owner);
 
+    Relation findByCardOwnerAndCardTypeAndType(Card card, CardType cardType, RelationType relationType);
 }

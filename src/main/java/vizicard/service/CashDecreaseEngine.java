@@ -11,6 +11,7 @@ import vizicard.repository.AccountRepository;
 public class CashDecreaseEngine {
 
     private final AccountRepository accountRepository;
+    private final CompanyService companyService;
 
     @Scheduled(fixedRate = 1000*60*60)
     private void decreaseGlobalCash() {
@@ -31,7 +32,7 @@ public class CashDecreaseEngine {
 
     private float getDecreasePrice(Account account) {
         float res = 1;
-        Card company = account.getMainCard().getCompany();
+        Card company = companyService.getCompanyOf(account.getMainCard());
         if (company != null && company.isStatus()) {
             res += (float) (0.5 * company.getRelationsWhereCard().stream()
                     .filter(Relation::isStatus)

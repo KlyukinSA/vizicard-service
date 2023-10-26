@@ -25,6 +25,7 @@ import java.net.URL;
 public class VcardFileService {
 
     private final CloudFileService cloudFileService;
+    private final CompanyService companyService;
 
     @Value("${front-url-base}")
     private String urlBase;
@@ -60,9 +61,10 @@ public class VcardFileService {
         if (isGoodForVcard(card.getDescription())) {
             vcard.addNote(card.getDescription());
         }
-        if (card.getCompany() != null && card.getCompany().isStatus() &&
-                isGoodForVcard(card.getCompany().getName())) {
-            vcard.setOrganization(card.getCompany().getName());
+        Card company = companyService.getCompanyOf(card);
+        if (company != null && company.isStatus() &&
+                isGoodForVcard(company.getName())) {
+            vcard.setOrganization(company.getName());
         }
         if (isGoodForVcard(card.getCity())) {
             Address address = new Address();

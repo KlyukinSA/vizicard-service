@@ -11,6 +11,7 @@ import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
+import vizicard.dto.profile.response.CompanyResponse;
 import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.model.CloudFile;
@@ -23,6 +24,7 @@ import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.service.CashService;
 import vizicard.service.CloudFileService;
+import vizicard.service.CompanyService;
 import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
@@ -43,6 +45,7 @@ public class CardMapper {
     private final ContactMapper contactMapper;
     private final ProfileProvider profileProvider;
     private final CashService cashService;
+    private final CompanyService companyService;
 
     public BriefCardResponse mapToBrief(Card card) {
         BriefCardResponse res = modelMapper.map(card, BriefCardResponse.class);
@@ -75,14 +78,15 @@ public class CardMapper {
     }
 
     private void finishCompany(CardResponse res, Card card) {
-        if (card.getCompany() == null || !card.getCompany().isStatus()) { // TODO function for same checks
+        Card company = companyService.getCompanyOf(card);
+        if (company == null || !company.isStatus()) { // TODO function for same checks
             res.setCompany(null);
         } else if (!cashService.isPro(card.getAccount())) {
             BriefCardResponse dto = new BriefCardResponse();
-            dto.setName(card.getCompany().getName());
+            dto.setName(company.getName());
             res.setCompany(dto);
         } else {
-            res.getCompany().setMainShortname(shortnameService.getMainShortname(card.getCompany()));
+            res.getCompany().setMainShortname(shortnameService.getMainShortname(company));
         }
     }
 
@@ -124,6 +128,14 @@ public class CardMapper {
                         .map((val) -> new SkillResponseDTO(val.getId(), val.getSkill()))
                         .collect(Collectors.toList())
         );
+    }
+
+    public CompanyResponse mapToCompanyResponse(Card company) {
+        CompanyResponse res = modelMapper.map(company, CompanyResponse.class);
+        res.setContacts(getContactDTOs(company));
+        res.setMainShortname(shortnameService.getMainShortname(company));
+        res.setAvatar(getAvatar(company));
+        return res;
     }
 
 }

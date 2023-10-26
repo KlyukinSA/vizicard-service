@@ -36,6 +36,7 @@ public class RelationService {
     private final Relator relator;
     private final CardService cardService;
     private final VcardFileService vcardFileService;
+    private final CompanyService companyService;
 
     public void unrelate(Integer cardId) {
         Card card = cardRepository.findById(cardId).get();
@@ -57,12 +58,7 @@ public class RelationService {
         Account owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getAccount().getId(), owner.getId())) {
             emailService.sendSaved(owner, target);
-
             relator.relate(owner, owner.getCurrentCard(), target, RelationType.USUAL);
-
-            if (target.getCompany() != null && target.getCompany().isStatus()) {
-                relator.relate(owner, owner.getCurrentCard(), target.getCompany(), RelationType.USUAL);
-            }
         }
 
         actionService.addSaveAction(owner, target);
@@ -89,7 +85,7 @@ public class RelationService {
                 return;
             }
             leadCard = account.getCurrentCard();
-            company = leadCard.getCompany();
+            company = companyService.getCompanyOf(leadCard);
             email = emailService.resolveEmail(account);
             relationType = RelationType.USUAL;
         } else {
@@ -100,8 +96,9 @@ public class RelationService {
             }
             leadCard.setType(CardType.PERSON);
             leadCard.setCustom(true);
-            leadCard.setCompany(company);
             cardService.create(leadCard);
+
+            companyService.setFor(leadCard, company);
 
             emailService.sendSaved(email, target);
             relationType = RelationType.OWNER;
@@ -118,8 +115,8 @@ public class RelationService {
 
     public List<Relation> searchLike(String name, String type) {
         Account user = profileProvider.getUserFromAuth();
-        StringBuilder query = new StringBuilder(
-                "select relation.id from relation inner join card on relation.card_id=card.id where owner_id=")
+        StringBuilder query = new StringBuilder( // should search as in Relator::relate
+                "select relation.id from relation inner join card on relation.card_id=card.id where account_owner_id=")
                 .append(user.getId());
 
         if (name != null) {
@@ -147,7 +144,6 @@ public class RelationService {
                 .map((id) -> relationRepository.findById(id).get())
                 .filter(Relation::isStatus)
                 .filter((relation) -> relation.getCard().isStatus())
-                .filter(relation -> relation.getType() != RelationType.SECONDARY)
                 .collect(Collectors.toList());
     }
 

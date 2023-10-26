@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.profile.request.CompanyRequest;
 import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.request.WorkerCreateDTO;
+import vizicard.dto.profile.response.CompanyResponse;
 import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.service.CompanyService;
@@ -47,6 +49,23 @@ public class CompanyController {
         return companyService.getAllWorkers().stream()
                 .map(cardMapper::mapToBrief)
                 .collect(Collectors.toList());
+    }
+
+    @PutMapping
+    @PreAuthorize("isAuthenticated()")
+    public CompanyResponse createOrUpdate(@RequestBody CompanyRequest dto) {
+        Card company = new Card();
+        company.setName(dto.getName());
+        company = companyService.prepareToCreateOrUpdate(company);
+        profileService.updateProfile(company, modelMapper.map(dto, ProfileUpdateDTO.class));
+        return cardMapper.mapToCompanyResponse(company);
+    }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public CompanyResponse getOfCurrentCard() {
+        Card company = companyService.getOfCurrentCard();
+        return cardMapper.mapToCompanyResponse(company);
     }
 
 }

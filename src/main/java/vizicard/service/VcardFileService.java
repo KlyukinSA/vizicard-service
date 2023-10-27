@@ -22,10 +22,11 @@ import java.net.URL;
 
 @Component
 @RequiredArgsConstructor
-public class VcardFileService {
+public class VcardFileService { // TODO mapper instead of service, include getVcardResponse()
 
     private final CloudFileService cloudFileService;
     private final CompanyService companyService;
+    private final ShortnameService shortnameService;
 
     @Value("${front-url-base}")
     private String urlBase;
@@ -74,7 +75,9 @@ public class VcardFileService {
         vcard.setProductId(urlBase);
 
         int group = 1;
-        addGroupedLink(group, vcard, "CARD-SOURCE", urlBase);
+        String mainShortname = shortnameService.getMainShortname(card);
+        String mainUrl = urlBase + "/" + mainShortname + "?utm_source=vcard";
+        addGroupedLink(group, vcard, "CARD-SOURCE", mainUrl);
         for (Contact contact : card.getContacts()) {
             ContactEnum contactEnum = contact.getType().getType();
             String string = contact.getContact();

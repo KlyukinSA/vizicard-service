@@ -8,6 +8,7 @@ import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
+import vizicard.repository.CardRepository;
 import vizicard.repository.ShortnameRepository;
 import vizicard.utils.ProfileProvider;
 
@@ -20,6 +21,7 @@ public class ShortnameService {
 
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
+    private final CardRepository cardRepository;
 
     public Shortname create(String sn, ShortnameType type) {
         stopUsed(sn);
@@ -56,11 +58,16 @@ public class ShortnameService {
         return shortnameRepository.save(shortname);
     }
 
-    public Shortname assignToAccount(Integer id) {
+    public Shortname assignToCardByIdOrMyAccount(Integer id, Integer cardId) {
         Shortname shortname = shortnameRepository.findById(id).get();
-        Account user = profileProvider.getUserFromAuth();
-        shortname.setCard(null);
-        shortname.setAccount(user);
+        if (cardId != null) {
+            Card card = cardRepository.findById(cardId).get();
+            shortname.setCard(card);
+            shortname.setAccount(null);
+        } else {
+            shortname.setCard(null);
+            shortname.setAccount(profileProvider.getUserFromAuth());
+        }
         return shortnameRepository.save(shortname);
     }
 

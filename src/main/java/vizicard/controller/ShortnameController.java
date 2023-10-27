@@ -67,9 +67,10 @@ public class ShortnameController {
         return modelMapper.map(shortnameService.assignToMainCard(id), ShortnameResponse.class);
     }
 
-    @PostMapping("{id}/assign-to-account")
-    public ShortnameResponse assignToAccount(@PathVariable Integer id) {
-        return modelMapper.map(shortnameService.assignToAccount(id), ShortnameResponse.class);
+    @PostMapping("{id}/assign-to-card-or-account")
+    @PreAuthorize("isAuthenticated()")
+    public ShortnameResponse assignToCardByIdOrMyAccount(@PathVariable Integer id, @RequestParam(required = false) Integer cardId) {
+        return modelMapper.map(shortnameService.assignToCardByIdOrMyAccount(id, cardId), ShortnameResponse.class);
     }
 
     @GetMapping("qr")

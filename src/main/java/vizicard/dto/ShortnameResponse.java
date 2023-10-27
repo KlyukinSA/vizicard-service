@@ -13,7 +13,7 @@ public class ShortnameResponse {
     private String shortname;
     private ShortnameType type;
 
-    private Integer ownerId;
+    private Integer accountId;
     private Integer cardId;
     private Integer referrerId;
 }

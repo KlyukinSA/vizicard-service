@@ -53,10 +53,10 @@ public class Account {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Card> cardsWhereAccount;
 
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Shortname> shortnamesWhereOwner;
+	private List<Shortname> shortnamesWhereAccount;
 
 	@OneToMany(mappedBy = "accountOwner", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)

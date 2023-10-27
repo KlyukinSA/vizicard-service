@@ -18,7 +18,7 @@ public class Shortname {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account owner;
+    private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;

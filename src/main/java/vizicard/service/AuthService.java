@@ -56,12 +56,12 @@ public class AuthService {
             if (shortname == null) {
                 return;
             }
-            if (shortname.getOwner() != null) {
-                referrer = shortname.getOwner().getMainCard(); // shortname should be bound to main card (use assignToMainCard())
+            if (shortname.getAccount() != null) {
+                referrer = shortname.getAccount().getMainCard(); // shortname should be bound to main card (use assignToMainCard())
             } else if (shortname.getReferrer() != null) {
                 referrer = shortname.getReferrer();
                 if (shortname.getType() == ShortnameType.DEVICE) {
-                    shortname.setOwner(card.getAccount());
+                    shortname.setAccount(card.getAccount());
                     shortnameRepository.save(shortname);
                 }
             } else {

@@ -16,6 +16,8 @@ import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/shortnames")
@@ -75,6 +77,13 @@ public class ShortnameController {
     public QRCodeResponse generateQRCodeForMainShortname() throws IOException, InterruptedException {
         String mainShortname = shortnameService.getMainShortname(profileProvider.getUserFromAuth().getCurrentCard());
         return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
+    }
+
+    @GetMapping("devices")
+    public List<ShortnameResponse> getAllMyDevices() {
+        return shortnameService.getAllMyDevices().stream()
+                .map(s -> modelMapper.map(s, ShortnameResponse.class))
+                .collect(Collectors.toList());
     }
 
 }

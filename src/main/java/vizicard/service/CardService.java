@@ -43,7 +43,7 @@ public class CardService {
         Shortname shortname = shortnameRepository.findByShortname(sn);
         Card card = shortname.getCard();
         if (card == null) {
-            card = shortname.getOwner().getMainCard();
+            card = shortname.getAccount().getMainCard();
         }
         return search(card, shortname);
     }

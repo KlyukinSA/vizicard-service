@@ -11,6 +11,9 @@ import vizicard.model.ShortnameType;
 import vizicard.repository.ShortnameRepository;
 import vizicard.utils.ProfileProvider;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ShortnameService {
@@ -49,7 +52,7 @@ public class ShortnameService {
         Shortname shortname = shortnameRepository.findById(id).get();
         Account user = profileProvider.getUserFromAuth();
         shortname.setCard(user.getMainCard());
-        shortname.setOwner(null);
+        shortname.setAccount(null);
         return shortnameRepository.save(shortname);
     }
 
@@ -57,8 +60,15 @@ public class ShortnameService {
         Shortname shortname = shortnameRepository.findById(id).get();
         Account user = profileProvider.getUserFromAuth();
         shortname.setCard(null);
-        shortname.setOwner(user);
+        shortname.setAccount(user);
         return shortnameRepository.save(shortname);
+    }
+
+    public List<Shortname> getAllMyDevices() {
+        Account account = profileProvider.getUserFromAuth();
+        return shortnameRepository.findAllByAccountOrCard(account, account.getCurrentCard()).stream()
+                .filter(shortname -> shortname.getType() == ShortnameType.DEVICE)
+                .collect(Collectors.toList());
     }
 
 }

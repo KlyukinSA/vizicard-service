@@ -36,7 +36,6 @@ public class RelationService {
     private final Relator relator;
     private final CardService cardService;
     private final VcardFileService vcardFileService;
-    private final CompanyService companyService;
 
     public void unrelate(Integer cardId) {
         Card card = cardRepository.findById(cardId).get();

@@ -136,9 +136,9 @@ public class AuthService {
         accountRepository.save(user);
     }
 
-    public void changePassword(Card card, String password) {
-        card.getAccount().setPassword(passwordEncoder.encode(password));
-        accountRepository.save(card.getAccount());
+    public void changePassword(Account account, String password) {
+        account.setPassword(passwordEncoder.encode(password));
+        accountRepository.save(account);
     }
 
 }

@@ -27,6 +27,9 @@ public class Relation {
     @JoinColumn(nullable = false)
     private Card card;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Card overlay;
+
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 

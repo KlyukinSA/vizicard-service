@@ -7,6 +7,7 @@ import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.AlbumRepository;
 import vizicard.repository.CardRepository;
+import vizicard.repository.RelationRepository;
 import vizicard.repository.ShortnameRepository;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
@@ -20,6 +21,7 @@ public class CardService {
     private final CardRepository cardRepository;
     private final ShortnameRepository shortnameRepository;
     private final AlbumRepository albumRepository;
+    private final RelationRepository relationRepository;
 
     private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
@@ -101,8 +103,23 @@ public class CardService {
 
     public Card prepareToUpdate(Integer id) {
         Card target = profileProvider.getTarget(id);
-        relationValidator.stopNotOwnerOf(target);
-        return target;
+        Account user = profileProvider.getUserFromAuth();
+        if (Objects.equals(user.getId(), target.getAccount().getId())) { // TODO CardOwnership.check(user, target)
+            return target;
+        } else {
+            Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
+            Card overlay = relation.getOverlay();
+            if (overlay == null) {
+                overlay = new Card();
+                overlay.setName(target.getName());
+                overlay.setType(target.getType());
+                overlay.setCustom(target.isCustom());
+                cardRepository.save(overlay);
+                relation.setOverlay(overlay);
+                relationRepository.save(relation);
+            }
+            return overlay;
+        }
     }
 
 }

@@ -135,7 +135,10 @@ public class ProfileService {
     }
 
     if (dto.getPassword() != null) {
-      authService.changePassword(card, dto.getPassword());
+      Account account = card.getAccount();
+      if (account != null) {
+        authService.changePassword(account, dto.getPassword());
+      }
     }
 
     return cardRepository.save(card);

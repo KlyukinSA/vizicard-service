@@ -11,8 +11,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BriefRelationResponseDTO {
-    private Integer ownerId;
     private Integer cardId;
     private Date createAt;
     private RelationType type;
+    private Integer accountOwnerId;
+    private Integer cardOwnerId;
 }

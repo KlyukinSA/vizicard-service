@@ -104,10 +104,11 @@ public class CardService {
     public Card prepareToUpdate(Integer id) {
         Card target = profileProvider.getTarget(id);
         Account user = profileProvider.getUserFromAuth();
-        if (Objects.equals(user.getId(), target.getAccount().getId())) { // TODO CardOwnership.check(user, target)
+        Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
+        if (Objects.equals(user.getId(), target.getAccount().getId())
+                && (relation == null || relation.getType() != RelationType.EXCHANGE)) { // TODO CardOwnership.check(user, target)
             return target;
         } else {
-            Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
             Card overlay = relation.getOverlay();
             if (overlay == null) {
                 overlay = new Card();

@@ -14,6 +14,7 @@ import vizicard.service.CardService;
 import vizicard.service.ProfileService;
 import vizicard.mapper.CardMapper;
 import vizicard.service.ShortnameService;
+import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class CardController {
     private final ProfileService profileService;
     private final ModelMapper modelMapper;
     private final ShortnameService shortnameService;
+    private final ProfileProvider profileProvider;
 
     @GetMapping("{shortname}")
     public CardResponse searchByShortname(@PathVariable String shortname) {
@@ -51,7 +53,7 @@ public class CardController {
     public CardResponse update(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
         Card card = cardService.prepareToUpdate(id); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
         profileService.updateProfile(card, dto); //
-        return cardMapper.mapToResponse(card);
+        return cardMapper.mapToResponse(profileProvider.getTarget(id));
     }
 
     @PostMapping

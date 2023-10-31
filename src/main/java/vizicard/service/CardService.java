@@ -55,7 +55,7 @@ public class CardService {
     }
 
     private Card search(Card card, Shortname shortname) {
-        if (card.isCustom() || card.getType() == CardType.ROOM) {
+        if (card.isCustom() || card.getType() == CardType.GROUP) {
             relationValidator.stopNotOwnerOf(card);
         }
         actionService.addVisitAction(card, shortname);
@@ -91,12 +91,6 @@ public class CardService {
     }
 
     public Card createMyCard(Card card) {
-//        Set<CardType> relationOrCompanyGroupCardTypes = new HashSet<>(Arrays.asList(
-//                CardType.CUSTOM_USER, CardType.CUSTOM_COMPANY,
-//                CardType.COMPANY, CardType.ROOM));
-//        if (!relationOrCompanyGroupCardTypes.contains(card.getType())) {
-//            throw new CustomException("cant create card with this type", HttpStatus.UNPROCESSABLE_ENTITY);
-//        }
         card.setAccount(profileProvider.getUserFromAuth());
         return create(card);
     }

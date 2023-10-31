@@ -23,8 +23,8 @@ public class GroupController {
 
     @PostMapping("{id}/members")
     @PreAuthorize("isAuthenticated()")
-    public void addGroupMembers(@PathVariable("id") Integer groupId, @RequestBody List<Integer> memberIds) {
-        groupService.addGroupMembers(groupId, memberIds);
+    public List<BriefCardResponse> addGroupMembers(@PathVariable("id") Integer groupId, @RequestBody List<Integer> memberIds) {
+        return groupService.addGroupMembers(groupId, memberIds);
     }
 
     @GetMapping("/me/groups")

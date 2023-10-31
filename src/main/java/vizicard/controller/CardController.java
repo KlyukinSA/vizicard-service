@@ -2,6 +2,7 @@ package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.response.BriefCardResponse;
@@ -9,7 +10,9 @@ import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
+import vizicard.exception.CustomException;
 import vizicard.model.Card;
+import vizicard.model.CardType;
 import vizicard.service.CardService;
 import vizicard.service.ProfileService;
 import vizicard.mapper.CardMapper;
@@ -59,6 +62,9 @@ public class CardController {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public CardResponse createMyCard(@RequestBody ProfileCreateDTO dto) {
+        if (dto.getType() != CardType.PERSON) {
+            throw new CustomException("create not person as relation card", HttpStatus.BAD_REQUEST);
+        }
         Card card = new Card();
         card.setName(dto.getName());
         card.setType(dto.getType());

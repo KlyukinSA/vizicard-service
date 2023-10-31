@@ -27,7 +27,7 @@ public class CompanyService {
         account.setType(AccountType.EMPLOYEE);
         authService.signup(account, card, null, null);
 
-        relationRepository.save(new Relation(account, card, company, RelationType.MEMBER));
+        relationRepository.save(new Relation(account, card, company, RelationType.EMPLOYEE));
         return card;
     }
 
@@ -58,7 +58,7 @@ public class CompanyService {
         company.setCustom(false);
         company.setAccount(user);
         cardService.create(company);
-        relationRepository.save(new Relation(user, user.getCurrentCard(), company, RelationType.MEMBER));
+        relationRepository.save(new Relation(user, user.getCurrentCard(), company, RelationType.EMPLOYEE));
         return company;
     }
 
@@ -78,7 +78,7 @@ public class CompanyService {
         return relationRepository.findByCardOwnerAndCardTypeAndType(
                 card,
                 CardType.COMPANY,
-                RelationType.MEMBER);
+                RelationType.EMPLOYEE);
     }
 
     public void setFor(Card card, Card company) {
@@ -87,7 +87,7 @@ public class CompanyService {
             relation.setStatus(true);
             relation.setCard(company);
         } else {
-            relation = new Relation(profileProvider.getUserFromAuth(), card, company, RelationType.MEMBER);
+            relation = new Relation(profileProvider.getUserFromAuth(), card, company, RelationType.EMPLOYEE);
         }
         relationRepository.save(relation);
     }

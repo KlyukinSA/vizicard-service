@@ -54,7 +54,7 @@ public class GroupService {
 
         for (Integer memberId : memberIds) {
             Card card = profileProvider.getTarget(memberId);
-            relator.relate(card.getAccount(), card, group, RelationType.MEMBER);
+            relator.relate(card.getAccount(), card, group, RelationType.EMPLOYEE);
         }
     }
 

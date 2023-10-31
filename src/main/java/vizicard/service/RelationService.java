@@ -86,7 +86,7 @@ public class RelationService {
         leadCard.setCustom(true);
         leadCard.setAccount(target.getAccount());
         cardService.create(leadCard);
-        relationRepository.save(new Relation(target.getAccount(), leadCard, company, RelationType.MEMBER));
+        relationRepository.save(new Relation(target.getAccount(), leadCard, company, RelationType.EMPLOYEE));
 
         emailService.sendSaved(email, target);
         emailService.sendLead(target.getAccount(), leadCard);

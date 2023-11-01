@@ -83,6 +83,7 @@ public class CardMapper {
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card, overlay);
         res.setAvatar(getAvatar(card, overlay));
+        res.setLastVizit(getLastVizit(card));
         return res;
     }
 
@@ -183,7 +184,12 @@ public class CardMapper {
         res.setContacts(getContactDTOs(company, overlay));
         res.setMainShortname(shortnameService.getMainShortname(company));
         res.setAvatar(getAvatar(company, overlay));
+        res.setLastVizit(getLastVizit(company));
         return res;
+    }
+
+    private Date getLastVizit(Card card) {
+        return card.getAccount().getLastVizit();
     }
 
 }

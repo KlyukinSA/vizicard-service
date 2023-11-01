@@ -30,6 +30,9 @@ public class Relation {
     @OneToOne(fetch = FetchType.LAZY)
     private Card overlay;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private GroupMemberStatus groupStatus;
+
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 

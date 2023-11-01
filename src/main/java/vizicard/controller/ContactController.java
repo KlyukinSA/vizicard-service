@@ -89,4 +89,10 @@ public class ContactController {
         return contactMapper.mapList(contactService.reorder(ids, orders));
     }
 
+    @GetMapping("my")
+    @PreAuthorize("isAuthenticated()")
+    public List<ContactResponse> getOfCurrentCard() {
+        return contactMapper.mapList(contactService.getOfCurrentCard());
+    }
+
 }

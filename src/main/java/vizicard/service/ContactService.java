@@ -74,4 +74,8 @@ public class ContactService {
         return contactRepository.findAllByOwner(owner);
     }
 
+    public List<Contact> getOfCurrentCard() {
+        return contactRepository.findAllByOwner(profileProvider.getUserFromAuth().getCurrentCard());
+    }
+
 }

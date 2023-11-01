@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.SkillDTO;
 import vizicard.model.Card;
+import vizicard.model.detail.Experience;
 import vizicard.model.detail.Skill;
 import vizicard.repository.detail.SkillRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -47,4 +50,8 @@ public class SkillService {
                 .collect(Collectors.toList());
     }
 
+    public Stream<Skill> getOfCurrentCard() {
+        return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getSkills().stream()
+                .filter(Skill::isStatus);
+    }
 }

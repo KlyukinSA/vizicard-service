@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.SkillDTO;
 import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.service.detail.SkillService;
@@ -27,4 +28,11 @@ public class SkillController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public List<SkillResponseDTO> getOfCurrentCard() {
+        return service.getOfCurrentCard()
+                .map((val) -> modelMapper.map(val, SkillResponseDTO.class))
+                .collect(Collectors.toList());
+    }
 }

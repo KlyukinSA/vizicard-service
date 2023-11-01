@@ -15,6 +15,7 @@ import vizicard.utils.ProfileProvider;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class EducationService {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Education education = new Education(user);
         modelMapper.map(dto, education);
+        education.setId(null);
         educationRepository.save(education);
         return modelMapper.map(education, EducationResponseDTO.class);
     }
@@ -59,6 +61,11 @@ public class EducationService {
         return educationTypeRepository.findAll().stream()
                 .map((val) -> modelMapper.map(val, EducationTypeDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    public Stream<Education> getOfCurrentCard() {
+        return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getEducation().stream()
+                .filter(Education::isStatus);
     }
 
 }

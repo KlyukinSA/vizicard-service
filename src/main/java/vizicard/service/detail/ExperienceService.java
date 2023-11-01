@@ -11,6 +11,7 @@ import vizicard.repository.detail.ExperienceRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -48,4 +49,8 @@ public class ExperienceService {
         }
     }
 
+    public Stream<Experience> getOfCurrentCard() {
+        return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getExperience().stream()
+                .filter(Experience::isStatus);
+    }
 }

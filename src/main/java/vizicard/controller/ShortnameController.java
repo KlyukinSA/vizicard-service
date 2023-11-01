@@ -36,10 +36,10 @@ public class ShortnameController {
         return modelMapper.map(shortnameRepository.findByShortname(shortname), ShortnameResponse.class);
     }
 
-    @PostMapping("my")
+    @PutMapping("my")
     @PreAuthorize("isAuthenticated()")
-    public ShortnameResponse create(@RequestBody ShortnameDTO dto) {
-        return modelMapper.map(shortnameService.create(dto.getShortname(), dto.getType()), ShortnameResponse.class);
+    public ShortnameResponse putToCurrentCard(@RequestBody ShortnameDTO dto) {
+        return modelMapper.map(shortnameService.put(dto.getShortname(), dto.getType()), ShortnameResponse.class);
     }
 
     @PostMapping("referral")

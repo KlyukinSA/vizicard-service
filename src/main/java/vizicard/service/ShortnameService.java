@@ -13,6 +13,7 @@ import vizicard.repository.ShortnameRepository;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,19 +23,6 @@ public class ShortnameService {
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
     private final CardRepository cardRepository;
-
-    public Shortname create(String sn, ShortnameType type) {
-        stopUsed(sn);
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
-        if (type == ShortnameType.MAIN) {
-            Shortname oldMain = shortnameRepository.findByCardAndType(user, ShortnameType.MAIN);
-            if (oldMain != null) {
-                oldMain.setType(ShortnameType.USUAL);
-                shortnameRepository.save(oldMain);
-            }
-        }
-        return shortnameRepository.save(new Shortname(user, sn, type));
-    }
 
     public void stopUsed(String sn) {
         if (null != shortnameRepository.findByShortname(sn)) {
@@ -78,4 +66,30 @@ public class ShortnameService {
                 .collect(Collectors.toList());
     }
 
+    public Shortname put(String sn, ShortnameType type) {
+        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+        Shortname bySn = shortnameRepository.findByShortname(sn);
+        Shortname res;
+        if (bySn != null) {
+            stopNotOwnerOf(bySn, card);
+            res = bySn;
+            res.setType(type);
+        } else {
+            res = new Shortname(card, sn, type);
+        }
+        if (type == ShortnameType.MAIN) {
+            Shortname oldMain = shortnameRepository.findByCardAndType(card, ShortnameType.MAIN);
+            if (oldMain != null) {
+                oldMain.setType(ShortnameType.USUAL);
+                shortnameRepository.save(oldMain);
+            }
+        }
+        return shortnameRepository.save(res);
+    }
+
+    private void stopNotOwnerOf(Shortname shortname, Card card) {
+        if (!Objects.equals(shortname.getCard().getId(), card.getId())) {
+            throw new CustomException("you are not card of this existing sn", HttpStatus.FORBIDDEN);
+        }
+    }
 }

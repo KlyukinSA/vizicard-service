@@ -2,9 +2,14 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -42,6 +47,11 @@ public class Relation {
     @Column(columnDefinition = "ENUM('EMPLOYEE', 'OWNER', 'SAVE', 'EXCHANGE', 'REFERRAL', 'REFERRER', 'REFERRER_LEVEL2', 'MEMBER')", nullable = false)
     @Enumerated(EnumType.STRING)
     private RelationType type;
+
+    @OneToMany(mappedBy = "relation", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<CustomAttribute> customAttributes;
 
     public Relation(Account ownerAccount, Card cardOwner, Card card, RelationType relationType) {
         this.accountOwner = ownerAccount;

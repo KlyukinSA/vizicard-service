@@ -2,8 +2,8 @@ package vizicard.dto.profile.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vizicard.dto.CardTypeDTO;
 import vizicard.dto.CloudFileDTO;
-import vizicard.model.CardType;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +13,6 @@ public class BriefCardResponse {
     private String title;
     private CloudFileDTO avatar;
     private String mainShortname;
-    private CardType type;
+    private CardTypeDTO type;
     private boolean custom;
 }

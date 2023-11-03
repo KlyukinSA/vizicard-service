@@ -26,6 +26,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private final EducationTypeRepository educationTypeRepository;
   private final CloudFileRepository cloudFileRepository;
   private final AlbumRepository albumRepository;
+  private final CardTypeRepository cardTypeRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
@@ -42,6 +43,17 @@ public class VizicardServiceApp implements CommandLineRunner {
       System.out.println("WHERE ARE EDUCATION TYPES?");
       System.out.println("adding...");
       fillEducationTypes();
+    }
+    if (cardTypeRepository.findAll().size() < CardTypeEnum.class.getEnumConstants().length) {
+      System.out.println("WHERE ARE CARD TYPES?");
+      System.out.println("adding...");
+      fillCardTypes();
+    }
+  }
+
+  private void fillCardTypes() {
+    for (CardTypeEnum type : CardTypeEnum.class.getEnumConstants()) {
+      cardTypeRepository.save(new CardType(type, type.toString().toLowerCase()));
     }
   }
 

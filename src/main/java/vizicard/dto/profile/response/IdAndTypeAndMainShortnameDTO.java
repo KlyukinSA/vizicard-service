@@ -2,13 +2,14 @@ package vizicard.dto.profile.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import vizicard.model.CardType;
+import lombok.NoArgsConstructor;
+import vizicard.dto.CardTypeDTO;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class IdAndTypeAndMainShortnameDTO {
     private Integer id;
-    private CardType type;
+    private CardTypeDTO type;
     private String mainShortname;
 }

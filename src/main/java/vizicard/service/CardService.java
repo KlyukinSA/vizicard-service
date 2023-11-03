@@ -33,7 +33,7 @@ public class CardService {
         shortnameRepository.save(new Shortname(
                 card, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
 
-        if (card.getType() == CardType.PERSON || card.getType() == CardType.COMPANY) {
+        if (card.getType().getType() == CardTypeEnum.PERSON || card.getType().getType() == CardTypeEnum.COMPANY) {
             Album album = new Album(card);
             albumRepository.save(album);
             card.setAlbum(album);
@@ -55,7 +55,7 @@ public class CardService {
     }
 
     private Card search(Card card, Shortname shortname) {
-        if (card.isCustom() || card.getType() == CardType.GROUP) {
+        if (card.isCustom() || card.getType().getType() == CardTypeEnum.GROUP) {
             relationValidator.stopNotOwnerOf(card);
         }
         actionService.addVisitAction(card, shortname);

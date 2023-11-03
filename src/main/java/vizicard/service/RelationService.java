@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
 import vizicard.repository.CardRepository;
+import vizicard.repository.CardTypeRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.*;
 
@@ -36,6 +37,7 @@ public class RelationService {
     private final Relator relator;
     private final CardService cardService;
     private final VcardFileService vcardFileService;
+    private final CardTypeRepository cardTypeRepository;
 
     public void unrelate(Integer cardId) {
         Card card = cardRepository.findById(cardId).get();
@@ -78,11 +80,11 @@ public class RelationService {
         Card target = profileProvider.getTarget(targetId);
 
         if (company.getName() != null) {
-            company.setType(CardType.COMPANY);
+            company.setType(cardTypeRepository.findByType(CardTypeEnum.COMPANY));
             company.setCustom(true);
             cardService.create(company);
         }
-        leadCard.setType(CardType.PERSON);
+        leadCard.setType(cardTypeRepository.findByType(CardTypeEnum.PERSON));
         leadCard.setCustom(true);
         leadCard.setAccount(target.getAccount());
         cardService.create(leadCard);

@@ -14,6 +14,7 @@ import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.model.Card;
 import vizicard.model.ContactEnum;
 import vizicard.model.Relation;
+import vizicard.repository.CardTypeRepository;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
 import vizicard.mapper.CardMapper;
@@ -30,6 +31,7 @@ public class RelationController {
     private final CardMapper cardMapper;
     private final ModelMapper modelMapper;
     private final ProfileService profileService;
+    private final CardTypeRepository cardTypeRepository;
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
@@ -78,7 +80,7 @@ public class RelationController {
     public CardResponse createRelationCard(@RequestBody ProfileCreateDTO dto) {
         Card card = new Card();
         card.setName(dto.getName());
-        card.setType(dto.getType());
+        card.setType(cardTypeRepository.findByType(dto.getType()));
         relationService.createRelationCard(card);
         profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
         return cardMapper.mapToResponse(card);

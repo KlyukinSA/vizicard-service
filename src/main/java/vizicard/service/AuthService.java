@@ -31,6 +31,7 @@ public class AuthService {
     private final ShortnameRepository shortnameRepository;
     private final CloudFileService cloudFileService;
     private final CardRepository cardRepository;
+    private final CardTypeRepository cardTypeRepository;
 
     public Account signin(String username, String password) {
         Account account = accountRepository.findByUsername(username);
@@ -99,7 +100,7 @@ public class AuthService {
         if (accountRepository.findByUsername(account.getUsername()) != null) {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        card.setType(CardType.PERSON);
+        card.setType(cardTypeRepository.findByType(CardTypeEnum.PERSON));
         card.setCustom(false);
         cardService.create(card);
 

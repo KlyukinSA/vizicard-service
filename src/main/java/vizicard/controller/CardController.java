@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vizicard.dto.CardTypeDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
@@ -12,7 +13,8 @@ import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
 import vizicard.exception.CustomException;
 import vizicard.model.Card;
-import vizicard.model.CardType;
+import vizicard.model.CardTypeEnum;
+import vizicard.repository.CardTypeRepository;
 import vizicard.service.CardService;
 import vizicard.service.ProfileService;
 import vizicard.mapper.CardMapper;
@@ -34,6 +36,7 @@ public class CardController {
     private final ModelMapper modelMapper;
     private final ShortnameService shortnameService;
     private final ProfileProvider profileProvider;
+    private final CardTypeRepository cardTypeRepository;
 
     @GetMapping("{shortname}")
     public CardResponse searchByShortname(@PathVariable String shortname) {
@@ -62,12 +65,12 @@ public class CardController {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public CardResponse createMyCard(@RequestBody ProfileCreateDTO dto) {
-        if (dto.getType() != CardType.PERSON) {
+        if (dto.getType() != CardTypeEnum.PERSON) {
             throw new CustomException("create not person as relation card", HttpStatus.BAD_REQUEST);
         }
         Card card = new Card();
         card.setName(dto.getName());
-        card.setType(dto.getType());
+        card.setType(cardTypeRepository.findByType(dto.getType()));
         card.setCustom(false);
         cardService.createMyCard(card);
         profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
@@ -99,7 +102,16 @@ public class CardController {
     public IdAndTypeAndMainShortnameDTO getIdAndTypeAndMainShortnameOfCurrentCard() {
         Card card = cardService.whoami();
         return new IdAndTypeAndMainShortnameDTO(
-                card.getId(), card.getType(), shortnameService.getMainShortname(card));
+                card.getId(),
+                modelMapper.map(cardTypeRepository.findByType(card.getType().getType()), CardTypeDTO.class),
+                shortnameService.getMainShortname(card));
+    }
+
+    @GetMapping("types")
+    public List<CardTypeDTO> getAllTypes() {
+        return cardTypeRepository.findAll().stream()
+                .map(t -> modelMapper.map(t, CardTypeDTO.class))
+                .collect(Collectors.toList());
     }
 
 }

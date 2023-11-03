@@ -48,8 +48,8 @@ public class Card {
 	@Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
 	private final Date createAt = new Date();
 
-	@Column(columnDefinition = "ENUM('PERSON', 'COMPANY', 'COMMUNITY', 'GROUP')", nullable = false)
-	@Enumerated(EnumType.STRING)
+	@ManyToOne
+	@JoinColumn(nullable = false)
 	private CardType type;
 
 	@Column(nullable = false)

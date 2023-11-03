@@ -40,7 +40,7 @@ public class GroupService {
     }
 
      private void letGroupPass(Card card) {
-        if (card.getType() != CardType.GROUP) {
+        if (card.getType().getType() != CardTypeEnum.GROUP) {
             throw new CustomException("This profile should be a group", HttpStatus.FORBIDDEN);
         }
     }
@@ -54,7 +54,7 @@ public class GroupService {
             Card card = profileProvider.getTarget(memberId);
             Relation friendship = relationRepository.findByAccountOwnerAndCard(profileProvider.getUserFromAuth(), card);
             if (friendship != null) {
-                Relation membership = relationRepository.findByCardOwnerAndCardTypeAndType(card, CardType.GROUP, RelationType.MEMBER);
+                Relation membership = relationRepository.findByCardOwnerAndCardTypeTypeAndType(card, CardTypeEnum.GROUP, RelationType.MEMBER);
                 if (membership != null && membership.getCard().getId().equals(groupId)) {
                     membership.setStatus(true);
                 } else {
@@ -68,7 +68,7 @@ public class GroupService {
 
     public List<BriefCardResponse> getAllMyGroups() {
         Account user = profileProvider.getUserFromAuth();
-        return relationRepository.findAllByAccountOwnerAndCardTypeAndType(user, CardType.GROUP, RelationType.OWNER).stream()
+        return relationRepository.findAllByAccountOwnerAndCardTypeTypeAndType(user, CardTypeEnum.GROUP, RelationType.OWNER).stream()
                 .map(Relation::getCard)
                 .filter(Card::isStatus)
                 .map(cardMapper::mapToBrief)

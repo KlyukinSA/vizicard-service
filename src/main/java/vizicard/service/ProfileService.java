@@ -226,10 +226,10 @@ public class ProfileService {
   private boolean checkCanMerge(Card main, Card secondary) {
     if (!(main.isCustom() && secondary.isCustom())) {
       return false;
-    } else if (main.getType() == CardType.PERSON) {
-      return secondary.getType() == CardType.PERSON;
-    } else if (main.getType() == CardType.COMPANY) {
-      return secondary.getType() == CardType.COMPANY;
+    } else if (main.getType().getType() == CardTypeEnum.PERSON) {
+      return secondary.getType().getType() == CardTypeEnum.PERSON;
+    } else if (main.getType().getType() == CardTypeEnum.COMPANY) {
+      return secondary.getType().getType() == CardTypeEnum.COMPANY;
     } else {
       return false;
     }

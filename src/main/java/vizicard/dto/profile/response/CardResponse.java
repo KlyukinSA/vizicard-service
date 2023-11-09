@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Data;
 import vizicard.dto.BriefRelationResponseDTO;
+import vizicard.dto.TabTypeDTO;
 import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
@@ -28,4 +29,5 @@ public class CardResponse extends BriefCardResponse {
   private Integer albumId;
 
   private String cardName;
+  private List<TabTypeDTO> tabs;
 }

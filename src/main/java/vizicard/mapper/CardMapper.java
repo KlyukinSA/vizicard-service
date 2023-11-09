@@ -82,6 +82,22 @@ public class CardMapper {
         finishCompany(res, card, overlay);
         res.setAvatar(getAvatar(card, overlay));
         res.setLastVizit(getLastVizit(card));
+        res.setTabs(getTabs(card));
+        return res;
+    }
+
+    private List<TabTypeDTO> getTabs(Card card) {
+        List<TabTypeDTO> res = new ArrayList<>();
+        Account user = profileProvider.getUserFromAuth();
+        boolean isCurrent = user != null && user.getCurrentCard().getId().equals(card.getId());
+        if (isCurrent || !contactRepository.findAllByOwner(card).isEmpty()) {
+            res.add(new TabTypeDTO(TabType.CONTACTS, "Контакты", 1));
+        }
+        ProfileDetailStruct detailStruct = card.getDetailStruct();
+        if (isCurrent || detailStruct != null && detailStruct.getEducation().size() +
+                detailStruct.getExperience().size() + detailStruct.getSkills().size() > 0) {
+            res.add(new TabTypeDTO(TabType.RESUME, "Резюме", 2));
+        }
         return res;
     }
 

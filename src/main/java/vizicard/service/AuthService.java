@@ -13,6 +13,8 @@ import vizicard.repository.*;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -142,4 +144,7 @@ public class AuthService {
         accountRepository.save(account);
     }
 
+    public Optional<Card> getCurrentCardById(Integer id) {
+        return accountRepository.findById(id).map(Account::getCurrentCard);
+    }
 }

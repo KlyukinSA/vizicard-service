@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.request.SigninDTO;
 import vizicard.dto.profile.response.AuthResponseDTO;
 import vizicard.dto.profile.request.SignupDTO;
+import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.exception.CustomException;
+import vizicard.mapper.CardMapper;
 import vizicard.model.Account;
 import vizicard.model.Card;
 import vizicard.security.JwtTokenProvider;
@@ -23,6 +25,9 @@ import vizicard.service.ShortnameService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +38,7 @@ public class AuthController {
     private final ShortnameService shortnameService;
 
     private final ModelMapper modelMapper;
+    private final CardMapper cardMapper;
 
     @Value("${google-auth.client-id}")
     private String clientId;
@@ -85,4 +91,14 @@ public class AuthController {
         authService.deleteMe();
     }
 
+    @PostMapping("currents")
+    @PreAuthorize("isAuthenticated()")
+    public List<BriefCardResponse> getCurrentsByAccountIds(@RequestBody List<Integer> ids) {
+        return ids.stream()
+                .map(authService::getCurrentCardById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(cardMapper::mapToBrief)
+                .collect(Collectors.toList());
+    }
 }

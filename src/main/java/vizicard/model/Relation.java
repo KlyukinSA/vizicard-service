@@ -21,14 +21,14 @@ public class Relation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Account accountOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Card cardOwner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Card card;
 

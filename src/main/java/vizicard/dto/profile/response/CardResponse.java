@@ -26,4 +26,6 @@ public class CardResponse extends BriefCardResponse {
   private BriefRelationResponseDTO relation;
 
   private Integer albumId;
+
+  private String cardName;
 }

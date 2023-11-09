@@ -7,6 +7,6 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
-public class RelationBriefCardDTO extends BriefCardResponse {
+public class ParamCardResponse extends BriefCardResponse {
     private Map<String, Object> params;
 }

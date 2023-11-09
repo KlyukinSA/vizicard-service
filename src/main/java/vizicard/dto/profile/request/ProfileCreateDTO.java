@@ -11,4 +11,5 @@ public class ProfileCreateDTO extends CreateUpdateBase {
     private Integer companyId;
 
     private CardTypeEnum type;
+    private String cardName;
 }

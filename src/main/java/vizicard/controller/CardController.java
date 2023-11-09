@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CardTypeDTO;
-import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
+import vizicard.dto.profile.response.ParamCardResponse;
 import vizicard.exception.CustomException;
 import vizicard.model.Card;
 import vizicard.model.CardTypeEnum;
@@ -72,6 +72,7 @@ public class CardController {
         card.setName(dto.getName());
         card.setType(cardTypeRepository.findByType(dto.getType()));
         card.setCustom(false);
+        card.setCardName(dto.getCardName());
         cardService.createMyCard(card);
         profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
         return cardMapper.mapToResponse(card);
@@ -85,9 +86,9 @@ public class CardController {
 
     @GetMapping("my")
     @PreAuthorize("isAuthenticated()")
-    public List<BriefCardResponse> getAllMyCards() {
+    public List<ParamCardResponse> getAllMyCards() {
         return cardService.getAllMyCards().stream()
-                .map(cardMapper::mapToBrief)
+                .map(cardMapper::mapToParamResponse)
                 .collect(Collectors.toList());
     }
 

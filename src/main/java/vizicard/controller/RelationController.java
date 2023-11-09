@@ -11,7 +11,6 @@ import vizicard.dto.profile.request.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
-import vizicard.dto.profile.response.RelationBriefCardDTO;
 import vizicard.model.Card;
 import vizicard.model.CardTypeEnum;
 import vizicard.model.ContactEnum;
@@ -36,7 +35,6 @@ public class RelationController {
     private final ModelMapper modelMapper;
     private final ProfileService profileService;
     private final CardTypeRepository cardTypeRepository;
-    private final CompanyService companyService;
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
@@ -77,14 +75,7 @@ public class RelationController {
     }
 
     private RelationResponseDTO mapToResponse(Relation r) {
-        RelationBriefCardDTO dto = modelMapper.map(cardMapper.mapToBrief(r.getCard()), RelationBriefCardDTO.class);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("city", r.getCard().getCity());
-        if (r.getCard().getType().getType() == CardTypeEnum.PERSON) {
-            map.put("company", cardMapper.mapToBrief(companyService.getCompanyOf(r.getCard())));
-        }
-        dto.setParams(map);
-        return new RelationResponseDTO(dto, r.getCreateAt(), r.getType(), r.getAccountOwner().getId(), r.getCardOwner().getId());
+        return new RelationResponseDTO(cardMapper.mapToParamResponse(r.getCard()), r.getCreateAt(), r.getType(), r.getAccountOwner().getId(), r.getCardOwner().getId());
     }
 
     @PostMapping("card")
@@ -93,6 +84,7 @@ public class RelationController {
         Card card = new Card();
         card.setName(dto.getName());
         card.setType(cardTypeRepository.findByType(dto.getType()));
+        card.setCardName(dto.getCardName());
         relationService.createRelationCard(card);
         profileService.updateProfile(card, modelMapper.map(dto, ProfileUpdateDTO.class)); //
         return cardMapper.mapToResponse(card);

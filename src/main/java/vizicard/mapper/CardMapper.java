@@ -12,6 +12,7 @@ import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.response.CompanyResponse;
+import vizicard.dto.profile.response.ParamCardResponse;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
@@ -25,10 +26,7 @@ import vizicard.service.CompanyService;
 import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -192,4 +190,20 @@ public class CardMapper {
         return card.getAccount().getLastVizit();
     }
 
+    public ParamCardResponse mapToParamResponse(Card card) {
+        ParamCardResponse dto = modelMapper.map(mapToBrief(card), ParamCardResponse.class);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("city", card.getCity());
+        if (card.getType().getType() == CardTypeEnum.PERSON) {
+            Card company = companyService.getCompanyOf(card);
+            Object res = null;
+            if (company != null) {
+                res = mapToBrief(company);
+            }
+            map.put("company", res);
+        }
+        map.put("cardName", card.getCardName());
+        dto.setParams(map);
+        return dto;
+    }
 }

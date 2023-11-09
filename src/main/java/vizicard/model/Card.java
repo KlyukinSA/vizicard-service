@@ -64,6 +64,8 @@ public class Card {
 
 	private ProfileDetailStruct detailStruct;
 
+	private String cardName;
+
 	// SQL settings (OnDeleteAction.CASCADE)
 	@OneToMany(mappedBy = "card", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)

@@ -14,4 +14,6 @@ public class ContactRequest {
     private String contact;
     private String title;
     private Integer logoId;
+    private String description;
+    private boolean full;
 }

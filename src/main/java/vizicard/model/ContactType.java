@@ -36,4 +36,7 @@ public class ContactType {
     @JoinColumn(nullable = false)
     private ContactGroup group;
 
+    @Column(nullable = false)
+    private String urlBase;
+
 }

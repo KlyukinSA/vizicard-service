@@ -12,7 +12,6 @@ import vizicard.service.CloudFileService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -53,9 +52,17 @@ public class ContactMapper {
 		return new ContactResponse(
 				contact.getId(),
 				contact.getType().getType(),
-				contact.getContact(),
+				formContactUrl(contact),
 				contact.getTitle(),
 				contact.getOrder(),
 				cloudFileService.findById(logoId).getUrl());
+	}
+
+	private String formContactUrl(Contact contact) {
+		String s = contact.getContact();
+		if (s.contains(".")) {
+			return s;
+		}
+		return contact.getType().getUrlBase() + contact.getContact();
 	}
 }

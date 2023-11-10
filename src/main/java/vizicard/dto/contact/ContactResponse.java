@@ -14,7 +14,6 @@ public class ContactResponse {
     private ContactEnum type;
     private String contact;
     private String title;
-    private String description;
     private Integer order;
 
     private String logoUrl;

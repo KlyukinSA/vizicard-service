@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Data;
 import vizicard.dto.BriefRelationResponseDTO;
 import vizicard.dto.TabTypeDTO;
+import vizicard.dto.contact.ContactListResponse;
 import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
@@ -14,7 +15,7 @@ import vizicard.dto.profile.response.BriefCardResponse;
 public class CardResponse extends BriefCardResponse {
   private String description;
   private String city;
-  private List<ContactResponse> contacts;
+  private ContactListResponse contacts;
 
   private Date createAt;
 

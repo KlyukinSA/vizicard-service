@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
-import vizicard.dto.contact.ContactResponse;
+import vizicard.dto.contact.ContactListResponse;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
@@ -75,7 +75,7 @@ public class CardMapper {
             res.setId(id);
             res.setCreateAt(createAt);
         }
-        res.setContacts(getContactDTOs(card, overlay));
+        res.setContacts(getContacts(card, overlay));
         res.setResume(getResume(card, overlay));
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
@@ -147,7 +147,7 @@ public class CardMapper {
         return modelMapper.map(relation, BriefRelationResponseDTO.class);
     }
 
-    private List<ContactResponse> getContactDTOs(Card card, Optional<Card> overlay) {
+    private ContactListResponse getContacts(Card card, Optional<Card> overlay) {
         List<Contact> list = contactRepository.findAllByOwner(card);
         if (overlay.isPresent()) {
             List<Contact> list1 = contactRepository.findAllByOwner(overlay.get());
@@ -195,7 +195,7 @@ public class CardMapper {
             res.setId(id);
             res.setCreateAt(createAt);
         }
-        res.setContacts(getContactDTOs(company, overlay));
+        res.setContacts(getContacts(company, overlay));
         res.setMainShortname(shortnameService.getMainShortname(company));
         res.setAvatar(getAvatar(company, overlay));
         res.setLastVizit(getLastVizit(company));

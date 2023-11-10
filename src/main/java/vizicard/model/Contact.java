@@ -39,6 +39,13 @@ public class Contact {
     @Column(nullable = false)
     private boolean status = true;
 
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private CloudFile logo;
+
+    @Column(nullable = false)
+    private boolean full;
+
     @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Action> clicks;

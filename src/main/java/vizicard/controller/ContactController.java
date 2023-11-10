@@ -8,6 +8,7 @@ import vizicard.dto.contact.*;
 import vizicard.mapper.ContactMapper;
 import vizicard.model.Contact;
 import vizicard.model.ContactType;
+import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
 import vizicard.service.ContactService;
@@ -22,6 +23,7 @@ public class ContactController {
 
     private final ContactTypeRepository contactTypeRepository;
     private final ContactGroupRepository contactGroupRepository;
+    private final CloudFileRepository cloudFileRepository;
 
     private final ContactService contactService;
     private final ModelMapper modelMapper;
@@ -51,7 +53,7 @@ public class ContactController {
     @PreAuthorize("isAuthenticated()")
     public ContactResponse create(@RequestBody ContactCreateDTO dto) {
         ContactType contactType = contactTypeRepository.findByType(dto.getType());
-        Contact contact = modelMapper.map(dto, Contact.class);
+        Contact contact = getMapFromContactRequest(dto);
         contact.setType(contactType);
 
         contact = contactService.create(contact);
@@ -62,9 +64,19 @@ public class ContactController {
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public ContactResponse update(@RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
-        Contact contact = modelMapper.map(dto, Contact.class);
+        Contact contact = getMapFromContactRequest(dto);
         contact = contactService.update(contact, id);
         return contactMapper.mapToResponse(contact);
+    }
+
+    private Contact getMapFromContactRequest(ContactRequest dto) {
+        Integer logoId = dto.getLogoId();
+        dto.setLogoId(null);
+        Contact map = modelMapper.map(dto, Contact.class);
+        if (logoId != null && !logoId.equals(0)) {
+            cloudFileRepository.findById(logoId).ifPresent(map::setLogo);
+        }
+        return map;
     }
 
     @DeleteMapping("{id}")

@@ -13,4 +13,5 @@ import java.util.List;
 public class ContactRequest {
     private String contact;
     private String title;
+    private Integer logoId;
 }

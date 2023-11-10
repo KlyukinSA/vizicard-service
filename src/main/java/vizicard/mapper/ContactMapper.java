@@ -3,6 +3,7 @@ package vizicard.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import vizicard.dto.contact.ContactResponse;
+import vizicard.model.CloudFile;
 import vizicard.model.Contact;
 import vizicard.service.CloudFileService;
 
@@ -23,6 +24,13 @@ public class ContactMapper {
 	}
 
 	public ContactResponse mapToResponse(Contact contact) {
+		CloudFile logo = contact.getLogo();
+		Integer logoId;
+		if (logo != null) {
+			logoId = logo.getId();
+		} else {
+			logoId = contact.getType().getLogo().getId();
+		}
 		return new ContactResponse(
 				contact.getId(),
 				contact.getType().getType(),
@@ -30,7 +38,7 @@ public class ContactMapper {
 				contact.getTitle(),
 				contact.getDescription(),
 				contact.getOrder(),
-				cloudFileService.findById(contact.getType().getLogo().getId()).getUrl());
+				cloudFileService.findById(logoId).getUrl());
 	}
 
 }

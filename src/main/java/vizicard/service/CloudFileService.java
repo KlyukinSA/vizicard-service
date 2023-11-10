@@ -7,6 +7,7 @@ import vizicard.model.Album;
 import vizicard.model.CloudFile;
 import vizicard.repository.CloudFileRepository;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ public class CloudFileService {
 
     private final CloudFileRepository cloudFileRepository;
     private final S3Service s3Service;
+    private final EntityManager entityManager;
 
     public CloudFile saveFile(MultipartFile file, Album album) {
         String key = s3Service.uploadFile(file);
@@ -43,6 +45,7 @@ public class CloudFileService {
 
     private CloudFile finishUrl(CloudFile cloudFile) {
         cloudFile.setUrl(s3Service.getUrlFromKey(cloudFile.getUrl()));
+        entityManager.detach(cloudFile);
         return cloudFile;
     }
 

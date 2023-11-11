@@ -21,6 +21,7 @@ import vizicard.model.Card;
 import vizicard.security.JwtTokenProvider;
 import vizicard.service.AuthService;
 import vizicard.service.ShortnameService;
+import vizicard.utils.ProfileProvider;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -36,6 +37,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final ShortnameService shortnameService;
+    private final ProfileProvider profileProvider;
 
     private final ModelMapper modelMapper;
     private final CardMapper cardMapper;
@@ -93,7 +95,11 @@ public class AuthController {
 
     @PostMapping("currents")
     @PreAuthorize("isAuthenticated()")
-    public List<BriefCardResponse> getCurrentsByAccountIds(@RequestBody List<Integer> ids) {
+    public List<BriefCardResponse> getCurrentsByAccountIdsOrCurrent(@RequestBody List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.singletonList(cardMapper.mapToBrief(
+                    profileProvider.getUserFromAuth().getCurrentCard()));
+        }
         return ids.stream()
                 .map(authService::getCurrentCardById)
                 .filter(Optional::isPresent)

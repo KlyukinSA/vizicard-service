@@ -44,6 +44,7 @@ public class Card {
 //	private CloudFile avatar;
 
 	private Integer avatarId;
+	private Integer backgroundId;
 
 	@Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
 	private final Date createAt = new Date();

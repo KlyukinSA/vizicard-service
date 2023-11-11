@@ -120,6 +120,16 @@ public class ProfileService {
         }
       }
     }
+    if (dto.getBackgroundId() != null) {
+      if (dto.getBackgroundId().equals(0)) {
+        card.setBackgroundId(null);
+      } else {
+        Optional<CloudFile> cloudFile = cloudFileRepository.findById(dto.getBackgroundId());
+        if (cloudFile.isPresent() && cloudFile.get().isStatus()) {
+          card.setBackgroundId(cloudFile.get().getId());
+        }
+      }
+    }
 
     if (dto.getCompanyId() != null) {
       if (dto.getCompanyId().equals(0)) {

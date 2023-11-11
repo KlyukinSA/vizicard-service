@@ -8,12 +8,5 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class CompanyResponse extends BriefCardResponse {
-    private String description;
-    private String city;
-    private ContactListResponse contacts;
-
-    private Date createAt;
-    private Date lastVizit;
-    private Integer albumId;
+public class CompanyResponse extends BigCardResponse {
 }

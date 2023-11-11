@@ -6,8 +6,7 @@ import vizicard.model.CardTypeEnum;
 
 @Data
 @NoArgsConstructor
-public class ProfileCreateDTO extends CreateUpdateBase {
-    private Integer avatarId;
+public class ProfileCreateDTO extends PhotoCreateUpdateBase {
     private Integer companyId;
 
     private CardTypeEnum type;

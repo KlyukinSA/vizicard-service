@@ -5,9 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class WorkerCreateDTO extends CreateUpdateBase {
-    private Integer avatarId;
-
+public class WorkerCreateDTO extends PhotoCreateUpdateBase {
     private String username;
     private String password;
 }

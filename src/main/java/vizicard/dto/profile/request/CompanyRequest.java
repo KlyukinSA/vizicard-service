@@ -5,6 +5,5 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class CompanyRequest extends CreateUpdateBase {
-    private Integer avatarId;
+public class CompanyRequest extends PhotoCreateUpdateBase {
 }

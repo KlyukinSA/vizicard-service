@@ -66,7 +66,7 @@ public class CardMapper {
     }
 
     public CardResponse mapToResponse(Card card) {
-        CardResponse res = modelMapper.map(card, CardResponse.class); // TODO map except company and contacts and about
+        CardResponse res = modelMapper.map(card, CardResponse.class); // TODO combine with mapToCompanyResponse
         Optional<Card> overlay = findOverlay(card);
         if (overlay.isPresent()) {
             Integer id = res.getId();
@@ -81,9 +81,25 @@ public class CardMapper {
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card, overlay);
         res.setAvatar(getAvatar(card, overlay));
+        res.setBackground(getBackground(card, overlay));
         res.setLastVizit(getLastVizit(card));
         res.setTabs(getTabs(card));
         return res;
+    }
+
+    private CloudFileDTO getBackground(Card card, Optional<Card> overlay) {
+        return getCloudFileDTOByFileId(overlay.filter(c -> c.getBackgroundId() != null).orElse(card).getBackgroundId());
+    }
+
+    private CloudFileDTO getCloudFileDTOByFileId(Integer id) {
+        if (id != null) {
+            CloudFile cloudFile = cloudFileService.findById(id);
+            if (cloudFile == null || !cloudFile.isStatus()) {
+                return null;
+            }
+            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId());
+        }
+        return null;
     }
 
     private List<TabTypeDTO> getTabs(Card card) {
@@ -102,15 +118,7 @@ public class CardMapper {
     }
 
     private CloudFileDTO getAvatar(Card card, Optional<Card> overlay) {
-        Integer avatarId = overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId();
-        if (avatarId != null) {
-            CloudFile cloudFile = cloudFileService.findById(avatarId);
-            if (cloudFile == null || !cloudFile.isStatus()) {
-                return null;
-            }
-            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId());
-        }
-        return null;
+        return getCloudFileDTOByFileId(overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId());
     }
 
     private void finishCompany(CardResponse res, Card card, Optional<Card> overlay) {
@@ -128,6 +136,7 @@ public class CardMapper {
             dto.setName(company.getName());
             res.setCompany(dto);
         } else {
+            res.setCompany(mapToBrief(company));
             res.getCompany().setMainShortname(shortnameService.getMainShortname(company));
         }
     }
@@ -198,6 +207,7 @@ public class CardMapper {
         res.setContacts(getContacts(company, overlay));
         res.setMainShortname(shortnameService.getMainShortname(company));
         res.setAvatar(getAvatar(company, overlay));
+        res.setBackground(getBackground(company, overlay));
         res.setLastVizit(getLastVizit(company));
         return res;
     }

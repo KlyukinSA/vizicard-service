@@ -80,7 +80,7 @@ public class VizicardServiceApp implements CommandLineRunner {
     contactType.setWriting(contactEnum.toString().toLowerCase());
     contactType.setLogo(createLogoFor(contactType.getWriting(), album));
     contactType.setGroup(contactGroup);
-    contactType.setUrlBase("UrlBase/");
+    contactType.setUrlBase(contactEnum.name() + "UrlBase/");
     contactTypeRepository.save(contactType);
   }
 

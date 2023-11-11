@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
 import vizicard.model.Card;
 import vizicard.model.Contact;
+import vizicard.model.ContactEnum;
 import vizicard.repository.ContactRepository;
 import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
@@ -26,16 +27,26 @@ public class ContactService {
     private final ModelMapper modelMapper;
 
     public Contact create(Contact contact) {
-        contact.setOwner(profileProvider.getUserFromAuth().getCurrentCard());
-        contactRepository.save(contact);
-        contact.setOrder(contact.getId());
         if (contact.isFull() && contact.getDescription() == null) {
             throw new CustomException("cant create full contact without description", HttpStatus.BAD_REQUEST);
         }
+        stopInvalidContactUrl(contact);
+
+        contact.setOwner(profileProvider.getUserFromAuth().getCurrentCard());
+        contactRepository.save(contact);
+        contact.setOrder(contact.getId());
         return contactRepository.save(contact);
     }
 
+    private void stopInvalidContactUrl(Contact contact) {
+        if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL &&
+                contact.getContact().contains(".") && !contact.getContact().startsWith("http")) {
+            throw new CustomException("url should start with http", HttpStatus.BAD_REQUEST);
+        }
+    }
+
     public Contact update(Contact map, Integer id) {
+        stopInvalidContactUrl(map);
         Contact contact = contactRepository.findById(id).get();
         relationValidator.stopNotOwnerOf(contact.getOwner());
         modelMapper.map(map, contact);

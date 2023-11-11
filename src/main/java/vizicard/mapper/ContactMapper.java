@@ -8,6 +8,7 @@ import vizicard.dto.contact.ContactResponse;
 import vizicard.dto.contact.FullContactResponse;
 import vizicard.model.CloudFile;
 import vizicard.model.Contact;
+import vizicard.model.ContactEnum;
 import vizicard.service.CloudFileService;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ContactMapper {
 
 	private String formContactUrl(Contact contact) {
 		String s = contact.getContact();
-		if (s.contains(".")) {
+		if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL && s.contains(".")) {
 			return s;
 		}
 		return contact.getType().getUrlBase() + contact.getContact();

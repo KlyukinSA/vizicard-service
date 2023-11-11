@@ -34,10 +34,6 @@ public class Account {
 	private float cash = 0;
 	private float referralBonus = 0;
 
-	@Column(columnDefinition = "ENUM('USER', 'EMPLOYEE')", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private AccountType type;
-
 	@OneToOne
 	@JoinColumn(nullable = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
@@ -47,6 +43,10 @@ public class Account {
 	@JoinColumn(nullable = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Card mainCard;
+
+	@OneToOne
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Card employer;
 
 	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)

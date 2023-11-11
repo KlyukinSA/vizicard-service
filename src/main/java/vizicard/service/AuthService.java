@@ -107,9 +107,6 @@ public class AuthService {
         cardService.create(card);
 
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        if (account.getType() == null) {
-            account.setType(AccountType.USER);
-        }
 
         account.setCurrentCard(card);
         account.setMainCard(card);

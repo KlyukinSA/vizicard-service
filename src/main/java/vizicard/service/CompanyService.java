@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
 import vizicard.model.*;
+import vizicard.repository.AccountRepository;
 import vizicard.repository.CardTypeRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.ProfileProvider;
@@ -22,11 +23,12 @@ public class CompanyService {
     private final AuthService authService;
     private final CardService cardService;
     private final CardTypeRepository cardTypeRepository;
+    private final AccountRepository accountRepository;
 
     public Card createWorker(Account account, Card card) {
         Card company = getOfCurrentCard();
 
-        account.setType(AccountType.EMPLOYEE);
+        account.setEmployer(company);
         authService.signup(account, card, null, null);
 
         relationRepository.save(new Relation(account, card, company, RelationType.EMPLOYEE));
@@ -39,14 +41,15 @@ public class CompanyService {
         }
     }
 
-    public List<Card> getAllWorkers() {
-        return relationRepository.findAllByCardAndAccountOwnerType(
-                getOfCurrentCard(), AccountType.EMPLOYEE).stream()
-                .filter(Relation::isStatus)
-                .map(Relation::getAccountOwner)
+    public List<Card> getAllWorkers(Card company) {
+        return accountRepository.findAllByEmployer(company).stream()
                 .map(Account::getCurrentCard)
                 .filter(Card::isStatus)
                 .collect(Collectors.toList());
+    }
+
+    public List<Card> getAllWorkers() {
+        return getAllWorkers(getOfCurrentCard());
     }
 
     public Card prepareToCreateOrUpdate(Card company) {

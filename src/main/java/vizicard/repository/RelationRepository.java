@@ -13,8 +13,6 @@ public interface RelationRepository extends JpaRepository<Relation, Integer> {
 
     List<Relation> findAllByAccountOwnerAndCardTypeTypeAndType(Account owner, CardTypeEnum cardTypeEnum, RelationType relationType);
 
-    List<Relation> findAllByCardAndAccountOwnerType(Card card, AccountType accountType);
-
     List<Relation> findAllByTypeAndAccountOwner(RelationType relationType, Account owner);
 
     Relation findByCardOwnerAndCardTypeTypeAndType(Card card, CardTypeEnum cardTypeEnum, RelationType relationType);

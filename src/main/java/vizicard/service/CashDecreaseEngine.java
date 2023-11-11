@@ -34,12 +34,7 @@ public class CashDecreaseEngine {
         float res = 1;
         Card company = companyService.getCompanyOf(account.getMainCard());
         if (company != null && company.isStatus()) {
-            res += (float) (0.5 * company.getRelationsWhereCard().stream()
-                    .filter(Relation::isStatus)
-                    .map(Relation::getAccountOwner)
-                    .filter(Account::isStatus)
-                    .filter(owner -> owner.getType() == AccountType.EMPLOYEE)
-                    .count());
+            res += (float) (0.5 * companyService.getAllWorkers(company).size());
         }
         return res;
     }

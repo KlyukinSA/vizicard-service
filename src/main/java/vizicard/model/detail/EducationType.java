@@ -17,10 +17,6 @@ public class EducationType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition = "ENUM('PRIMARY', 'SECONDARY', 'HIGHER', 'VOCATIONAL')", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EducationLevel type;
-
     @Column(nullable = false)
     private String writing;
 
@@ -28,8 +24,7 @@ public class EducationType {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Education> educations;
 
-    public EducationType(EducationLevel type, String writing) {
-        this.type = type;
+    public EducationType(String writing) {
         this.writing = writing;
     }
 

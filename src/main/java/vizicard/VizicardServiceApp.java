@@ -1,14 +1,12 @@
 package vizicard;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import vizicard.model.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import vizicard.model.detail.EducationLevel;
 import vizicard.model.detail.EducationType;
 import vizicard.repository.*;
 import vizicard.repository.detail.EducationTypeRepository;
@@ -17,8 +15,8 @@ import vizicard.repository.detail.EducationTypeRepository;
 @EnableScheduling
 @RequiredArgsConstructor
 public class VizicardServiceApp implements CommandLineRunner {
-  @Value("${spring.profiles.active}")
-  private String activeProfile;
+//  @Value("${spring.profiles.active}")
+//  private String activeProfile;
 
   private final ContactTypeRepository contactTypeRepository;
   private final ContactGroupRepository contactGroupRepository;
@@ -33,13 +31,13 @@ public class VizicardServiceApp implements CommandLineRunner {
   }
 
   @Override
-  public void run(String... params) throws Exception {
+  public void run(String... params) {
     if (contactTypeRepository.findAll().size() < ContactEnum.class.getEnumConstants().length) {
       System.out.println("WHERE ARE CONTACT TYPES?");
       System.out.println("adding...");
       fillContactTypes();
     }
-    if (educationTypeRepository.findAll().size() < EducationLevel.class.getEnumConstants().length) {
+    if (educationTypeRepository.findAll().size() < 8) {
       System.out.println("WHERE ARE EDUCATION TYPES?");
       System.out.println("adding...");
       fillEducationTypes();
@@ -58,10 +56,14 @@ public class VizicardServiceApp implements CommandLineRunner {
   }
 
   private void fillEducationTypes() {
-    educationTypeRepository.save(new EducationType(EducationLevel.PRIMARY, "начальное"));
-    educationTypeRepository.save(new EducationType(EducationLevel.SECONDARY, "среднее"));
-    educationTypeRepository.save(new EducationType(EducationLevel.HIGHER, "высшее"));
-    educationTypeRepository.save(new EducationType(EducationLevel.VOCATIONAL, "профессиональное"));
+    educationTypeRepository.save(new EducationType("Среднее"));
+    educationTypeRepository.save(new EducationType("Среднее специальное"));
+    educationTypeRepository.save(new EducationType("Неоконченное высшее"));
+    educationTypeRepository.save(new EducationType("Высшее"));
+    educationTypeRepository.save(new EducationType("Бакалавр"));
+    educationTypeRepository.save(new EducationType("Магистр"));
+    educationTypeRepository.save(new EducationType("Кандидат наук"));
+    educationTypeRepository.save(new EducationType("Доктор наук"));
   }
 
   void fillContactTypes() {

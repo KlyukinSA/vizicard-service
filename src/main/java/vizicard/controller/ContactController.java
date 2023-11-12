@@ -11,6 +11,7 @@ import vizicard.model.ContactType;
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
+import vizicard.repository.CustomContactTypeRepository;
 import vizicard.service.ContactService;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class ContactController {
 
     private final ContactTypeRepository contactTypeRepository;
+    private final CustomContactTypeRepository customContactTypeRepository;
     private final ContactGroupRepository contactGroupRepository;
     private final CloudFileRepository cloudFileRepository;
 
@@ -32,6 +34,13 @@ public class ContactController {
     @GetMapping("types")
     public List<ContactTypeResponse> getAllTypes() {
         return contactTypeRepository.findAll().stream()
+                .map((val) -> modelMapper.map(val, ContactTypeResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("types/search")
+    public List<ContactTypeResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
+        return customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting).stream()
                 .map((val) -> modelMapper.map(val, ContactTypeResponse.class))
                 .collect(Collectors.toList());
     }

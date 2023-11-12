@@ -48,7 +48,7 @@ public class ContactController {
     @GetMapping("groups")
     public List<ContactGroupResponse> getAllGroups() {
         return contactGroupRepository.findAll().stream()
-                .map((val) -> modelMapper.map(val, ContactGroupResponse.class))
+                .map(contactMapper::mapToContactGroupResponse)
                 .collect(Collectors.toList());
     }
 

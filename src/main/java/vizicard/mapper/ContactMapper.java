@@ -3,18 +3,13 @@ package vizicard.mapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import vizicard.dto.contact.ContactListResponse;
-import vizicard.dto.contact.ContactResponse;
-import vizicard.dto.contact.ContactTypeResponse;
-import vizicard.dto.contact.FullContactResponse;
-import vizicard.model.CloudFile;
-import vizicard.model.Contact;
-import vizicard.model.ContactEnum;
-import vizicard.model.ContactType;
+import vizicard.dto.contact.*;
+import vizicard.model.*;
 import vizicard.service.CloudFileService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -72,6 +67,14 @@ public class ContactMapper {
 	public ContactTypeResponse mapToContactTypeResponse(ContactType contactType) {
 		ContactTypeResponse map = modelMapper.map(contactType, ContactTypeResponse.class);
 		map.setLogoUrl(cloudFileService.findById(contactType.getLogo().getId()).getUrl());
+		return map;
+	}
+
+	public ContactGroupResponse mapToContactGroupResponse(ContactGroup contactGroup) {
+		ContactGroupResponse map = modelMapper.map(contactGroup, ContactGroupResponse.class);
+		map.setContactTypes(contactGroup.getContactTypes().stream()
+				.map(this::mapToContactTypeResponse)
+				.collect(Collectors.toList()));
 		return map;
 	}
 }

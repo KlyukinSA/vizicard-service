@@ -34,14 +34,14 @@ public class ContactController {
     @GetMapping("types")
     public List<ContactTypeResponse> getAllTypes() {
         return contactTypeRepository.findAll().stream()
-                .map((val) -> modelMapper.map(val, ContactTypeResponse.class))
+                .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("types/search")
     public List<ContactTypeResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
         return customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting).stream()
-                .map((val) -> modelMapper.map(val, ContactTypeResponse.class))
+                .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
     }
 

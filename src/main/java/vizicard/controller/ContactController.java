@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.contact.*;
 import vizicard.mapper.ContactMapper;
 import vizicard.model.Contact;
+import vizicard.model.ContactGroup;
 import vizicard.model.ContactType;
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactGroupRepository;
@@ -39,8 +40,18 @@ public class ContactController {
     }
 
     @GetMapping("types/search")
-    public List<ContactTypeResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
-        return customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting).stream()
+    public List<ContactGroupResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
+        List<ContactType> types = customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting);
+        List<ContactGroup> groups = contactGroupRepository.findAll();
+        List<ContactGroupResponse> res = groups.stream()
+                .map(g -> new ContactGroupResponse(g.getType(), g.getWriting(), getTypeResponsesByGroup(g, types)))
+                .collect(Collectors.toList());
+        return res;
+    }
+
+    private List<ContactTypeResponse> getTypeResponsesByGroup(ContactGroup group, List<ContactType> types) {
+        return types.stream()
+                .filter(t -> t.getGroup().getId().equals(group.getId()))
                 .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
     }

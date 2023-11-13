@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.model.Album;
 import vizicard.model.CloudFile;
+import vizicard.model.CloudFileType;
 import vizicard.repository.CloudFileRepository;
 
 import javax.persistence.EntityManager;
@@ -19,22 +20,22 @@ public class CloudFileService {
     private final S3Service s3Service;
     private final EntityManager entityManager;
 
-    public CloudFile saveFile(MultipartFile file, Album album) {
+    public CloudFile saveFile(MultipartFile file, Album album, CloudFileType type, String extension) {
         String key = s3Service.uploadFile(file);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album)));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, extension)));
     }
 
-    public CloudFile saveExternal(String url, Album album) {
+    public CloudFile saveExternal(String url, Album album, CloudFileType type) {
         String key = s3Service.uploadExternal(url);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album)));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, url.substring(url.lastIndexOf(".") + 1))));
     }
 
     public CloudFile findById(Integer id) {
         return finishUrl(cloudFileRepository.findById(id).get());
     }
 
-    public List<CloudFile> findAllByAlbum(Album album) {
-        return cloudFileRepository.findAllByAlbum(album).stream()
+    public List<CloudFile> findAllByAlbumAndType(Album album, CloudFileType type) {
+        return cloudFileRepository.findAllByAlbumAndType(album, type).stream()
                 .map(this::finishUrl)
                 .collect(Collectors.toList());
     }
@@ -49,4 +50,10 @@ public class CloudFileService {
         return cloudFile;
     }
 
+    public CloudFile updateDescription(Integer id, String description) {
+        CloudFile cloudFile = cloudFileRepository.findById(id).get();
+        cloudFile.setDescription(description);
+        cloudFileRepository.save(cloudFile);
+        return finishUrl(cloudFile);
+    }
 }

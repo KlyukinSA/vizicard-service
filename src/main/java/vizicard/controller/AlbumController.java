@@ -1,16 +1,16 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.dto.CloudFileDTO;
+import vizicard.model.CloudFile;
+import vizicard.model.CloudFileType;
 import vizicard.service.AlbumService;
-import vizicard.service.ContactService;
+import vizicard.service.CloudFileService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,17 +21,32 @@ public class AlbumController {
 
     private final AlbumService albumService;
     private final ModelMapper modelMapper;
+    private final CloudFileService cloudFileService;
 
     @PostMapping("{id}/files")
     @PreAuthorize("isAuthenticated()")
-    CloudFileDTO addFile(@RequestPart MultipartFile file, @PathVariable Integer id) throws IOException {
-        return modelMapper.map(albumService.addFile(file, id), CloudFileDTO.class);
+    CloudFileDTO addUsualFile(@RequestPart MultipartFile file, @PathVariable Integer id) {
+        return modelMapper.map(albumService.addFile(file, id, CloudFileType.FILE), CloudFileDTO.class);
+    }
+
+    @PostMapping("{id}/files/media")
+    @PreAuthorize("isAuthenticated()")
+    CloudFileDTO addMedia(@RequestPart MultipartFile file, @PathVariable Integer id) {
+        return modelMapper.map(albumService.addFile(file, id, CloudFileType.MEDIA), CloudFileDTO.class);
     }
 
     @GetMapping("{id}/files")
     @PreAuthorize("isAuthenticated()")
-    List<CloudFileDTO> getAllFiles(@PathVariable Integer id) {
-        return albumService.getAllFiles(id).stream()
+    List<CloudFileDTO> getAllUsualFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(id, CloudFileType.FILE).stream()
+                .map((val) -> modelMapper.map(val, CloudFileDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("{id}/files/media")
+    @PreAuthorize("isAuthenticated()")
+    List<CloudFileDTO> getAllMediaFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(id, CloudFileType.MEDIA).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
     }
@@ -42,4 +57,9 @@ public class AlbumController {
         albumService.deleteFile(id);
     }
 
+    @PutMapping("any/files/{id}/description")
+    public CloudFileDTO updateDescription(@PathVariable Integer id, @RequestParam String description) {
+        CloudFile cloudFile = cloudFileService.updateDescription(id, description);
+        return modelMapper.map(cloudFile, CloudFileDTO.class);
+    }
 }

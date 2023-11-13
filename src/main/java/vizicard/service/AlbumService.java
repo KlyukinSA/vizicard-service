@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.model.Album;
 import vizicard.model.CloudFile;
+import vizicard.model.CloudFileType;
 import vizicard.repository.AlbumRepository;
 import vizicard.utils.RelationValidator;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,15 +20,17 @@ public class AlbumService {
     private final CloudFileService cloudFileService;
     private final RelationValidator relationValidator;
 
-    public CloudFile addFile(MultipartFile file, Integer id) throws IOException {
+    public CloudFile addFile(MultipartFile file, Integer id, CloudFileType type) {
         Album album = albumRepository.findById(id).get();
         relationValidator.stopNotOwnerOf(album.getOwner());
-        return cloudFileService.saveFile(file, album);
+        String filename = file.getOriginalFilename();
+        String extension = filename.substring(filename.lastIndexOf(".") + 1);
+        return cloudFileService.saveFile(file, album, type, extension);
     }
 
-    public List<CloudFile> getAllFiles(Integer id) {
+    public List<CloudFile> getAllFiles(Integer id, CloudFileType type) {
         Album album = albumRepository.findById(id).get();
-        return cloudFileService.findAllByAlbum(album).stream()
+        return cloudFileService.findAllByAlbumAndType(album, type).stream()
                 .filter(CloudFile::isStatus)
                 .collect(Collectors.toList());
     }
@@ -39,5 +41,4 @@ public class AlbumService {
         file.setStatus(false);
         cloudFileService.save(file);
     }
-
 }

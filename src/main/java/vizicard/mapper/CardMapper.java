@@ -97,7 +97,7 @@ public class CardMapper {
             if (cloudFile == null || !cloudFile.isStatus()) {
                 return null;
             }
-            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId());
+            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId(), cloudFile.getDescription());
         }
         return null;
     }

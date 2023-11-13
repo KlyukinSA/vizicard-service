@@ -92,7 +92,7 @@ public class AuthService {
 
         signup(account, card, shortname, referrerId);
 
-        CloudFile picture = cloudFileService.saveExternal((String) payload.get("picture"), card.getAlbum());
+        CloudFile picture = cloudFileService.saveExternal((String) payload.get("picture"), card.getAlbum(), CloudFileType.MEDIA);
         card.setAvatarId(picture.getId());
         cardRepository.save(card);
         return account;

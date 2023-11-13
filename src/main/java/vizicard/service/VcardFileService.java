@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import vizicard.model.CloudFile;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Card;
@@ -96,9 +97,10 @@ public class VcardFileService { // TODO mapper instead of service, include getVc
         }
 
         if (card.getAvatarId() != null) {
-            String url = cloudFileService.findById(card.getAvatarId()).getUrl();
+            CloudFile file = cloudFileService.findById(card.getAvatarId());
+            String url = file.getUrl();
             InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
-            Photo photo = new Photo(inputStream, ImageType.JPEG);
+            Photo photo = new Photo(inputStream, file.getExtension().equals("png") ? ImageType.PNG : ImageType.JPEG);
             vcard.addPhoto(photo); // TODO image types
         }
 

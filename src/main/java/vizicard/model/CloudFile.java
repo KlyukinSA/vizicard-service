@@ -1,12 +1,12 @@
 package vizicard.model;
 
-import com.amazonaws.services.appflow.model.PrefixFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Table(name = "cloud") // wtf
 @Data
 @NoArgsConstructor
 public class CloudFile {
@@ -25,9 +25,20 @@ public class CloudFile {
     @Column(nullable = false)
     private boolean status = true;
 
-    public CloudFile(String url, Album album) {
+    @Column(columnDefinition = "ENUM('MEDIA', 'FILE')", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CloudFileType type;
+
+    private String extension;
+
+    @Column(length = 200)
+    private String description;
+
+    public CloudFile(String url, Album album, CloudFileType type, String extension) {
         this.url = url;
         this.album = album;
+        this.type = type;
+        this.extension = extension;
     }
 
 }

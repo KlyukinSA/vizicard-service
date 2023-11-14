@@ -29,12 +29,13 @@ public class CloudFile {
     @Enumerated(EnumType.STRING)
     private CloudFileType type;
 
-    private String extension;
+    @ManyToOne
+    private Extension extension;
 
     @Column(length = 200)
     private String description;
 
-    public CloudFile(String url, Album album, CloudFileType type, String extension) {
+    public CloudFile(String url, Album album, CloudFileType type, Extension extension) {
         this.url = url;
         this.album = album;
         this.type = type;

@@ -25,6 +25,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private final CloudFileRepository cloudFileRepository;
   private final AlbumRepository albumRepository;
   private final CardTypeRepository cardTypeRepository;
+  private final ExtensionRepository extensionRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
@@ -32,6 +33,11 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   @Override
   public void run(String... params) {
+    if (extensionRepository.findAll().size() < 20) {
+      System.out.println("WHERE are EXTENSIONS?");
+      System.out.println("adding...");
+      fillExtentions();
+    }
     if (contactTypeRepository.findAll().size() < ContactEnum.class.getEnumConstants().length) {
       System.out.println("WHERE ARE CONTACT TYPES?");
       System.out.println("adding...");
@@ -46,6 +52,15 @@ public class VizicardServiceApp implements CommandLineRunner {
       System.out.println("WHERE ARE CARD TYPES?");
       System.out.println("adding...");
       fillCardTypes();
+    }
+  }
+
+  private void fillExtentions() {
+    String src = "EPS - E4C62D, JPG - D03132, PNG - A166AA, IND - C13E7A, FLA - D03034, MP3 - 176AA9, MOV - 156BA9, HTML - 8DC27A, PHP - E1B221, CSS - DC7F1C, GIF - D82F2F, DOC - 104F7A, DOCX - 104F7A, PDF - D03034, PPT - DC7F1C, XLS - 0D683E, XLSX - 0D683E, CSV - 0D683E, ZIP - E1B31F, OTHER - 536471";
+    String[] pairs = src.split(",");
+    for (String pair : pairs) {
+      String[] els = pair.split("-");
+      extensionRepository.save(new Extension(els[0].trim(), els[1].trim()));
     }
   }
 
@@ -89,7 +104,8 @@ public class VizicardServiceApp implements CommandLineRunner {
   private CloudFile createLogoFor(String writing, Album album) {
     String usedLogoExtension = "svg";
     String keyName = "img_" + writing + "." + usedLogoExtension;
-    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA, usedLogoExtension));
+    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA,
+            extensionRepository.findByName(usedLogoExtension.toUpperCase())));
   }
 
 }

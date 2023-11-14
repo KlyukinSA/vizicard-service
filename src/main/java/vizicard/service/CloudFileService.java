@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import vizicard.model.Album;
 import vizicard.model.CloudFile;
 import vizicard.model.CloudFileType;
+import vizicard.model.Extension;
 import vizicard.repository.CloudFileRepository;
+import vizicard.repository.ExtensionRepository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -19,15 +21,21 @@ public class CloudFileService {
     private final CloudFileRepository cloudFileRepository;
     private final S3Service s3Service;
     private final EntityManager entityManager;
+    private final ExtensionRepository extensionRepository;
 
     public CloudFile saveFile(MultipartFile file, Album album, CloudFileType type, String extension) {
         String key = s3Service.uploadFile(file);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, extension)));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(extension))));
     }
 
     public CloudFile saveExternal(String url, Album album, CloudFileType type) {
         String key = s3Service.uploadExternal(url);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, url.substring(url.lastIndexOf(".") + 1))));
+        String ext = url.substring(url.lastIndexOf(".") + 1);
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(ext))));
+    }
+
+    private Extension getExtensionByName(String name) {
+        return extensionRepository.findByName(name.toUpperCase());
     }
 
     public CloudFile findById(Integer id) {

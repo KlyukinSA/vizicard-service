@@ -100,7 +100,7 @@ public class VcardFileService { // TODO mapper instead of service, include getVc
             CloudFile file = cloudFileService.findById(card.getAvatarId());
             String url = file.getUrl();
             InputStream inputStream = new BufferedInputStream(new URL(url).openStream());
-            Photo photo = new Photo(inputStream, file.getExtension().equals("png") ? ImageType.PNG : ImageType.JPEG);
+            Photo photo = new Photo(inputStream, file.getExtension().getName().equalsIgnoreCase("png") ? ImageType.PNG : ImageType.JPEG);
             vcard.addPhoto(photo); // TODO image types
         }
 

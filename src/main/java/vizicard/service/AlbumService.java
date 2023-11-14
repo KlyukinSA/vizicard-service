@@ -1,8 +1,10 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vizicard.exception.CustomException;
 import vizicard.model.Album;
 import vizicard.model.CloudFile;
 import vizicard.model.CloudFileType;
@@ -25,6 +27,11 @@ public class AlbumService {
         relationValidator.stopNotOwnerOf(album.getOwner());
         String filename = file.getOriginalFilename();
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
+        if (type == CloudFileType.MEDIA
+                && !(extension.equalsIgnoreCase("jpg")
+                || extension.equalsIgnoreCase("png"))) {
+            throw new CustomException("can add only jpg and png in media", HttpStatus.FORBIDDEN);
+        }
         return cloudFileService.saveFile(file, album, type, extension);
     }
 

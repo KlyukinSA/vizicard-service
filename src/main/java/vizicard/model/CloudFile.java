@@ -35,11 +35,15 @@ public class CloudFile {
     @Column(length = 200)
     private String description;
 
-    public CloudFile(String url, Album album, CloudFileType type, Extension extension) {
+    @Column(nullable = false)
+    private long size;
+
+    public CloudFile(String url, Album album, CloudFileType type, Extension extension, long size) {
         this.url = url;
         this.album = album;
         this.type = type;
         this.extension = extension;
+        this.size = size;
     }
 
 }

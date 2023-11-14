@@ -25,13 +25,13 @@ public class CloudFileService {
 
     public CloudFile saveFile(MultipartFile file, Album album, CloudFileType type, String extension) {
         String key = s3Service.uploadFile(file);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(extension))));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(extension), file.getSize())));
     }
 
     public CloudFile saveExternal(String url, Album album, CloudFileType type) {
         String key = s3Service.uploadExternal(url);
         String ext = url.substring(url.lastIndexOf(".") + 1);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(ext))));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, getExtensionByName(ext), 0)));
     }
 
     private Extension getExtensionByName(String name) {

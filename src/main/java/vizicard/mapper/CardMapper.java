@@ -110,11 +110,15 @@ public class CardMapper {
             res.add(new TabTypeDTO(TabType.CONTACTS, "Контакты", 1));
         }
         ProfileDetailStruct detailStruct = card.getDetailStruct();
-        if (isCurrent || detailStruct != null && detailStruct.getEducation().size() +
-                detailStruct.getExperience().size() + detailStruct.getSkills().size() > 0) {
+        if (isCurrent || isResumeNotEmpty(detailStruct)) {
             res.add(new TabTypeDTO(TabType.RESUME, "Резюме", 2));
         }
         return res;
+    }
+
+    private static boolean isResumeNotEmpty(ProfileDetailStruct detailStruct) {
+        return detailStruct != null && detailStruct.getEducation().size() +
+                detailStruct.getExperience().size() + detailStruct.getSkills().size() > 0;
     }
 
     private CloudFileDTO getAvatar(Card card, Optional<Card> overlay) {
@@ -164,6 +168,9 @@ public class CardMapper {
                 list = list1;
             }
         }
+        if (list.isEmpty()) {
+            return null;
+        }
         return contactMapper.mapList(list);
     }
 
@@ -175,7 +182,7 @@ public class CardMapper {
                 detailStruct = detailStruct1;
             }
         }
-        if (detailStruct == null) {
+        if (!isResumeNotEmpty(detailStruct)) {
             return null;
         }
         return new ProfileDetailStructResponseDTO(

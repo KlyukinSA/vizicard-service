@@ -26,6 +26,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private final AlbumRepository albumRepository;
   private final CardTypeRepository cardTypeRepository;
   private final ExtensionRepository extensionRepository;
+  private final TabTypeRepository tabTypeRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
@@ -53,6 +54,18 @@ public class VizicardServiceApp implements CommandLineRunner {
       System.out.println("adding...");
       fillCardTypes();
     }
+    if (tabTypeRepository.findAll().size() < TabTypeEnum.values().length) {
+      System.out.println("WHERE ARE TAB TYPES?");
+      System.out.println("adding...");
+      fillTabTypes();
+    }
+  }
+
+  private void fillTabTypes() {
+    tabTypeRepository.save(new TabType(TabTypeEnum.CONTACTS, "Контакты"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.RESUME, "Резюме"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.MEDIA, "Медиа"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.FILE, "Файлы"));
   }
 
   private void fillExtentions() {

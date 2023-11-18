@@ -96,4 +96,9 @@ public class Card {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Shortname> shortnamesWhereCard;
+
+	@OneToMany(mappedBy = "cardOwner", cascade = CascadeType.ALL)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<Tab> tabs;
+
 }

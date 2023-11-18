@@ -13,6 +13,7 @@ import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.response.CompanyResponse;
 import vizicard.dto.profile.response.ParamCardResponse;
+import vizicard.dto.tab.TabResponseDTO;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
@@ -20,10 +21,9 @@ import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
-import vizicard.service.CashService;
-import vizicard.service.CloudFileService;
-import vizicard.service.CompanyService;
-import vizicard.service.ShortnameService;
+import vizicard.repository.TabRepository;
+import vizicard.repository.TabTypeRepository;
+import vizicard.service.*;
 import vizicard.utils.ProfileProvider;
 
 import java.util.*;
@@ -43,6 +43,10 @@ public class CardMapper {
     private final ProfileProvider profileProvider;
     private final CashService cashService;
     private final CompanyService companyService;
+
+    private final TabRepository tabRepository; // TODO TabMapper
+    private final TabTypeRepository tabTypeRepository;
+    private final AlbumService albumService;
 
     public BriefCardResponse mapToBrief(Card card) {
         BriefCardResponse res = modelMapper.map(card, BriefCardResponse.class);
@@ -66,7 +70,10 @@ public class CardMapper {
     }
 
     public CardResponse mapToResponse(Card card) {
+        List<Tab> tabs = card.getTabs();
+        card.setTabs(null);
         CardResponse res = modelMapper.map(card, CardResponse.class); // TODO combine with mapToCompanyResponse
+        card.setTabs(tabs);
         Optional<Card> overlay = findOverlay(card);
         if (overlay.isPresent()) {
             Integer id = res.getId();
@@ -102,18 +109,39 @@ public class CardMapper {
         return null;
     }
 
-    private List<TabTypeDTO> getTabs(Card card) {
-        List<TabTypeDTO> res = new ArrayList<>();
+    private List<TabResponseDTO> getTabs(Card card) {
+        List<TabResponseDTO> res = new ArrayList<>();
+        List<Tab> tabs = tabRepository.findAllByCardOwner(card);
+        HashSet<TabTypeEnum> usedTypes = new HashSet<>();
         Account user = profileProvider.getUserFromAuth();
-        boolean isCurrent = user != null && user.getCurrentCard().getId().equals(card.getId());
-        if (isCurrent || !contactRepository.findAllByOwner(card).isEmpty()) {
-            res.add(new TabTypeDTO(TabType.CONTACTS, "Контакты", 1));
+        boolean isCurrentCard = user != null && user.getCurrentCard().getId().equals(card.getId());
+        for (Tab tab : tabs) {
+            if (isCurrentCard || !tab.isHidden()) {
+                res.add(new TabResponseDTO(tab.getType().getWriting(), tab.getOrder()));
+                usedTypes.add(tab.getType().getType());
+            }
         }
+        int i = tabs.stream().mapToInt(Tab::getOrder).max().orElse(0);
+        finishTabType(usedTypes, TabTypeEnum.CONTACTS, isCurrentCard, !contactRepository.findAllByOwner(card).isEmpty(), res, i);
+        i++;
+
         ProfileDetailStruct detailStruct = card.getDetailStruct();
-        if (isCurrent || isResumeNotEmpty(detailStruct)) {
-            res.add(new TabTypeDTO(TabType.RESUME, "Резюме", 2));
-        }
+        finishTabType(usedTypes, TabTypeEnum.RESUME, isCurrentCard, isResumeNotEmpty(detailStruct), res, i);
+        i++;
+
+        Integer albumId = card.getAlbum().getId();
+        List<CloudFile> allFiles = albumService.getAllFiles(albumId, CloudFileType.FILE);
+        finishTabType(usedTypes, TabTypeEnum.FILE, isCurrentCard, !allFiles.isEmpty(), res, i);
+        i++;
+        List<CloudFile> allMedia = albumService.getAllFiles(albumId, CloudFileType.MEDIA);
+        finishTabType(usedTypes, TabTypeEnum.MEDIA, isCurrentCard, !allMedia.isEmpty(), res, i);
         return res;
+    }
+
+    private void finishTabType(HashSet<TabTypeEnum> usedTypes, TabTypeEnum type, boolean isCurrentCard, boolean cardHasOfThisType, List<TabResponseDTO> res, int i) {
+        if (!usedTypes.contains(type) && (isCurrentCard || cardHasOfThisType)) {
+            res.add(new TabResponseDTO(tabTypeRepository.findByType(type).getWriting(), i));
+        }
     }
 
     private static boolean isResumeNotEmpty(ProfileDetailStruct detailStruct) {

@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "order"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"card_owner_id", "order"}))
 public class Contact {
 
     @Id
@@ -20,7 +20,7 @@ public class Contact {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Card owner;
+    private Card cardOwner;
 
     @ManyToOne
     @JoinColumn(nullable = false)

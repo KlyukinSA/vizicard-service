@@ -171,10 +171,10 @@ public class ProfileService {
     for (ContactInListRequest dto : contacts) {
       order++;
       ContactType contactType = contactTypeRepository.findByType(dto.getType());
-      Contact contact = contactRepository.findByOwnerAndOrder(card, order);
+      Contact contact = contactRepository.findByCardOwnerAndOrder(card, order);
       if (contact == null) {
         contact = new Contact();
-        contact.setOwner(card);
+        contact.setCardOwner(card);
         contact.setOrder(order);
       } else {
         contact.setStatus(true);
@@ -222,7 +222,7 @@ public class ProfileService {
       if (!mainContactTypes.contains(contact.getType().getType())) {
         order++;
         contact.setOrder(order);
-        contact.setOwner(main);
+        contact.setCardOwner(main);
         mainContacts.add(contact);
       }
     }

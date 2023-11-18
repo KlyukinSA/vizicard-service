@@ -33,7 +33,7 @@ public class Card {
 	private String description;
 	@Column(length = 50)
 	private String city;
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "cardOwner", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Contact> contacts = new ArrayList<>();

@@ -7,7 +7,7 @@ import vizicard.model.detail.Skill;
 import java.util.List;
 
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
-	List<Skill> findAllByOwner(Card card);
+	List<Skill> findAllByCardOwner(Card card);
 
-	Skill findBySkillAndOwner(String s, Card owner);
+	Skill findBySkillAndCardOwner(String s, Card owner);
 }

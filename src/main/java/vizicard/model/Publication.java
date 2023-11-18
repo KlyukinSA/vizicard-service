@@ -17,7 +17,7 @@ public class Publication {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private Account owner;
+    private Account accountOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;
@@ -35,8 +35,8 @@ public class Publication {
     @Column(columnDefinition = "TIMESTAMP(0) DEFAULT NOW()", nullable = false)
     private final Date createAt = new Date();
 
-    public Publication(Account owner) {
-        this.owner = owner;
+    public Publication(Account accountOwner) {
+        this.accountOwner = accountOwner;
     }
 
 }

@@ -39,7 +39,7 @@ public class EducationService {
     public EducationResponseDTO updateEducation(EducationDTO dto, Integer id) {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Education education = educationRepository.findById(id).get();
-        if (Objects.equals(education.getOwner().getId(), user.getId())) {
+        if (Objects.equals(education.getCardOwner().getId(), user.getId())) {
             education.setType(educationTypeRepository.findById(dto.getTypeId()).get());
             dto.setTypeId(null);
             modelMapper.map(dto, education);
@@ -51,7 +51,7 @@ public class EducationService {
     public void deleteEducation(Integer id) {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Education education = educationRepository.findById(id).get();
-        if (Objects.equals(education.getOwner().getId(), user.getId())) {
+        if (Objects.equals(education.getCardOwner().getId(), user.getId())) {
             education.setStatus(false);
             educationRepository.save(education);
         }

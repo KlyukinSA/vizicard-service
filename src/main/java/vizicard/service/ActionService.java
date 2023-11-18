@@ -55,11 +55,11 @@ public class ActionService {
     private boolean isUniqueIn(Account owner, String ip, List<Action> visits) {
         for (Action visit : visits) {
             if (owner == null) {
-                if (visit.getOwner() == null && visit.getIp().equals(ip)) {
+                if (visit.getAccountOwner() == null && visit.getIp().equals(ip)) {
                     return false;
                 }
-            } else if (visit.getOwner() != null) {
-                if (visit.getOwner().getId().equals(owner.getId())) {
+            } else if (visit.getAccountOwner() != null) {
+                if (visit.getAccountOwner().getId().equals(owner.getId())) {
                     return false;
                 }
             }
@@ -73,7 +73,7 @@ public class ActionService {
 
     public void addClickAction(Integer resourceId) {
         Contact resource = contactRepository.findById(resourceId).get();
-        Card target = resource.getOwner();
+        Card target = resource.getCardOwner();
         Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK, getIp());
         click.setResource(resource);
         actionRepository.save(click);
@@ -130,8 +130,8 @@ public class ActionService {
 
             response.setVizits(response.getVizits() + 1);
 
-            if (!visitorSets.get(pos).contains(visit.getOwner().getId())) {
-                visitorSets.get(pos).add(visit.getOwner().getId());
+            if (!visitorSets.get(pos).contains(visit.getAccountOwner().getId())) {
+                visitorSets.get(pos).add(visit.getAccountOwner().getId());
 
                 response.setCoverage(response.getCoverage() + 1);
             }
@@ -157,10 +157,10 @@ public class ActionService {
         Set<Integer> ownerIds = new HashSet<>();
         Set<String> ips = new HashSet<>();
         for (Action visit : visits) {
-            if (visit.getOwner() != null) {
-                if (!ownerIds.contains(visit.getOwner().getId())) {
+            if (visit.getAccountOwner() != null) {
+                if (!ownerIds.contains(visit.getAccountOwner().getId())) {
                     res++;
-                    ownerIds.add(visit.getOwner().getId());
+                    ownerIds.add(visit.getAccountOwner().getId());
                 }
             } else {
                 if (!ips.contains(visit.getIp())) {
@@ -173,7 +173,7 @@ public class ActionService {
     }
 
     public List<Action> getProfilesIVisitedHistory() {
-        return actionRepository.findAllByOwnerAndTypeOrderByCreateAtDesc(profileProvider.getUserFromAuth(), ActionType.VIZIT);
+        return actionRepository.findAllByAccountOwnerAndTypeOrderByCreateAtDesc(profileProvider.getUserFromAuth(), ActionType.VIZIT);
     }
 
 }

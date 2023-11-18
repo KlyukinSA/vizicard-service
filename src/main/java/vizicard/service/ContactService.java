@@ -32,7 +32,7 @@ public class ContactService {
         }
         stopInvalidContactUrl(contact);
 
-        contact.setOwner(profileProvider.getUserFromAuth().getCurrentCard());
+        contact.setCardOwner(profileProvider.getUserFromAuth().getCurrentCard());
         contactRepository.save(contact);
         contact.setOrder(contact.getId());
         return contactRepository.save(contact);
@@ -48,14 +48,14 @@ public class ContactService {
     public Contact update(Contact map, Integer id) {
         stopInvalidContactUrl(map);
         Contact contact = contactRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(contact.getOwner());
+        relationValidator.stopNotOwnerOf(contact.getCardOwner());
         modelMapper.map(map, contact);
         return contactRepository.save(contact);
     }
 
     public void delete(Integer id) {
         Contact contact = contactRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(contact.getOwner());
+        relationValidator.stopNotOwnerOf(contact.getCardOwner());
         contact.setStatus(false);
         contactRepository.save(contact);
     }
@@ -70,10 +70,10 @@ public class ContactService {
         Card owner = profileProvider.getUserFromAuth().getCurrentCard();
         for (int i = 0; i < ids.size(); i++) {
             Contact contact = contactRepository.findById(ids.get(i)).get();
-            relationValidator.stopNotOwnerOf(contact.getOwner());
+            relationValidator.stopNotOwnerOf(contact.getCardOwner());
             Integer order = orders.get(i);
             if (!Objects.equals(contact.getOrder(), order)) {
-                Contact conflict = contactRepository.findByOwnerAndOrder(owner, order);
+                Contact conflict = contactRepository.findByCardOwnerAndOrder(owner, order);
                 conflict.setOrder(0);
                 contactRepository.save(conflict);
 
@@ -85,11 +85,11 @@ public class ContactService {
                 contactRepository.save(conflict);
             }
         }
-        return contactRepository.findAllByOwner(owner);
+        return contactRepository.findAllByCardOwner(owner);
     }
 
     public List<Contact> getOfCurrentCard() {
-        return contactRepository.findAllByOwner(profileProvider.getUserFromAuth().getCurrentCard());
+        return contactRepository.findAllByCardOwner(profileProvider.getUserFromAuth().getCurrentCard());
     }
 
 }

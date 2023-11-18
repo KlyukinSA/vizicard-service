@@ -122,7 +122,7 @@ public class CardMapper {
             }
         }
         int i = tabs.stream().mapToInt(Tab::getOrder).max().orElse(0);
-        finishTabType(usedTypes, TabTypeEnum.CONTACTS, isCurrentCard, !contactRepository.findAllByOwner(card).isEmpty(), res, i);
+        finishTabType(usedTypes, TabTypeEnum.CONTACTS, isCurrentCard, !contactRepository.findAllByCardOwner(card).isEmpty(), res, i);
         i++;
 
         ProfileDetailStruct detailStruct = card.getDetailStruct();
@@ -189,9 +189,9 @@ public class CardMapper {
     }
 
     private ContactListResponse getContacts(Card card, Optional<Card> overlay) {
-        List<Contact> list = contactRepository.findAllByOwner(card);
+        List<Contact> list = contactRepository.findAllByCardOwner(card);
         if (overlay.isPresent()) {
-            List<Contact> list1 = contactRepository.findAllByOwner(overlay.get());
+            List<Contact> list1 = contactRepository.findAllByCardOwner(overlay.get());
             if (!list1.isEmpty()) {
                 list = list1;
             }

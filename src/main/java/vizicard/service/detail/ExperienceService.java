@@ -33,7 +33,7 @@ public class ExperienceService {
     public ExperienceResponseDTO updateExperience(ExperienceDTO dto, Integer id) {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Experience detail = repository.findById(id).get();
-        if (Objects.equals(detail.getOwner().getId(), user.getId())) {
+        if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
             modelMapper.map(dto, detail);
             repository.save(detail);
         }
@@ -43,7 +43,7 @@ public class ExperienceService {
     public void deleteExperience(Integer id) {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         Experience detail = repository.findById(id).get();
-        if (Objects.equals(detail.getOwner().getId(), user.getId())) {
+        if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
             detail.setStatus(false);
             repository.save(detail);
         }

@@ -40,7 +40,7 @@ public class CommentController {
     @GetMapping("profiles/{id}/comments")
     @PreAuthorize("isAuthenticated()")
     public List<CommentResponse> getOnPage(@PathVariable Integer id) {
-        return (List<CommentResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id).stream().filter(Publication::isModerated).collect(Collectors.toList()), p -> p.getOwner().getMainCard(), CommentResponse.class);
+        return (List<CommentResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id).stream().filter(Publication::isModerated).collect(Collectors.toList()), p -> p.getAccountOwner().getMainCard(), CommentResponse.class);
     }
 
 }

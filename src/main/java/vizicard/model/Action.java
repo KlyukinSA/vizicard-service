@@ -16,7 +16,7 @@ public class Action {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account owner;
+    private Account accountOwner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -40,8 +40,8 @@ public class Action {
     @ManyToOne(fetch = FetchType.LAZY)
     private Shortname shortname;
 
-    public Action(Account owner, Card card, ActionType type, String ip) {
-        this.owner = owner;
+    public Action(Account accountOwner, Card card, ActionType type, String ip) {
+        this.accountOwner = accountOwner;
         this.card = card;
         this.type = type;
         this.ip = ip;

@@ -24,7 +24,7 @@ public class AlbumService {
 
     public CloudFile addFile(MultipartFile file, Integer id, CloudFileType type) {
         Album album = albumRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(album.getOwner());
+        relationValidator.stopNotOwnerOf(album.getCardOwner());
         String filename = file.getOriginalFilename();
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
         if (type == CloudFileType.MEDIA
@@ -44,7 +44,7 @@ public class AlbumService {
 
     public void deleteFile(Integer id) {
         CloudFile file = cloudFileService.findById(id);
-        relationValidator.stopNotOwnerOf(file.getAlbum().getOwner());
+        relationValidator.stopNotOwnerOf(file.getAlbum().getCardOwner());
         file.setStatus(false);
         cloudFileService.save(file);
     }

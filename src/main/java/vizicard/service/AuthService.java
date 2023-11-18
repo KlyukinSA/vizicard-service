@@ -37,7 +37,7 @@ public class AuthService {
 
     public Account signin(String username, String password) {
         Account account = accountRepository.findByUsername(username);
-        if (!account.isStatus()) {
+        if (account == null || !account.isStatus()) {
             throw new CustomException("you dont exist", HttpStatus.FORBIDDEN);
         }
         try {

@@ -17,13 +17,13 @@ public class DetailBase {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Card owner;
+    private Card cardOwner;
 
     @Column(nullable = false)
     private boolean status = true;
 
-    public DetailBase(Card owner) {
-        this.owner = owner;
+    public DetailBase(Card cardOwner) {
+        this.cardOwner = cardOwner;
     }
 
 }

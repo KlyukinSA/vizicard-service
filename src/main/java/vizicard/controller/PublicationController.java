@@ -7,14 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.publication.PublicationCreateDTO;
 import vizicard.dto.publication.PublicationResponse;
 import vizicard.mapper.PublicationCommentResponseMapper;
-import vizicard.model.Card;
 import vizicard.model.Publication;
 import vizicard.service.PublicationService;
-import vizicard.mapper.CardMapper;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +36,7 @@ public class PublicationController {
     @GetMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
     public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
-        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id), p -> p.getOwner().getMainCard(), PublicationResponse.class);
+        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id), p -> p.getAccountOwner().getMainCard(), PublicationResponse.class);
     }
 
 }

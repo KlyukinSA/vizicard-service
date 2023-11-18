@@ -8,7 +8,7 @@ import vizicard.model.Publication;
 import java.util.List;
 
 public interface PublicationRepository extends JpaRepository<Publication, Integer> {
-    List<Publication> findAllByOwner(Account owner);
+    List<Publication> findAllByAccountOwner(Account owner);
 
     List<Publication> findAllByCard(Card page);
 }

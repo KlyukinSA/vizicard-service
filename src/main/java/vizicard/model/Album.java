@@ -12,11 +12,11 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude="owner")
+@EqualsAndHashCode(exclude="cardOwner")
 public class Album {
 
-    public Album(Card owner) {
-        this.owner = owner;
+    public Album(Card cardOwner) {
+        this.cardOwner = cardOwner;
     }
 
     @Id
@@ -25,7 +25,7 @@ public class Album {
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Card owner;
+    private Card cardOwner;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)

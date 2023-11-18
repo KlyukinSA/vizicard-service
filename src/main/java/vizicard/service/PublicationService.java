@@ -18,13 +18,13 @@ public class PublicationService {
     private final ProfileProvider profileProvider;
 
     public Publication createPublication(Publication publication, Integer id) {
-        publication.setOwner(profileProvider.getUserFromAuth());
+        publication.setAccountOwner(profileProvider.getUserFromAuth());
         publication.setCard(profileProvider.getTarget(id));
         return publicationRepository.save(publication);
     }
 
     public List<Publication> getAllMy() {
-        return publicationRepository.findAllByOwner(profileProvider.getUserFromAuth());
+        return publicationRepository.findAllByAccountOwner(profileProvider.getUserFromAuth());
     }
 
     public List<Publication> getOnPage(Integer id) {

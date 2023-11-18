@@ -11,7 +11,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "skill"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"card_owner_id", "skill"}))
 public class Skill extends DetailBase {
 
     private String skill;

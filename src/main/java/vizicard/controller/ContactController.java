@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.contact.*;
 import vizicard.mapper.ContactMapper;
 import vizicard.model.Contact;
+import vizicard.model.ContactEnum;
 import vizicard.model.ContactGroup;
 import vizicard.model.ContactType;
 import vizicard.repository.CloudFileRepository;
@@ -37,6 +38,11 @@ public class ContactController {
         return contactTypeRepository.findAll().stream()
                 .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("types/{type}")
+    public ContactTypeResponse getTypeByType(@PathVariable ContactEnum type) {
+        return contactMapper.mapToContactTypeResponse(contactTypeRepository.findByType(type));
     }
 
     @GetMapping("types/search")

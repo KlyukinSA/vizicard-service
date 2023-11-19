@@ -115,7 +115,7 @@ public class ContactController {
 
     @PutMapping("order")
     @PreAuthorize("isAuthenticated()")
-    public ContactListResponse reorder(@RequestBody List<ContactReorderDTO> dto) {
+    public List<FullContactResponse> reorder(@RequestBody List<ContactReorderDTO> dto) {
         List<Integer> ids = dto.stream().map(ContactReorderDTO::getId).collect(Collectors.toList());
         List<Integer> orders = dto.stream().map(ContactReorderDTO::getOrder).collect(Collectors.toList());
         return contactMapper.mapList(contactService.reorder(ids, orders));
@@ -123,7 +123,7 @@ public class ContactController {
 
     @GetMapping("my")
     @PreAuthorize("isAuthenticated()")
-    public ContactListResponse getOfCurrentCard() {
+    public List<FullContactResponse> getOfCurrentCard() {
         return contactMapper.mapList(contactService.getOfCurrentCard());
     }
 

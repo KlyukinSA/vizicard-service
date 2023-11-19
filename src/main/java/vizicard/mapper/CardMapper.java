@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
 import vizicard.dto.contact.ContactListResponse;
+import vizicard.dto.contact.FullContactResponse;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.ProfileDetailStructResponseDTO;
@@ -188,7 +189,7 @@ public class CardMapper {
         return modelMapper.map(relation, BriefRelationResponseDTO.class);
     }
 
-    private ContactListResponse getContacts(Card card, Optional<Card> overlay) {
+    private List<FullContactResponse> getContacts(Card card, Optional<Card> overlay) {
         List<Contact> list = contactRepository.findAllByCardOwner(card);
         if (overlay.isPresent()) {
             List<Contact> list1 = contactRepository.findAllByCardOwner(overlay.get());

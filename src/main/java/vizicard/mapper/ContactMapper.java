@@ -18,19 +18,11 @@ public class ContactMapper {
 	private final CloudFileService cloudFileService;
 	private final ModelMapper modelMapper;
 
-	public ContactListResponse mapList(List<Contact> contacts) {
-		List<FullContactResponse> full = new ArrayList<>();
-		List<ContactResponse> brief = new ArrayList<>();
-		contacts.stream()
+	public List<FullContactResponse> mapList(List<Contact> contacts) {
+		return contacts.stream()
 				.filter(Contact::isStatus)
-				.forEach((c) -> {
-					if (c.isFull()) {
-						full.add(mapToResponse(c));
-					} else {
-						brief.add(mapToBrief(c));
-					}
-				});
-		return new ContactListResponse(full, brief);
+				.map(this::mapToResponse)
+				.collect(Collectors.toList());
 	}
 
 	public FullContactResponse mapToResponse(Contact contact) {
@@ -53,7 +45,8 @@ public class ContactMapper {
 				formContactUrl(contact),
 				contact.getTitle(),
 				contact.getOrder(),
-				cloudFileService.findById(logoId).getUrl());
+				cloudFileService.findById(logoId).getUrl(),
+				contact.isFull());
 	}
 
 	private String formContactUrl(Contact contact) {

@@ -28,7 +28,6 @@ public class ContactMapper {
 	public FullContactResponse mapToResponse(Contact contact) {
 		FullContactResponse res = modelMapper.map(mapToBrief(contact), FullContactResponse.class);
 		res.setDescription(contact.getDescription());
-		res.setId(contact.getIndividualId());
 		return res;
 	}
 
@@ -41,7 +40,7 @@ public class ContactMapper {
 			logoId = contact.getType().getLogo().getId();
 		}
 		return new ContactResponse(
-				contact.getId(),
+				contact.getIndividualId(),
 				contact.getType().getType(),
 				formContactUrl(contact),
 				contact.getTitle(),

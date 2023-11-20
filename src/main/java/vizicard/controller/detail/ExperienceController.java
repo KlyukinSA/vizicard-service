@@ -8,6 +8,7 @@ import vizicard.dto.detail.EducationDTO;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
+import vizicard.model.detail.Experience;
 import vizicard.service.detail.EducationService;
 import vizicard.service.detail.ExperienceService;
 
@@ -25,13 +26,13 @@ public class ExperienceController {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ExperienceResponseDTO createExperience(@RequestBody ExperienceDTO dto) {
-        return service.createExperience(dto);
+        return mapToResponse(service.createExperience(dto));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public ExperienceResponseDTO updateExperience(@RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
-        return service.updateExperience(dto, id);
+        return mapToResponse(service.updateExperience(dto, id));
     }
 
     @DeleteMapping("{id}")
@@ -44,7 +45,14 @@ public class ExperienceController {
     @PreAuthorize("isAuthenticated()")
     public List<ExperienceResponseDTO> getOfCurrentCard() {
         return service.getOfCurrentCard()
-                .map((val) -> modelMapper.map(val, ExperienceResponseDTO.class))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    private ExperienceResponseDTO mapToResponse(Experience experience) {
+        ExperienceResponseDTO res = modelMapper.map(experience, ExperienceResponseDTO.class);
+        res.setId(experience.getIndividualId());
+        return res;
+    }
+
 }

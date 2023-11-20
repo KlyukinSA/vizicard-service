@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.SkillDTO;
 import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 import vizicard.model.detail.Skill;
 import vizicard.repository.detail.SkillRepository;
 import vizicard.utils.ProfileProvider;
@@ -30,13 +31,14 @@ public class SkillService {
                     skill.setStatus(true);
                 } else {
                     skill = new Skill(user, s);
+                    skill.setIndividualId(getNextIndividualId(user));
                 }
                 repository.save(skill);
             }
         }
         if (dto.getDelete() != null) {
             for (Integer id : dto.getDelete()) {
-                Skill detail = repository.findById(id).get();
+                Skill detail = repository.findByCardOwnerAndIndividualId(user, id);
                 if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
                     detail.setStatus(false);
                     repository.save(detail);
@@ -46,6 +48,12 @@ public class SkillService {
         return repository.findAllByCardOwner(user).stream()
                 .filter(Skill::isStatus)
                 .collect(Collectors.toList());
+    }
+
+    private Integer getNextIndividualId(Card card) {
+        return repository.findAllByCardOwner(card).stream()
+                .mapToInt(CardAttribute::getIndividualId)
+                .max().orElse(0) + 1;
     }
 
     public Stream<Skill> getOfCurrentCard() {

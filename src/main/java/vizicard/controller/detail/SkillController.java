@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.SkillDTO;
 import vizicard.dto.detail.SkillResponseDTO;
+import vizicard.model.detail.Skill;
 import vizicard.service.detail.SkillService;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class SkillController {
     @PreAuthorize("isAuthenticated()")
     public List<SkillResponseDTO> changeSkills(@RequestBody SkillDTO dto) {
         return service.changeSkills(dto).stream()
-                .map(s -> modelMapper.map(s, SkillResponseDTO.class))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -32,7 +33,14 @@ public class SkillController {
     @PreAuthorize("isAuthenticated()")
     public List<SkillResponseDTO> getOfCurrentCard() {
         return service.getOfCurrentCard()
-                .map((val) -> modelMapper.map(val, SkillResponseDTO.class))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    private SkillResponseDTO mapToResponse(Skill detail) {
+        SkillResponseDTO res = modelMapper.map(detail, SkillResponseDTO.class);
+        res.setId(detail.getIndividualId());
+        return res;
+    }
+
 }

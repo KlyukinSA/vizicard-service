@@ -10,4 +10,6 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
 	List<Skill> findAllByCardOwner(Card card);
 
 	Skill findBySkillAndCardOwner(String s, Card owner);
+
+    Skill findByCardOwnerAndIndividualId(Card user, Integer id);
 }

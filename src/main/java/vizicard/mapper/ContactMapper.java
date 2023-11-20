@@ -28,6 +28,7 @@ public class ContactMapper {
 	public FullContactResponse mapToResponse(Contact contact) {
 		FullContactResponse res = modelMapper.map(mapToBrief(contact), FullContactResponse.class);
 		res.setDescription(contact.getDescription());
+		res.setId(contact.getIndividualId());
 		return res;
 	}
 

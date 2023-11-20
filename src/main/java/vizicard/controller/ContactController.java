@@ -89,7 +89,7 @@ public class ContactController {
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public ContactResponse update(@RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
+    public FullContactResponse update(@RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
         Contact contact = getMapFromContactRequest(dto);
         contact = contactService.update(contact, id);
         return contactMapper.mapToResponse(contact);

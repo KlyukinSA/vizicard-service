@@ -21,6 +21,9 @@ public class CardAttribute {
     @Column(nullable = false)
     private boolean status = true;
 
+    @Column(nullable = false)
+    private Integer individualId;
+
     public CardAttribute(Card cardOwner) {
         this.cardOwner = cardOwner;
     }

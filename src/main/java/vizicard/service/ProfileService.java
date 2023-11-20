@@ -166,20 +166,22 @@ public class ProfileService {
       contact.setStatus(false);
     }
 
-//    int order = profile.getContacts().stream().mapToInt(Contact::getOrder).max().orElse(0);
-    int order = 0;
+    int order = card.getContacts().stream().mapToInt(Contact::getOrder).max().orElse(0);
+    int individualId = card.getContacts().stream().mapToInt(Contact::getIndividualId).max().orElse(0);
     for (ContactInListRequest dto : contacts) {
       order++;
-      ContactType contactType = contactTypeRepository.findByType(dto.getType());
-      Contact contact = contactRepository.findByCardOwnerAndOrder(card, order);
-      if (contact == null) {
-        contact = new Contact();
-        contact.setCardOwner(card);
-        contact.setOrder(order);
-      } else {
-        contact.setStatus(true);
-      }
-      contact.setType(contactType);
+      individualId++;
+//      while (contactRepository.findByCardOwnerAndOrder(card, order) != null) {
+//        order++;
+//      }
+//      while (contactRepository.findByCardOwnerAndIndividualId(card, individualId) != null) {
+//        individualId++;
+//      }
+      Contact contact = new Contact();
+      contact.setCardOwner(card);
+      contact.setOrder(order);
+      contact.setIndividualId(individualId);
+      contact.setType(contactTypeRepository.findByType(dto.getType()));
       contact.setContact(dto.getContact());
       contactRepository.save(contact);
 //      card.getContacts().add(contact);

@@ -10,4 +10,6 @@ public interface ContactRepository extends JpaRepository<Contact, Integer> {
     Contact findByCardOwnerAndOrder(Card owner, Integer order);
 
     List<Contact> findAllByCardOwner(Card card);
+
+    Contact findByCardOwnerAndIndividualId(Card card, Integer individualId);
 }

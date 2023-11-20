@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.exception.CustomException;
 import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.repository.ContactRepository;
@@ -32,10 +33,18 @@ public class ContactService {
         }
         stopInvalidContactUrl(contact);
 
-        contact.setCardOwner(profileProvider.getUserFromAuth().getCurrentCard());
+        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+        contact.setCardOwner(card);
+        contact.setIndividualId(getNextIndividualId(card));
         contactRepository.save(contact);
         contact.setOrder(contact.getId());
         return contactRepository.save(contact);
+    }
+
+    private Integer getNextIndividualId(Card card) {
+        return contactRepository.findAllByCardOwner(card).stream()
+                .mapToInt(CardAttribute::getIndividualId)
+                .max().orElse(0) + 1;
     }
 
     private void stopInvalidContactUrl(Contact contact) {
@@ -46,30 +55,29 @@ public class ContactService {
     }
 
     public Contact update(Contact map, Integer id) {
-        stopInvalidContactUrl(map);
-        Contact contact = contactRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(contact.getCardOwner());
+        Contact contact = contactRepository.findByCardOwnerAndIndividualId(
+                profileProvider.getUserFromAuth().getCurrentCard(), id);
         modelMapper.map(map, contact);
         return contactRepository.save(contact);
     }
 
     public void delete(Integer id) {
-        Contact contact = contactRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(contact.getCardOwner());
+        Contact contact = contactRepository.findByCardOwnerAndIndividualId(
+                profileProvider.getUserFromAuth().getCurrentCard(), id);
         contact.setStatus(false);
         contactRepository.save(contact);
     }
 
     public List<Contact> reorder(List<Integer> ids, List<Integer> orders) {
-        Set<Integer> currents = ids.stream().map(id -> contactRepository.findById(id).get().getOrder()).collect(Collectors.toSet());
+        Card owner = profileProvider.getUserFromAuth().getCurrentCard();
+        Set<Integer> currents = ids.stream().map(id -> contactRepository.findByCardOwnerAndIndividualId(owner, id).getOrder()).collect(Collectors.toSet());
         Set<Integer> news = new HashSet<>(orders);
         if (!Objects.equals(currents, news)) {
             throw new CustomException("set of orders must be equal to set of orders of contacts by ids", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        Card owner = profileProvider.getUserFromAuth().getCurrentCard();
         for (int i = 0; i < ids.size(); i++) {
-            Contact contact = contactRepository.findById(ids.get(i)).get();
+            Contact contact = contactRepository.findByCardOwnerAndIndividualId(owner, ids.get(i));
             relationValidator.stopNotOwnerOf(contact.getCardOwner());
             Integer order = orders.get(i);
             if (!Objects.equals(contact.getOrder(), order)) {

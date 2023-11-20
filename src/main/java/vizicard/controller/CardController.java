@@ -54,12 +54,20 @@ public class CardController {
         cardService.delete(id);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("id{id}")
     @PreAuthorize("isAuthenticated()")
-    public CardResponse update(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
+    public CardResponse updateById(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
         Card card = cardService.prepareToUpdate(id); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
         profileService.updateProfile(card, dto); //
         return cardMapper.mapToResponse(profileProvider.getTarget(id));
+    }
+
+    @PutMapping("{shortname}")
+    @PreAuthorize("isAuthenticated()")
+    public CardResponse updateByShortname(@PathVariable String shortname, @RequestBody ProfileUpdateDTO dto) {
+        Card card = cardService.prepareToUpdate(shortname); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
+        profileService.updateProfile(card, dto); //
+        return cardMapper.mapToResponse(profileProvider.getTarget(card.getId()));
     }
 
     @PostMapping

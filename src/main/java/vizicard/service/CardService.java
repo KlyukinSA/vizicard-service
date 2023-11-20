@@ -97,6 +97,10 @@ public class CardService {
 
     public Card prepareToUpdate(Integer id) {
         Card target = profileProvider.getTarget(id);
+        return prepareToUpdateByCard(target);
+    }
+
+    private Card prepareToUpdateByCard(Card target) {
         Account user = profileProvider.getUserFromAuth();
         Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
         if (Objects.equals(user.getId(), target.getAccount().getId())
@@ -115,6 +119,15 @@ public class CardService {
             }
             return overlay;
         }
+    }
+
+    public Card prepareToUpdate(String sn) {
+        Shortname shortname = shortnameRepository.findByShortname(sn);
+        Card card = shortname.getCard();
+        if (card == null) {
+            card = shortname.getAccount().getMainCard();
+        }
+        return prepareToUpdateByCard(card);
     }
 
 }

@@ -12,15 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"card_owner_id", "order"}))
-public class Contact {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Card cardOwner;
+public class Contact extends CardAttribute {
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -35,9 +27,6 @@ public class Contact {
 
     @Column(name = "`order`")
     private Integer order;
-
-    @Column(nullable = false)
-    private boolean status = true;
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)

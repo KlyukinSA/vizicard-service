@@ -32,6 +32,7 @@ public class EducationService {
         Education education = new Education(user);
         modelMapper.map(dto, education);
         education.setId(null);
+        education.setType(educationTypeRepository.findById(dto.getTypeId()).get());
         educationRepository.save(education);
         return modelMapper.map(education, EducationResponseDTO.class);
     }

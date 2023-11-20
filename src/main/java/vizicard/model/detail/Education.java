@@ -3,13 +3,14 @@ package vizicard.model.detail;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 
 import javax.persistence.*;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Education extends DetailBase {
+public class Education extends CardAttribute {
 
     @Column(nullable = false)
     private String institution;

@@ -1,15 +1,14 @@
-package vizicard.model.detail;
+package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.Card;
 
 import javax.persistence.*;
 
 @MappedSuperclass
 @Data
 @NoArgsConstructor
-public class DetailBase {
+public class CardAttribute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +21,7 @@ public class DetailBase {
     @Column(nullable = false)
     private boolean status = true;
 
-    public DetailBase(Card cardOwner) {
+    public CardAttribute(Card cardOwner) {
         this.cardOwner = cardOwner;
     }
 

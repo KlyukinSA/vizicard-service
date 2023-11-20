@@ -3,6 +3,7 @@ package vizicard.model.detail;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +14,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-public class Experience extends DetailBase {
+public class Experience extends CardAttribute {
 
     @Column(nullable = false)
     private String company;

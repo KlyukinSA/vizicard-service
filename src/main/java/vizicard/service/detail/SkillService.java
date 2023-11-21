@@ -26,23 +26,12 @@ public class SkillService {
         Card user = profileProvider.getUserFromAuth().getCurrentCard();
         if (dto.getAdd() != null) {
             for (String s : dto.getAdd()) {
-                Skill skill = repository.findBySkillAndCardOwner(s, user);
-                if (skill != null) {
-                    skill.setStatus(true);
-                } else {
-                    skill = new Skill(user, s);
-                    skill.setIndividualId(getNextIndividualId(user));
-                }
-                repository.save(skill);
+                create(s);
             }
         }
         if (dto.getDelete() != null) {
             for (Integer id : dto.getDelete()) {
-                Skill detail = repository.findByCardOwnerAndIndividualId(user, id);
-                if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
-                    detail.setStatus(false);
-                    repository.save(detail);
-                }
+                delete(id);
             }
         }
         return repository.findAllByCardOwner(user).stream()
@@ -60,4 +49,26 @@ public class SkillService {
         return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getSkills().stream()
                 .filter(Skill::isStatus);
     }
+
+    public Skill create(String s) {
+        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+        Skill skill = repository.findBySkillAndCardOwner(s, card);
+        if (skill != null) {
+            skill.setStatus(true);
+        } else {
+            skill = new Skill(card, s);
+            skill.setIndividualId(getNextIndividualId(card));
+        }
+        return repository.save(skill);
+    }
+
+    public void delete(Integer id) {
+        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+        Skill detail = repository.findByCardOwnerAndIndividualId(card, id);
+        if (Objects.equals(detail.getCardOwner().getId(), card.getId())) {
+            detail.setStatus(false);
+            repository.save(detail);
+        }
+    }
+
 }

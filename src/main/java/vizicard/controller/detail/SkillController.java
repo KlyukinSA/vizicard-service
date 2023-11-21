@@ -43,4 +43,14 @@ public class SkillController {
         return res;
     }
 
+    @PostMapping
+    public SkillResponseDTO create(@RequestBody String s) {
+        return mapToResponse(service.create(s));
+    }
+
+    @DeleteMapping("{id}")
+    public void delete(@RequestParam Integer id) {
+        service.delete(id);
+    }
+
 }

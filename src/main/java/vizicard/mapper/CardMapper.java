@@ -83,8 +83,6 @@ public class CardMapper {
             res.setId(id);
             res.setCreateAt(createAt);
         }
-        res.setContacts(getContacts(card, overlay));
-        res.setResume(getResume(card, overlay));
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card, overlay);
@@ -240,7 +238,6 @@ public class CardMapper {
             res.setId(id);
             res.setCreateAt(createAt);
         }
-        res.setContacts(getContacts(company, overlay));
         res.setMainShortname(shortnameService.getMainShortname(company));
         res.setAvatar(getAvatar(company, overlay));
         res.setBackground(getBackground(company, overlay));

@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.detail.*;
+import vizicard.mapper.DetailResponseMapper;
 import vizicard.model.detail.Education;
 import vizicard.service.detail.EducationService;
 
@@ -17,18 +18,18 @@ import java.util.stream.Collectors;
 public class EducationController {
 
     private final EducationService educationService;
-    private final ModelMapper modelMapper;
+    private final DetailResponseMapper mapper;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public EducationResponseDTO createEducation(@RequestBody EducationDTO dto) {
-        return mapToResponse(educationService.createEducation(dto));
+        return mapper.mapToResponse(educationService.createEducation(dto));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public EducationResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
-        return mapToResponse(educationService.updateEducation(dto, id));
+        return mapper.mapToResponse(educationService.updateEducation(dto, id));
     }
 
     @DeleteMapping("{id}")
@@ -45,14 +46,8 @@ public class EducationController {
     @GetMapping
     public List<EducationResponseDTO> getOfCurrentCard() {
         return educationService.getOfCurrentCard()
-                .map(this::mapToResponse)
+                .map(mapper::mapToResponse)
                 .collect(Collectors.toList());
-    }
-
-    private EducationResponseDTO mapToResponse(Education detail) {
-        EducationResponseDTO res = modelMapper.map(detail, EducationResponseDTO.class);
-        res.setId(detail.getIndividualId());
-        return res;
     }
 
 }

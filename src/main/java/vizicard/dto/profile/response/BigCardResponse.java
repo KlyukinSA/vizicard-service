@@ -14,7 +14,6 @@ import java.util.List;
 public class BigCardResponse extends BriefCardResponse {
     private String description;
     private String city;
-    private List<FullContactResponse> contacts;
 
     private Date createAt;
     private Date lastVizit;

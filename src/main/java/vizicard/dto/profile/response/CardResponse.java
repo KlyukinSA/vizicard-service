@@ -14,7 +14,6 @@ import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 @AllArgsConstructor
 public class CardResponse extends BigCardResponse {
   private BriefCardResponse company;
-  private ProfileDetailStructResponseDTO resume;
   private BriefRelationResponseDTO relation;
 
   private String cardName;

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.dto.detail.SkillDTO;
 import vizicard.dto.detail.SkillResponseDTO;
+import vizicard.mapper.DetailResponseMapper;
 import vizicard.model.detail.Skill;
 import vizicard.service.detail.SkillService;
 
@@ -19,13 +20,13 @@ import java.util.stream.Collectors;
 public class SkillController {
 
     private final SkillService service;
-    private final ModelMapper modelMapper;
+    private final DetailResponseMapper mapper;
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
     public List<SkillResponseDTO> changeSkills(@RequestBody SkillDTO dto) {
         return service.changeSkills(dto).stream()
-                .map(this::mapToResponse)
+                .map(mapper::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -33,19 +34,13 @@ public class SkillController {
     @PreAuthorize("isAuthenticated()")
     public List<SkillResponseDTO> getOfCurrentCard() {
         return service.getOfCurrentCard()
-                .map(this::mapToResponse)
+                .map(mapper::mapToResponse)
                 .collect(Collectors.toList());
-    }
-
-    private SkillResponseDTO mapToResponse(Skill detail) {
-        SkillResponseDTO res = modelMapper.map(detail, SkillResponseDTO.class);
-        res.setId(detail.getIndividualId());
-        return res;
     }
 
     @PostMapping
     public SkillResponseDTO create(@RequestBody String s) {
-        return mapToResponse(service.create(s));
+        return mapper.mapToResponse(service.create(s));
     }
 
     @DeleteMapping("{id}")

@@ -8,6 +8,7 @@ import vizicard.dto.detail.EducationDTO;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
+import vizicard.mapper.DetailResponseMapper;
 import vizicard.model.detail.Experience;
 import vizicard.service.detail.EducationService;
 import vizicard.service.detail.ExperienceService;
@@ -21,18 +22,18 @@ import java.util.stream.Collectors;
 public class ExperienceController {
 
     private final ExperienceService service;
-    private final ModelMapper modelMapper;
+    private final DetailResponseMapper mapper;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ExperienceResponseDTO createExperience(@RequestBody ExperienceDTO dto) {
-        return mapToResponse(service.createExperience(dto));
+        return mapper.mapToResponse(service.createExperience(dto));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
     public ExperienceResponseDTO updateExperience(@RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
-        return mapToResponse(service.updateExperience(dto, id));
+        return mapper.mapToResponse(service.updateExperience(dto, id));
     }
 
     @DeleteMapping("{id}")
@@ -45,14 +46,8 @@ public class ExperienceController {
     @PreAuthorize("isAuthenticated()")
     public List<ExperienceResponseDTO> getOfCurrentCard() {
         return service.getOfCurrentCard()
-                .map(this::mapToResponse)
+                .map(mapper::mapToResponse)
                 .collect(Collectors.toList());
-    }
-
-    private ExperienceResponseDTO mapToResponse(Experience experience) {
-        ExperienceResponseDTO res = modelMapper.map(experience, ExperienceResponseDTO.class);
-        res.setId(experience.getIndividualId());
-        return res;
     }
 
 }

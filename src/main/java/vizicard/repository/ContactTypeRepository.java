@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ContactTypeRepository extends JpaRepository<ContactType, Integer> {
     ContactType findByType(ContactEnum type);
+
+    ContactType findByUrlBase(String urlBase);
 }

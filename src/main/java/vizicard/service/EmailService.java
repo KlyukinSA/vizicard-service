@@ -38,7 +38,7 @@ public class EmailService {
             sendHtml(to, subject, text);
         } catch (Exception e) {
             System.out.println("tried to send message to " + to + " about " + target.getId() + "\nbut\n");
-            e.printStackTrace(); // TODO catch in sendHtml and print only message
+            System.out.println(e.getMessage()); // TODO catch in sendHtml and print only message
         }
     }
     

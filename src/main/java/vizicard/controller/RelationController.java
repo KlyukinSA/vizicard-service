@@ -53,10 +53,10 @@ public class RelationController {
         leadCard.setName(dto.getName());
         Card company = new Card();
         company.setName(dto.getCompanyName());
-        ContactInListRequest emailContactDTO = dto.getContacts().stream().filter(req -> req.getType().equals(ContactEnum.MAIL)).findFirst().orElse(new ContactInListRequest());
-        relationService.leadGenerate(id, leadCard, company, emailContactDTO.getContact());
+        relationService.leadGenerate(id, leadCard, company, dto.getEmail());
         if (leadCard.getId() != null) {
             profileService.updateProfile(leadCard, modelMapper.map(dto, ProfileUpdateDTO.class));
+            profileService.updateCardWithLeadGenCardCreationFields(leadCard, dto);
         }
     }
 

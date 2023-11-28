@@ -57,7 +57,7 @@ public class CardMapper {
             res.setId(id);
         }
         res.setMainShortname(shortnameService.getMainShortname(card));
-        res.setAvatar(getAvatar(card, overlay));
+        res.setAvatarUrl(getAvatarUrl(card, overlay));
         return res;
     }
 
@@ -85,24 +85,24 @@ public class CardMapper {
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
         finishCompany(res, card, overlay);
-        res.setAvatar(getAvatar(card, overlay));
-        res.setBackground(getBackground(card, overlay));
+        res.setAvatarUrl(getAvatarUrl(card, overlay));
+        res.setBackgroundUrl(getBackgroundUrl(card, overlay));
         res.setLastVizit(getLastVizit(card));
         res.setTabs(getTabs(card));
         return res;
     }
 
-    private CloudFileDTO getBackground(Card card, Optional<Card> overlay) {
-        return getCloudFileDTOByFileId(overlay.filter(c -> c.getBackgroundId() != null).orElse(card).getBackgroundId());
+    private String getBackgroundUrl(Card card, Optional<Card> overlay) {
+        return getCloudFileUrlByFileId(overlay.filter(c -> c.getBackgroundId() != null).orElse(card).getBackgroundId());
     }
 
-    private CloudFileDTO getCloudFileDTOByFileId(Integer id) {
+    private String getCloudFileUrlByFileId(Integer id) {
         if (id != null) {
             CloudFile cloudFile = cloudFileService.findById(id);
             if (cloudFile == null || !cloudFile.isStatus()) {
                 return null;
             }
-            return new CloudFileDTO(cloudFile.getId(), cloudFile.getUrl(), cloudFile.getAlbum().getId(), cloudFile.getDescription());
+            return cloudFile.getUrl();
         }
         return null;
     }
@@ -115,7 +115,7 @@ public class CardMapper {
         boolean isCurrentCard = user != null && user.getCurrentCard().getId().equals(card.getId());
         for (Tab tab : tabs) {
             if (isCurrentCard || !tab.isHidden()) {
-                res.add(new TabResponseDTO(tab.getType().getWriting(), tab.getOrder()));
+                res.add(new TabResponseDTO(tab.getType().getWriting(), tab.getOrder(), tab.getType().getType()));
                 usedTypes.add(tab.getType().getType());
             }
         }
@@ -138,7 +138,8 @@ public class CardMapper {
 
     private void finishTabType(HashSet<TabTypeEnum> usedTypes, TabTypeEnum type, boolean isCurrentCard, boolean cardHasOfThisType, List<TabResponseDTO> res, int i) {
         if (!usedTypes.contains(type) && (isCurrentCard || cardHasOfThisType)) {
-            res.add(new TabResponseDTO(tabTypeRepository.findByType(type).getWriting(), i));
+            TabType type1 = tabTypeRepository.findByType(type);
+            res.add(new TabResponseDTO(type1.getWriting(), i, type1.getType()));
         }
     }
 
@@ -147,8 +148,8 @@ public class CardMapper {
                 detailStruct.getExperience().size() + detailStruct.getSkills().size() > 0;
     }
 
-    private CloudFileDTO getAvatar(Card card, Optional<Card> overlay) {
-        return getCloudFileDTOByFileId(overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId());
+    private String getAvatarUrl(Card card, Optional<Card> overlay) {
+        return getCloudFileUrlByFileId(overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId());
     }
 
     private void finishCompany(CardResponse res, Card card, Optional<Card> overlay) {
@@ -241,8 +242,8 @@ public class CardMapper {
             res.setCreateAt(createAt);
         }
         res.setMainShortname(shortnameService.getMainShortname(company));
-        res.setAvatar(getAvatar(company, overlay));
-        res.setBackground(getBackground(company, overlay));
+        res.setAvatarUrl(getAvatarUrl(company, overlay));
+        res.setBackgroundUrl(getBackgroundUrl(company, overlay));
         res.setLastVizit(getLastVizit(company));
         return res;
     }

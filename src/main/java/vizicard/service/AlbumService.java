@@ -9,6 +9,7 @@ import vizicard.model.Album;
 import vizicard.model.CloudFile;
 import vizicard.model.CloudFileType;
 import vizicard.repository.AlbumRepository;
+import vizicard.repository.CloudFileRepository;
 import vizicard.utils.RelationValidator;
 
 import java.util.List;
@@ -48,4 +49,12 @@ public class AlbumService {
         file.setStatus(false);
         cloudFileService.save(file);
     }
+
+    public CloudFile addLinkFile(String url, Integer id) {
+        Album album = albumRepository.findById(id).get();
+        relationValidator.stopNotOwnerOf(album.getCardOwner());
+        String extension = url.substring(url.lastIndexOf(".") + 1);
+        return cloudFileService.saveLink(url, album, extension);
+    }
+
 }

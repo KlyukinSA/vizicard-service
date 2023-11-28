@@ -13,7 +13,6 @@ import vizicard.model.CloudFile;
 import vizicard.model.Contact;
 import vizicard.model.ContactEnum;
 import vizicard.model.Card;
-import vizicard.service.CloudFileService;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

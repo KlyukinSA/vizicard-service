@@ -53,8 +53,10 @@ public class CloudFileService {
     }
 
     private CloudFile finishUrl(CloudFile cloudFile) {
-        cloudFile.setUrl(s3Service.getUrlFromKey(cloudFile.getUrl()));
-        entityManager.detach(cloudFile);
+        if (cloudFile.getType() != CloudFileType.LINK) {
+            cloudFile.setUrl(s3Service.getUrlFromKey(cloudFile.getUrl()));
+            entityManager.detach(cloudFile);
+        }
         return cloudFile;
     }
 
@@ -64,4 +66,9 @@ public class CloudFileService {
         cloudFileRepository.save(cloudFile);
         return finishUrl(cloudFile);
     }
+
+    public CloudFile saveLink(String url, Album album, String extension) {
+        return cloudFileRepository.save(new CloudFile(url, album, CloudFileType.LINK, getExtensionByName(extension), 0));
+    }
+
 }

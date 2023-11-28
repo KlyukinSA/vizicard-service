@@ -35,6 +35,12 @@ public class AlbumController {
         return modelMapper.map(albumService.addFile(file, id, CloudFileType.MEDIA), CloudFileDTO.class);
     }
 
+    @PostMapping("{id}/files/links")
+    @PreAuthorize("isAuthenticated()")
+    CloudFileDTO addLink(@PathVariable Integer id, String url) {
+        return modelMapper.map(albumService.addLinkFile(url, id), CloudFileDTO.class);
+    }
+
     @GetMapping("{id}/files")
     @PreAuthorize("isAuthenticated()")
     List<CloudFileDTO> getAllUsualFiles(@PathVariable Integer id) {
@@ -47,6 +53,14 @@ public class AlbumController {
     @PreAuthorize("isAuthenticated()")
     List<CloudFileDTO> getAllMediaFiles(@PathVariable Integer id) {
         return albumService.getAllFiles(id, CloudFileType.MEDIA).stream()
+                .map((val) -> modelMapper.map(val, CloudFileDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("{id}/files/links")
+    @PreAuthorize("isAuthenticated()")
+    List<CloudFileDTO> getAllLinkFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(id, CloudFileType.LINK).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
     }

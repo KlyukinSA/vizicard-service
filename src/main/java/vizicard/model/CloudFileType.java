@@ -1,5 +1,5 @@
 package vizicard.model;
 
 public enum CloudFileType {
-    MEDIA, FILE;
+    MEDIA, FILE, LINK;
 }

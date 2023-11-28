@@ -25,7 +25,7 @@ public class CloudFile {
     @Column(nullable = false)
     private boolean status = true;
 
-    @Column(columnDefinition = "ENUM('MEDIA', 'FILE')", nullable = false)
+    @Column(columnDefinition = "ENUM('MEDIA', 'FILE', 'LINK')", nullable = false)
     @Enumerated(EnumType.STRING)
     private CloudFileType type;
 

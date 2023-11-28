@@ -173,6 +173,9 @@ public class CardMapper {
 
     private BriefRelationResponseDTO getPossibleRelation(Card card) {
         Account user = profileProvider.getUserFromAuth();
+        if (user == null) {
+            return null;
+        }
         Relation relation = relationRepository.findByAccountOwnerAndCard(user, card);
         if (relation == null) {
             relation = relationRepository.findByAccountOwnerAndCard(card.getAccount(), user.getCurrentCard());

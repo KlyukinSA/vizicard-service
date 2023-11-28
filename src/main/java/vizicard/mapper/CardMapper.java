@@ -89,6 +89,21 @@ public class CardMapper {
         res.setBackgroundUrl(getBackgroundUrl(card, overlay));
         res.setLastVizit(getLastVizit(card));
         res.setTabs(getTabs(card));
+        res.setDetails(getWeirdDetails(card));
+        return res;
+    }
+
+    private List<WeirdCardResponseDetailDTO> getWeirdDetails(Card card) {
+        List<WeirdCardResponseDetailDTO> res = new ArrayList<>();
+        if (card.getCity() != null) {
+            res.add(new WeirdCardResponseDetailDTO("https://s3.timeweb.com/2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2/img_place.svg",
+                    "CITY", card.getCity()));
+        }
+        Card company = companyService.getCompanyOf(card);
+        if (company != null) {
+            res.add(new WeirdCardResponseDetailDTO("https://s3.timeweb.com/2cc1de15-bc1f377d-9e5a-448f-8a1d-f117b93916d2/img_work.svg",
+                    "COMPANY", company.getName()));
+        }
         return res;
     }
 

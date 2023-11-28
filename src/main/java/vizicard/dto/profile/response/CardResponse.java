@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import vizicard.dto.BriefRelationResponseDTO;
+import vizicard.dto.WeirdCardResponseDetailDTO;
 import vizicard.dto.tab.TabResponseDTO;
-import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 public class CardResponse extends BigCardResponse {
   private BriefCardResponse company;
   private BriefRelationResponseDTO relation;
-
   private String cardName;
   private List<TabResponseDTO> tabs;
+  private List<WeirdCardResponseDetailDTO> details;
 }

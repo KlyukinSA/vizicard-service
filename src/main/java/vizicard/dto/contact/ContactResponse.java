@@ -16,5 +16,4 @@ public class ContactResponse {
     private String title;
     private Integer order;
     private String logoUrl;
-    private boolean full;
 }

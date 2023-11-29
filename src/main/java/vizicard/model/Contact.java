@@ -32,9 +32,6 @@ public class Contact extends CardAttribute {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CloudFile logo;
 
-    @Column(nullable = false)
-    private boolean full;
-
     @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Action> clicks;

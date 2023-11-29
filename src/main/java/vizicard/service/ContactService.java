@@ -28,9 +28,6 @@ public class ContactService {
     private final ModelMapper modelMapper;
 
     public Contact create(Contact contact) {
-        if (contact.isFull() && contact.getDescription() == null) {
-            throw new CustomException("cant create full contact without description", HttpStatus.BAD_REQUEST);
-        }
         stopInvalidContactUrl(contact);
 
         Card card = profileProvider.getUserFromAuth().getCurrentCard();

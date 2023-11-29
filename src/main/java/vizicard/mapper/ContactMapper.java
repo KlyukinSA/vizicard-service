@@ -44,8 +44,7 @@ public class ContactMapper {
 				formContactUrl(contact),
 				contact.getTitle(),
 				contact.getOrder(),
-				cloudFileService.findById(logoId).getUrl(),
-				contact.isFull());
+				cloudFileService.findById(logoId).getUrl());
 	}
 
 	private String formContactUrl(Contact contact) {

@@ -141,11 +141,11 @@ public class CardMapper {
         i++;
 
         Integer albumId = card.getAlbum().getId();
-        List<CloudFile> allFiles = albumService.getAllFiles(albumId, CloudFileType.FILE);
-        finishTabType(usedTypes, TabTypeEnum.FILE, isCurrentCard, !allFiles.isEmpty(), res, i);
-        i++;
         List<CloudFile> allMedia = albumService.getAllFiles(albumId, CloudFileType.MEDIA);
         finishTabType(usedTypes, TabTypeEnum.MEDIA, isCurrentCard, !allMedia.isEmpty(), res, i);
+        i++;
+        List<CloudFile> allFiles = albumService.getAllFiles(albumId, CloudFileType.FILE);
+        finishTabType(usedTypes, TabTypeEnum.FILE, isCurrentCard, !allFiles.isEmpty(), res, i);
         return res;
     }
 

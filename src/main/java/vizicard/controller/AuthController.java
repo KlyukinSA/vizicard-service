@@ -70,7 +70,8 @@ public class AuthController {
     private AuthResponseDTO getResponse(Account account) {
         return new AuthResponseDTO(
                 jwtTokenProvider.createToken(account),
-                shortnameService.getMainShortname(account.getCurrentCard())
+                shortnameService.getMainShortname(account.getCurrentCard()),
+                account.getId()
         );
     }
 

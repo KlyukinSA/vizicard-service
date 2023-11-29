@@ -39,7 +39,6 @@ public class CardMapper {
     private final CloudFileService cloudFileService;
 
     private final ModelMapper modelMapper;
-    private final ContactMapper contactMapper;
     private final ProfileProvider profileProvider;
     private final CompanyService companyService;
 
@@ -181,47 +180,6 @@ public class CardMapper {
             return null;
         }
         return modelMapper.map(relation, BriefRelationResponseDTO.class);
-    }
-
-    private List<FullContactResponse> getContacts(Card card, Optional<Card> overlay) {
-        List<Contact> list = contactRepository.findAllByCardOwner(card);
-        if (overlay.isPresent()) {
-            List<Contact> list1 = contactRepository.findAllByCardOwner(overlay.get());
-            if (!list1.isEmpty()) {
-                list = list1;
-            }
-        }
-        if (list.isEmpty()) {
-            return null;
-        }
-        return contactMapper.mapList(list);
-    }
-
-    private ProfileDetailStructResponseDTO getResume(Card card, Optional<Card> overlay) {
-        ProfileDetailStruct detailStruct = card.getDetailStruct();
-        if (overlay.isPresent()) {
-            ProfileDetailStruct detailStruct1 = overlay.get().getDetailStruct();
-            if (detailStruct1 != null) {
-                detailStruct = detailStruct1;
-            }
-        }
-        if (!isResumeNotEmpty(detailStruct)) {
-            return null;
-        }
-        return new ProfileDetailStructResponseDTO(
-                detailStruct.getEducation().stream()
-                        .filter(Education::isStatus)
-                        .map((val) -> modelMapper.map(val, EducationResponseDTO.class))
-                        .collect(Collectors.toList()),
-                detailStruct.getExperience().stream()
-                        .filter(Experience::isStatus)
-                        .map((val) -> modelMapper.map(val, ExperienceResponseDTO.class))
-                        .collect(Collectors.toList()),
-                detailStruct.getSkills().stream()
-                        .filter(Skill::isStatus)
-                        .map((val) -> new SkillResponseDTO(val.getId(), val.getSkill()))
-                        .collect(Collectors.toList())
-        );
     }
 
     public CompanyResponse mapToCompanyResponse(Card company) {

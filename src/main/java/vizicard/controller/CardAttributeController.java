@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vizicard.dto.contact.FullContactResponse;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
+import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.exception.CustomException;
 import vizicard.mapper.ContactMapper;
@@ -17,6 +18,7 @@ import vizicard.mapper.DetailResponseMapper;
 import vizicard.model.*;
 import vizicard.model.detail.Education;
 import vizicard.model.detail.Experience;
+import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.TabRepository;
@@ -102,9 +104,30 @@ public class CardAttributeController {
         boolean isCurrentCard = user != null && user.getCurrentCard().getId().equals(card.getId()); // TODO same in CardMapper
         Optional<Tab> optionalTab = tabRepository.findByTypeTypeAndCardOwner(tabType, card);
         if ((optionalTab.isPresent() && optionalTab.get().isHidden()
-                && !isCurrentCard) || list.isEmpty()) {
+                && !isCurrentCard) || (list != null && list.isEmpty())) {
             throw new CustomException("nothing here", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("resume")
+    public ProfileDetailStructResponseDTO getAllResume(@PathVariable Integer id) {
+        Card card = profileProvider.getTarget(id);
+        stopAccessToHiddenOrEmptyTab(TabTypeEnum.RESUME, null, card); // Any
+        ProfileDetailStruct detailStruct = card.getDetailStruct();
+        return new ProfileDetailStructResponseDTO(
+                detailStruct.getEducation().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getExperience().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getSkills().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList())
+        );
     }
 
 }

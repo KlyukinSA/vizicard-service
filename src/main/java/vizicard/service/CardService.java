@@ -30,8 +30,7 @@ public class CardService {
     public Card create(Card card) {
         cardRepository.save(card);
 
-        shortnameRepository.save(new Shortname(
-                card, String.valueOf(UUID.randomUUID()), ShortnameType.MAIN));
+        shortnameRepository.save(new Shortname(card, getRandomString(), ShortnameType.MAIN));
 
         if (card.getType().getType() == CardTypeEnum.PERSON || card.getType().getType() == CardTypeEnum.COMPANY) {
             Album album = new Album(card);
@@ -39,6 +38,17 @@ public class CardService {
             card.setAlbum(album);
         }
         return cardRepository.save(card);
+    }
+
+    private String getRandomString() {
+        int leftLimit = 97; // letter 'a'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 8;
+        Random random = new Random();
+        return random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
 
     public Card searchByShortname(String sn) {

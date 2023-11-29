@@ -132,12 +132,15 @@ public class ProfileService {
       }
     }
 
-    if (dto.getCompanyId() != null) {
-      if (dto.getCompanyId().equals(0)) {
+    if (dto.getCompanyName() != null) {
+      if (dto.getCompanyName().isEmpty()) {
         companyService.unsetFor(card);
       } else {
-        Card company = profileProvider.getTarget(dto.getCompanyId());
-        companyService.setFor(card, company);
+        Card company = companyService.getCompanyOf(card);
+        if (company != null) {
+          company.setName(dto.getCompanyName());
+          cardRepository.save(company);
+        }
       }
     }
 

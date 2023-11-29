@@ -41,7 +41,6 @@ public class CardMapper {
     private final ModelMapper modelMapper;
     private final ContactMapper contactMapper;
     private final ProfileProvider profileProvider;
-    private final CashService cashService;
     private final CompanyService companyService;
 
     private final TabRepository tabRepository; // TODO TabMapper
@@ -84,7 +83,6 @@ public class CardMapper {
         }
         res.setRelation(getPossibleRelation(card));
         res.setMainShortname(shortnameService.getMainShortname(card));
-        finishCompany(res, card, overlay);
         res.setAvatarUrl(getAvatarUrl(card, overlay));
         res.setBackgroundUrl(getBackgroundUrl(card, overlay));
         res.setLastVizit(getLastVizit(card));
@@ -165,26 +163,6 @@ public class CardMapper {
 
     private String getAvatarUrl(Card card, Optional<Card> overlay) {
         return getCloudFileUrlByFileId(overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId());
-    }
-
-    private void finishCompany(CardResponse res, Card card, Optional<Card> overlay) {
-        Card company = companyService.getCompanyOf(card);
-        if (overlay.isPresent()) {
-            Card company1 = companyService.getCompanyOf(overlay.get());
-            if (company1 != null && company1.isStatus()) {
-                company = company1;
-            }
-        }
-        if (company == null || !company.isStatus()) { // TODO function for same checks
-            res.setCompany(null);
-        } else if (!cashService.isPro(card.getAccount())) {
-            BriefCardResponse dto = new BriefCardResponse();
-            dto.setName(company.getName());
-            res.setCompany(dto);
-        } else {
-            res.setCompany(mapToBrief(company));
-            res.getCompany().setMainShortname(shortnameService.getMainShortname(company));
-        }
     }
 
     private BriefRelationResponseDTO getPossibleRelation(Card card) {

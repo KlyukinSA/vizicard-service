@@ -9,7 +9,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class BigCardResponse extends BriefCardResponse {
     private String description;
-    private String city;
 
     private Date createAt;
     private Date lastVizit;

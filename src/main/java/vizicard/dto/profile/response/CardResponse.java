@@ -13,7 +13,6 @@ import vizicard.dto.tab.TabResponseDTO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardResponse extends BigCardResponse {
-  private BriefCardResponse company;
   private BriefRelationResponseDTO relation;
   private String cardName;
   private List<TabResponseDTO> tabs;

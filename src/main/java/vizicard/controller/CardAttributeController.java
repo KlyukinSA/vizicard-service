@@ -1,12 +1,12 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import vizicard.dto.CloudFileDTO;
 import vizicard.dto.contact.FullContactResponse;
 import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
@@ -22,6 +22,7 @@ import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.TabRepository;
+import vizicard.service.AlbumService;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
@@ -37,9 +38,11 @@ public class CardAttributeController {
     private final TabRepository tabRepository;
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
+    private final AlbumService albumService;
 
     private final ContactMapper contactMapper;
     private final DetailResponseMapper detailResponseMapper;
+    private final ModelMapper modelMapper;
 
 
     @GetMapping("contacts")
@@ -128,6 +131,36 @@ public class CardAttributeController {
                         .map(detailResponseMapper::mapToResponse)
                         .collect(Collectors.toList())
         );
+    }
+
+    @GetMapping("/files")
+    List<CloudFileDTO> getUsualFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.FILE).stream()
+                .map((val) -> modelMapper.map(val, CloudFileDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    private Integer getTargetCardAlbumId(Integer id) {
+        return profileProvider.getTarget(id).getAlbum().getId();
+    }
+
+    @GetMapping("/media")
+    List<CloudFileDTO> getMediaFiles(@PathVariable Integer id) {
+        return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.MEDIA).stream()
+                .map((val) -> modelMapper.map(val, CloudFileDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("/files")
+    @PreAuthorize("isAuthenticated()")
+    CloudFileDTO addUsualFile(@RequestPart MultipartFile file, @PathVariable Integer id) {
+        return modelMapper.map(albumService.addFile(file, getTargetCardAlbumId(id), CloudFileType.FILE), CloudFileDTO.class);
+    }
+
+    @PostMapping("/media")
+    @PreAuthorize("isAuthenticated()")
+    CloudFileDTO addMedia(@RequestPart MultipartFile file, @PathVariable Integer id) {
+        return modelMapper.map(albumService.addFile(file, getTargetCardAlbumId(id), CloudFileType.MEDIA), CloudFileDTO.class);
     }
 
 }

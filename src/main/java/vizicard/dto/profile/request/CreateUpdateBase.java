@@ -13,5 +13,4 @@ public class CreateUpdateBase {
     private String title;
     private String description;
     private String city;
-    private List<ContactInListRequest> contacts;
 }

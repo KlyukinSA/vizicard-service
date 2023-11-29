@@ -43,6 +43,9 @@ public class ProfileService {
     if (dto.getCity() != null) {
       card.setCity(dto.getCity());
     }
+    if (dto.getCardName() != null) {
+      card.setCardName(dto.getCardName());
+    }
 
     if (dto.getAvatarId() != null) {
       if (dto.getAvatarId().equals(0)) {

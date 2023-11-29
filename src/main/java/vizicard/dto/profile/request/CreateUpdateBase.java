@@ -13,4 +13,5 @@ public class CreateUpdateBase {
     private String title;
     private String description;
     private String city;
+    private String cardName;
 }

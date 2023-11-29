@@ -7,6 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProfileUpdateDTO extends PhotoCreateUpdateBase {
     private String companyName;
-
     private String password;
 }

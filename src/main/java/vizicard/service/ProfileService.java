@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.request.LeadGenDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.exception.CustomException;
@@ -22,13 +21,10 @@ public class ProfileService {
   private final CardRepository cardRepository;
   private final ContactRepository contactRepository;
   private final ContactTypeRepository contactTypeRepository;
-
   private final ProfileProvider profileProvider;
-
-  private final CloudFileRepository cloudFileRepository;
-
   private final AuthService authService;
   private final CompanyService companyService;
+  private final CloudFileService cloudFileService;
 
   public Card updateProfile(Card card, ProfileUpdateDTO dto) {
     if (dto.getName() != null) { // TODO set modelMapper how to map contacts and cloudFiles
@@ -47,24 +43,20 @@ public class ProfileService {
       card.setCardName(dto.getCardName());
     }
 
-    if (dto.getAvatarId() != null) {
-      if (dto.getAvatarId().equals(0)) {
+    if (dto.getAvatarUrl() != null) {
+      if (dto.getAvatarUrl().isEmpty()) {
         card.setAvatarId(null);
       } else {
-        Optional<CloudFile> cloudFile = cloudFileRepository.findById(dto.getAvatarId());
-        if (cloudFile.isPresent() && cloudFile.get().isStatus()) {
-          card.setAvatarId(cloudFile.get().getId());
-        }
+        CloudFile cloudFile = cloudFileService.saveExternal(dto.getAvatarUrl(), card.getAlbum(), CloudFileType.MEDIA);
+        card.setAvatarId(cloudFile.getId());
       }
     }
-    if (dto.getBackgroundId() != null) {
-      if (dto.getBackgroundId().equals(0)) {
+    if (dto.getBackgroundUrl() != null) {
+      if (dto.getBackgroundUrl().isEmpty()) {
         card.setBackgroundId(null);
       } else {
-        Optional<CloudFile> cloudFile = cloudFileRepository.findById(dto.getBackgroundId());
-        if (cloudFile.isPresent() && cloudFile.get().isStatus()) {
-          card.setBackgroundId(cloudFile.get().getId());
-        }
+        CloudFile cloudFile = cloudFileService.saveExternal(dto.getBackgroundUrl(), card.getAlbum(), CloudFileType.MEDIA);
+        card.setBackgroundId(cloudFile.getId());
       }
     }
 

@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PhotoCreateUpdateBase extends CreateUpdateBase {
-    private Integer avatarId;
-    private Integer backgroundId;
+    private String avatarUrl;
+    private String backgroundUrl;
 }

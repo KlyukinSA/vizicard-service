@@ -85,7 +85,7 @@ public class ProfileService {
   public Card updateCardWithLeadGenCardCreationFields(Card card, LeadGenDTO dto) {
     int i = 1;
     Contact phone = new Contact();
-    phone.setContact(dto.getPhone());
+    phone.setValue(dto.getPhone());
     phone.setType(contactTypeRepository.findByType(ContactEnum.PHONE));
     phone.setCardOwner(card);
     phone.setOrder(i);
@@ -94,7 +94,7 @@ public class ProfileService {
 
     i++;
     Contact email = new Contact();
-    email.setContact(dto.getEmail());
+    email.setValue(dto.getEmail());
     email.setType(contactTypeRepository.findByType(ContactEnum.MAIL));
     email.setCardOwner(card);
     email.setOrder(i);
@@ -106,7 +106,7 @@ public class ProfileService {
     String urlBase = link.substring(0, link.indexOf('/') + 1);
     ContactType type = contactTypeRepository.findByUrlBase(urlBase);
     Contact linkContact = new Contact();
-    linkContact.setContact(link);
+    linkContact.setValue(link);
     linkContact.setType(type);
     linkContact.setCardOwner(card);
     linkContact.setOrder(i);

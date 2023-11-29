@@ -2,9 +2,6 @@ package vizicard.dto.profile.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.dto.contact.ContactInListRequest;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor

@@ -6,22 +6,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.response.CardResponse;
-import vizicard.dto.contact.ContactInListRequest;
 import vizicard.dto.profile.request.LeadGenDTO;
 import vizicard.dto.RelationResponseDTO;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.model.Card;
-import vizicard.model.CardTypeEnum;
-import vizicard.model.ContactEnum;
 import vizicard.model.Relation;
 import vizicard.repository.CardTypeRepository;
-import vizicard.service.CompanyService;
 import vizicard.service.ProfileService;
 import vizicard.service.RelationService;
 import vizicard.mapper.CardMapper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -82,7 +82,7 @@ public class EmailService {
     private Optional<String> getAddressTo(Card card) {
         return card.getContacts().stream()
                 .filter((val) -> val.getType().getType() == ContactEnum.MAIL)
-                .findFirst().map(Contact::getContact);
+                .findFirst().map(Contact::getValue);
     }
 
     private String replaceArg(String text, String arg, String val) {
@@ -107,7 +107,7 @@ public class EmailService {
         Optional<Contact> phone = card.getContacts().stream()
                 .filter((val) -> val.getType().getType() == ContactEnum.PHONE)
                 .findFirst();
-        return phone.map(Contact::getContact).orElse(null);
+        return phone.map(Contact::getValue).orElse(null);
     }
 
     public void sendLead(String to, Card actor) {

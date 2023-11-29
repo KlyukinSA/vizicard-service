@@ -19,7 +19,7 @@ public class Contact extends CardAttribute {
     private ContactType type;
 
     @Column(nullable = false, length = 200)
-    private String contact;
+    private String value;
 
     private String title;
 

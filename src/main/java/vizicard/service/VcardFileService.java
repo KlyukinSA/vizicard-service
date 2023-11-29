@@ -80,7 +80,7 @@ public class VcardFileService { // TODO mapper instead of service, include getVc
         addGroupedLink(group, vcard, "CARD-SOURCE", mainUrl);
         for (Contact contact : card.getContacts()) {
             ContactEnum contactEnum = contact.getType().getType();
-            String string = contact.getContact();
+            String string = contact.getValue();
             if (isGoodForVcard(string)) {
                 if (contactEnum == ContactEnum.PHONE) {
                     vcard.addTelephoneNumber(string);

@@ -12,7 +12,7 @@ import vizicard.model.ContactEnum;
 public class ContactResponse {
     private Integer id;
     private ContactEnum type;
-    private String contact;
+    private String value;
     private String title;
     private Integer order;
     private String logoUrl;

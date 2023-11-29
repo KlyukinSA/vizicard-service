@@ -46,7 +46,7 @@ public class ContactService {
 
     private void stopInvalidContactUrl(Contact contact) {
         if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL &&
-                contact.getContact().contains(".") && !contact.getContact().startsWith("http")) {
+                contact.getValue().contains(".") && !contact.getValue().startsWith("http")) {
             throw new CustomException("url should start with http", HttpStatus.BAD_REQUEST);
         }
     }

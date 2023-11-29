@@ -48,11 +48,11 @@ public class ContactMapper {
 	}
 
 	private String formContactUrl(Contact contact) {
-		String s = contact.getContact();
+		String s = contact.getValue();
 		if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL && s.contains(".")) {
 			return s;
 		}
-		return contact.getType().getUrlBase() + contact.getContact();
+		return contact.getType().getUrlBase() + contact.getValue();
 	}
 
 	public ContactTypeResponse mapToContactTypeResponse(ContactType contactType) {

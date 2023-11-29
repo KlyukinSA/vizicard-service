@@ -18,4 +18,5 @@ public class CardResponse extends BigCardResponse {
   private String cardName;
   private List<TabResponseDTO> tabs;
   private List<WeirdCardResponseDetailDTO> details;
+  private Integer accountId;
 }

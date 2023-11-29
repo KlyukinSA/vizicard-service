@@ -21,6 +21,7 @@ import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.model.detail.Skill;
 import vizicard.repository.RelationRepository;
+import vizicard.repository.ShortnameRepository;
 import vizicard.repository.TabRepository;
 import vizicard.service.AlbumService;
 import vizicard.utils.ProfileProvider;
@@ -39,6 +40,7 @@ public class CardAttributeController {
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
     private final AlbumService albumService;
+    private final ShortnameRepository shortnameRepository;
 
     private final ContactMapper contactMapper;
     private final DetailResponseMapper detailResponseMapper;
@@ -47,11 +49,25 @@ public class CardAttributeController {
 
     @GetMapping("contacts")
     @PreAuthorize("isAuthenticated()")
-    public List<FullContactResponse> getContacts(@PathVariable Integer id) {
-        Card card = profileProvider.getTarget(id);
+    public List<FullContactResponse> getContacts(@PathVariable String id) {
+        Card card = getCardByIdOrElseShortname(id);
         List<Contact> list = (List<Contact>) getListThroughOverlay(card, Card::getContacts);
         stopAccessToHiddenOrEmptyTab(TabTypeEnum.CONTACTS, list, card);
         return contactMapper.mapList(list);
+    }
+
+    private Card getCardByIdOrElseShortname(String idOrSn) {
+        try {
+            Integer id = Integer.parseInt(idOrSn);
+            return profileProvider.getTarget(id);
+        } catch (NumberFormatException nfe) {
+            Shortname shortname = shortnameRepository.findByShortname(idOrSn);
+            Card card = shortname.getCard();
+            if (card == null) {
+                return shortname.getAccount().getMainCard();
+            }
+            return card;
+        }
     }
 
     private List<? extends CardAttribute> getListThroughOverlay(Card card, Function<Card, List<? extends CardAttribute>> f) {
@@ -70,8 +86,8 @@ public class CardAttributeController {
     }
 
     @GetMapping("education")
-    public List<EducationResponseDTO> getEducation(@PathVariable Integer id) {
-        Card card = profileProvider.getTarget(id);
+    public List<EducationResponseDTO> getEducation(@PathVariable String id) {
+        Card card = getCardByIdOrElseShortname(id);
         List<Education> list = card.getDetailStruct().getEducation();
         stopAccessToHiddenOrEmptyTab(TabTypeEnum.RESUME, list, card);
         return list.stream()
@@ -81,8 +97,8 @@ public class CardAttributeController {
     }
 
     @GetMapping("experience")
-    public List<ExperienceResponseDTO> getExperience(@PathVariable Integer id) {
-        Card card = profileProvider.getTarget(id);
+    public List<ExperienceResponseDTO> getExperience(@PathVariable String id) {
+        Card card = getCardByIdOrElseShortname(id);
         List<Experience> list = card.getDetailStruct().getExperience();
         stopAccessToHiddenOrEmptyTab(TabTypeEnum.RESUME, list, card);
         return list.stream()
@@ -92,8 +108,8 @@ public class CardAttributeController {
     }
 
     @GetMapping("skills")
-    public List<SkillResponseDTO> getSkills(@PathVariable Integer id) {
-        Card card = profileProvider.getTarget(id);
+    public List<SkillResponseDTO> getSkills(@PathVariable String id) {
+        Card card = getCardByIdOrElseShortname(id);
         List<Skill> list = card.getDetailStruct().getSkills();
         stopAccessToHiddenOrEmptyTab(TabTypeEnum.RESUME, list, card);
         return list.stream()
@@ -113,8 +129,8 @@ public class CardAttributeController {
     }
 
     @GetMapping("resume")
-    public ProfileDetailStructResponseDTO getAllResume(@PathVariable Integer id) {
-        Card card = profileProvider.getTarget(id);
+    public ProfileDetailStructResponseDTO getAllResume(@PathVariable String id) {
+        Card card = getCardByIdOrElseShortname(id);
         stopAccessToHiddenOrEmptyTab(TabTypeEnum.RESUME, null, card); // Any
         ProfileDetailStruct detailStruct = card.getDetailStruct();
         return new ProfileDetailStructResponseDTO(
@@ -134,18 +150,18 @@ public class CardAttributeController {
     }
 
     @GetMapping("/files")
-    List<CloudFileDTO> getUsualFiles(@PathVariable Integer id) {
+    List<CloudFileDTO> getUsualFiles(@PathVariable String id) {
         return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.FILE).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
     }
 
-    private Integer getTargetCardAlbumId(Integer id) {
-        return profileProvider.getTarget(id).getAlbum().getId();
+    private Integer getTargetCardAlbumId(String id) {
+        return getCardByIdOrElseShortname(id).getAlbum().getId();
     }
 
     @GetMapping("/media")
-    List<CloudFileDTO> getMediaFiles(@PathVariable Integer id) {
+    List<CloudFileDTO> getMediaFiles(@PathVariable String id) {
         return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.MEDIA).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
@@ -153,13 +169,13 @@ public class CardAttributeController {
 
     @PostMapping("/files")
     @PreAuthorize("isAuthenticated()")
-    CloudFileDTO addUsualFile(@RequestPart MultipartFile file, @PathVariable Integer id) {
+    CloudFileDTO addUsualFile(@RequestPart MultipartFile file, @PathVariable String id) {
         return modelMapper.map(albumService.addFile(file, getTargetCardAlbumId(id), CloudFileType.FILE), CloudFileDTO.class);
     }
 
     @PostMapping("/media")
     @PreAuthorize("isAuthenticated()")
-    CloudFileDTO addMedia(@RequestPart MultipartFile file, @PathVariable Integer id) {
+    CloudFileDTO addMedia(@RequestPart MultipartFile file, @PathVariable String id) {
         return modelMapper.map(albumService.addFile(file, getTargetCardAlbumId(id), CloudFileType.MEDIA), CloudFileDTO.class);
     }
 

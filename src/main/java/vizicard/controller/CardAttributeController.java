@@ -121,9 +121,8 @@ public class CardAttributeController {
         Account user = profileProvider.getUserFromAuth();
         boolean isCurrentCard = user != null && user.getCurrentCard().getId().equals(card.getId()); // TODO same in CardMapper
         Optional<Tab> optionalTab = tabRepository.findByTypeTypeAndCardOwner(tabType, card);
-        if ((optionalTab.isPresent() && optionalTab.get().isHidden()
-                && !isCurrentCard) || (list != null && list.isEmpty())) {
-            throw new CustomException("nothing here", HttpStatus.NOT_FOUND);
+        if (!isCurrentCard && optionalTab.isPresent() && optionalTab.get().isHidden()) { // TODO same check
+            throw new CustomException("tab is hidden", HttpStatus.FORBIDDEN);
         }
     }
 
@@ -150,6 +149,7 @@ public class CardAttributeController {
 
     @GetMapping("/files")
     List<CloudFileDTO> getUsualFiles(@PathVariable String id) {
+        stopAccessToHiddenOrEmptyTab(TabTypeEnum.FILE, null, getCardByIdOrElseShortname(id));
         return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.FILE).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());
@@ -161,6 +161,7 @@ public class CardAttributeController {
 
     @GetMapping("/media")
     List<CloudFileDTO> getMediaFiles(@PathVariable String id) {
+        stopAccessToHiddenOrEmptyTab(TabTypeEnum.MEDIA, null, getCardByIdOrElseShortname(id));
         return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.MEDIA).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());

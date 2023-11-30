@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
-import vizicard.dto.profile.response.BriefCardResponse;
-import vizicard.dto.profile.response.CardResponse;
-import vizicard.dto.profile.response.CompanyResponse;
-import vizicard.dto.profile.response.ParamCardResponse;
+import vizicard.dto.detail.ResumeResponseDTO;
+import vizicard.dto.profile.response.*;
 import vizicard.dto.tab.TabResponseDTO;
 import vizicard.model.*;
 import vizicard.model.detail.ProfileDetailStruct;
@@ -19,6 +17,7 @@ import vizicard.service.*;
 import vizicard.utils.ProfileProvider;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -28,14 +27,14 @@ public class CardMapper {
     private final RelationRepository relationRepository;
     private final ContactRepository contactRepository;
     private final CloudFileService cloudFileService;
-
-    private final ModelMapper modelMapper;
     private final ProfileProvider profileProvider;
     private final CompanyService companyService;
-
     private final TabRepository tabRepository; // TODO TabMapper
     private final TabTypeRepository tabTypeRepository;
     private final AlbumService albumService;
+
+    private final ModelMapper modelMapper;
+    private final DetailResponseMapper detailResponseMapper;
 
     public BriefCardResponse mapToBrief(Card card) {
         BriefCardResponse res = modelMapper.map(card, BriefCardResponse.class);
@@ -209,4 +208,31 @@ public class CardMapper {
         dto.setParams(map);
         return dto;
     }
+
+    public MainResponseDTO mapToMainResponse(Card card) {
+        MainResponseDTO dto = modelMapper.map(card, MainResponseDTO.class);
+        dto.setCompanyName(companyService.getCompanyOf(card).getName());
+        dto.setAvatarUrl(getAvatarUrl(card, Optional.empty()));
+        dto.setBackgroundUrl(getBackgroundUrl(card, Optional.empty()));
+        return dto;
+    }
+
+    public ResumeResponseDTO mapToResume(Card card) {
+        ProfileDetailStruct detailStruct = card.getDetailStruct();
+        return new ResumeResponseDTO(
+                detailStruct.getEducation().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getExperience().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getSkills().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList())
+        );
+    }
+
 }

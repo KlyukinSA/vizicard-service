@@ -6,11 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CardTypeDTO;
-import vizicard.dto.detail.ProfileDetailStructResponseDTO;
+import vizicard.dto.detail.ResumeResponseDTO;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
+import vizicard.dto.profile.response.MainResponseDTO;
 import vizicard.dto.profile.response.ParamCardResponse;
 import vizicard.exception.CustomException;
 import vizicard.mapper.DetailResponseMapper;
@@ -20,11 +21,8 @@ import vizicard.model.CardTypeEnum;
 import vizicard.model.TabTypeEnum;
 import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.repository.CardTypeRepository;
-import vizicard.service.CardAttributeService;
-import vizicard.service.CardService;
-import vizicard.service.ProfileService;
+import vizicard.service.*;
 import vizicard.mapper.CardMapper;
-import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
 
 import java.util.List;
@@ -44,7 +42,6 @@ public class CardController {
 
     private final CardMapper cardMapper;
     private final ModelMapper modelMapper;
-    private final DetailResponseMapper detailResponseMapper;
 
     @GetMapping
     public CardResponse search(@PathVariable String cardAddress) {
@@ -122,24 +119,16 @@ public class CardController {
     }
 
     @GetMapping("resume")
-    public ProfileDetailStructResponseDTO getAllResume(@PathVariable String cardAddress) {
+    public ResumeResponseDTO getResume(@PathVariable String cardAddress) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        ProfileDetailStruct detailStruct = card.getDetailStruct();
-        return new ProfileDetailStructResponseDTO(
-                detailStruct.getEducation().stream()
-                        .filter(CardAttribute::isStatus)
-                        .map(detailResponseMapper::mapToResponse)
-                        .collect(Collectors.toList()),
-                detailStruct.getExperience().stream()
-                        .filter(CardAttribute::isStatus)
-                        .map(detailResponseMapper::mapToResponse)
-                        .collect(Collectors.toList()),
-                detailStruct.getSkills().stream()
-                        .filter(CardAttribute::isStatus)
-                        .map(detailResponseMapper::mapToResponse)
-                        .collect(Collectors.toList())
-        );
+        return cardMapper.mapToResume(card);
+    }
+
+    @GetMapping("main-info")
+    public MainResponseDTO getMainInfo(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return cardMapper.mapToMainResponse(card);
     }
 
 }

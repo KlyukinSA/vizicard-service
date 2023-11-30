@@ -4,14 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.ExperienceDTO;
-import vizicard.dto.detail.ExperienceResponseDTO;
 import vizicard.model.Card;
 import vizicard.model.CardAttribute;
 import vizicard.model.detail.Experience;
 import vizicard.repository.detail.ExperienceRepository;
-import vizicard.utils.ProfileProvider;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 @Service
@@ -21,24 +18,19 @@ public class ExperienceService {
     private final ExperienceRepository repository;
 
     private final ModelMapper modelMapper;
-    private final ProfileProvider profileProvider;
 
-    public Experience createExperience(ExperienceDTO dto) {
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
-        Experience detail = new Experience(user);
+    public Experience createExperience(Card card, ExperienceDTO dto) {
+        Experience detail = new Experience(card);
         modelMapper.map(dto, detail);
-        detail.setIndividualId(getNextIndividualId(user));
+        detail.setIndividualId(getNextIndividualId(card));
         repository.save(detail);
         return detail;
     }
 
-    public Experience updateExperience(ExperienceDTO dto, Integer id) {
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
-        Experience detail = repository.findByCardOwnerAndIndividualId(user, id);
-        if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
-            modelMapper.map(dto, detail);
-            repository.save(detail);
-        }
+    public Experience updateExperience(Card card, ExperienceDTO dto, Integer id) {
+        Experience detail = repository.findByCardOwnerAndIndividualId(card, id);
+        modelMapper.map(dto, detail);
+        repository.save(detail);
         return detail;
     }
 
@@ -48,17 +40,19 @@ public class ExperienceService {
                 .max().orElse(0) + 1;
     }
 
-    public void deleteExperience(Integer id) {
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
-        Experience detail = repository.findByCardOwnerAndIndividualId(user, id);
-        if (Objects.equals(detail.getCardOwner().getId(), user.getId())) {
-            detail.setStatus(false);
-            repository.save(detail);
-        }
+    public void deleteExperience(Card card, Integer id) {
+        Experience detail = repository.findByCardOwnerAndIndividualId(card, id);
+        detail.setStatus(false);
+        repository.save(detail);
     }
 
-    public Stream<Experience> getOfCurrentCard() {
-        return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getExperience().stream()
+    public Stream<Experience> getAllOfCard(Card card) {
+        return card.getDetailStruct().getExperience().stream()
                 .filter(Experience::isStatus);
     }
+
+    public Experience findById(Card card, Integer id) {
+        return repository.findByCardOwnerAndIndividualId(card, id);
+    }
+
 }

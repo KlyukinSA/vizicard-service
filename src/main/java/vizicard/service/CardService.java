@@ -60,8 +60,8 @@ public class CardService {
         return search(card, shortname);
     }
 
-    public Card searchById(Integer id) {
-        return search(profileProvider.getTarget(id), null);
+    public Card search(Card card) {
+        return search(card, null);
     }
 
     private Card search(Card card, Shortname shortname) {
@@ -72,8 +72,7 @@ public class CardService {
         return card;
     }
 
-    public void delete(Integer id) {
-        Card card = cardRepository.findById(id).get();
+    public void delete(Card card) {
         Account user = profileProvider.getUserFromAuth();
         if (user.getMainCard().getId().equals(card.getId())) {
             throw new CustomException("cant delete main card", HttpStatus.FORBIDDEN);
@@ -105,12 +104,7 @@ public class CardService {
         return create(card);
     }
 
-    public Card prepareToUpdate(Integer id) {
-        Card target = profileProvider.getTarget(id);
-        return prepareToUpdateByCard(target);
-    }
-
-    private Card prepareToUpdateByCard(Card target) {
+    public Card prepareToUpdate(Card target) {
         Account user = profileProvider.getUserFromAuth();
         Relation relation = relationRepository.findByAccountOwnerAndCard(user, target);
         if (Objects.equals(user.getId(), target.getAccount().getId())
@@ -129,15 +123,6 @@ public class CardService {
             }
             return overlay;
         }
-    }
-
-    public Card prepareToUpdate(String sn) {
-        Shortname shortname = shortnameRepository.findByShortname(sn);
-        Card card = shortname.getCard();
-        if (card == null) {
-            card = shortname.getAccount().getMainCard();
-        }
-        return prepareToUpdateByCard(card);
     }
 
 }

@@ -5,11 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vizicard.exception.CustomException;
-import vizicard.model.Album;
+import vizicard.model.Card;
 import vizicard.model.CloudFile;
 import vizicard.model.CloudFileType;
 import vizicard.repository.AlbumRepository;
-import vizicard.repository.CloudFileRepository;
 import vizicard.utils.RelationValidator;
 
 import java.util.List;
@@ -19,13 +18,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AlbumService {
 
-    private final AlbumRepository albumRepository;
     private final CloudFileService cloudFileService;
     private final RelationValidator relationValidator;
 
-    public CloudFile addFile(MultipartFile file, Integer id, CloudFileType type) {
-        Album album = albumRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(album.getCardOwner());
+    public CloudFile addFile(Card card, MultipartFile file, CloudFileType type) {
         String filename = file.getOriginalFilename();
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
         if (type == CloudFileType.MEDIA
@@ -33,12 +29,11 @@ public class AlbumService {
                 || extension.equalsIgnoreCase("png"))) {
             throw new CustomException("can add only jpg and png in media", HttpStatus.FORBIDDEN);
         }
-        return cloudFileService.saveFile(file, album, type, extension);
+        return cloudFileService.saveFile(file, card.getAlbum(), type, extension);
     }
 
-    public List<CloudFile> getAllFiles(Integer id, CloudFileType type) {
-        Album album = albumRepository.findById(id).get();
-        return cloudFileService.findAllByAlbumAndType(album, type).stream()
+    public List<CloudFile> getAllFiles(Card card, CloudFileType type) {
+        return cloudFileService.findAllByAlbumAndType(card.getAlbum(), type).stream()
                 .filter(CloudFile::isStatus)
                 .collect(Collectors.toList());
     }
@@ -50,11 +45,9 @@ public class AlbumService {
         cloudFileService.save(file);
     }
 
-    public CloudFile addLinkFile(String url, Integer id) {
-        Album album = albumRepository.findById(id).get();
-        relationValidator.stopNotOwnerOf(album.getCardOwner());
+    public CloudFile addLinkFile(Card card, String url) {
         String extension = url.substring(url.lastIndexOf(".") + 1);
-        return cloudFileService.saveLink(url, album, extension);
+        return cloudFileService.saveLink(url, card.getAlbum(), extension);
     }
 
 }

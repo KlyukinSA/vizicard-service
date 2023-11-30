@@ -6,15 +6,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CardTypeDTO;
+import vizicard.dto.detail.ProfileDetailStructResponseDTO;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
 import vizicard.dto.profile.request.ProfileUpdateDTO;
 import vizicard.dto.profile.response.IdAndTypeAndMainShortnameDTO;
 import vizicard.dto.profile.response.ParamCardResponse;
 import vizicard.exception.CustomException;
+import vizicard.mapper.DetailResponseMapper;
 import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 import vizicard.model.CardTypeEnum;
+import vizicard.model.TabTypeEnum;
+import vizicard.model.detail.ProfileDetailStruct;
 import vizicard.repository.CardTypeRepository;
+import vizicard.service.CardAttributeService;
 import vizicard.service.CardService;
 import vizicard.service.ProfileService;
 import vizicard.mapper.CardMapper;
@@ -25,52 +31,44 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/cards")
+@RequestMapping("cards/{cardAddress}")
 @RequiredArgsConstructor
 public class CardController {
 
     private final CardService cardService;
-    private final CardMapper cardMapper;
-
     private final ProfileService profileService;
-    private final ModelMapper modelMapper;
     private final ShortnameService shortnameService;
     private final ProfileProvider profileProvider;
     private final CardTypeRepository cardTypeRepository;
+    private final CardAttributeService cardAttributeService; // TODO create AddressService
 
-    @GetMapping("{shortname}")
-    public CardResponse searchByShortname(@PathVariable String shortname) {
-        return cardMapper.mapToResponse(cardService.searchByShortname(shortname));
+    private final CardMapper cardMapper;
+    private final ModelMapper modelMapper;
+    private final DetailResponseMapper detailResponseMapper;
+
+    @GetMapping
+    public CardResponse search(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return cardMapper.mapToResponse(cardService.search(card));
     }
 
-    @GetMapping("id{id}")
-    public CardResponse searchById(@PathVariable Integer id) {
-        return cardMapper.mapToResponse(cardService.searchById(id));
-    }
-
-    @DeleteMapping("{id}")
+    @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public void delete(@PathVariable Integer id) {
-        cardService.delete(id);
+    public void delete(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardService.delete(card);
     }
 
-    @PutMapping("id{id}")
+    @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public CardResponse updateById(@PathVariable Integer id, @RequestBody ProfileUpdateDTO dto) {
-        Card card = cardService.prepareToUpdate(id); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
-        profileService.updateProfile(card, dto); //
-        return cardMapper.mapToResponse(profileProvider.getTarget(id));
-    }
-
-    @PutMapping("{shortname}")
-    @PreAuthorize("isAuthenticated()")
-    public CardResponse updateByShortname(@PathVariable String shortname, @RequestBody ProfileUpdateDTO dto) {
-        Card card = cardService.prepareToUpdate(shortname); // TODO update(Card sourceMap, List<Contact> newContacts, CloudFile avatar, Integer destId)
+    public CardResponse update(@PathVariable String cardAddress, @RequestBody ProfileUpdateDTO dto) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardService.prepareToUpdate(card);
         profileService.updateProfile(card, dto); //
         return cardMapper.mapToResponse(profileProvider.getTarget(card.getId()));
     }
 
-    @PostMapping
+    @PostMapping // TODO move to AccountController
     @PreAuthorize("isAuthenticated()")
     public CardResponse createMyCard(@RequestBody ProfileCreateDTO dto) {
         if (dto.getType() != CardTypeEnum.PERSON) {
@@ -86,13 +84,13 @@ public class CardController {
         return cardMapper.mapToResponse(card);
     }
 
-    @GetMapping("current")
+    @GetMapping("current") // TODO move to AccountController
     @PreAuthorize("isAuthenticated()")
     public CardResponse whoami() {
         return cardMapper.mapToResponse(cardService.whoami());
     }
 
-    @GetMapping("my")
+    @GetMapping("cards") // TODO move to AccountController
     @PreAuthorize("isAuthenticated()")
     public List<ParamCardResponse> getAllMyCards() {
         return cardService.getAllMyCards().stream()
@@ -100,7 +98,7 @@ public class CardController {
                 .collect(Collectors.toList());
     }
 
-    @PutMapping("merge")
+    @PutMapping("merge") // TODO remove
     @PreAuthorize("isAuthenticated()")
     public CardResponse mergeCustomCards(@RequestParam Integer main, @RequestParam Integer secondary) {
         return cardMapper.mapToResponse(profileService.mergeCustomProfiles(main, secondary)); //
@@ -108,19 +106,40 @@ public class CardController {
 
     @GetMapping("id-type-shortname")
     @PreAuthorize("isAuthenticated()")
-    public IdAndTypeAndMainShortnameDTO getIdAndTypeAndMainShortnameOfCurrentCard() {
-        Card card = cardService.whoami();
+    public IdAndTypeAndMainShortnameDTO getIdAndTypeAndMainShortnameOfCard(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         return new IdAndTypeAndMainShortnameDTO(
                 card.getId(),
                 modelMapper.map(cardTypeRepository.findByType(card.getType().getType()), CardTypeDTO.class),
                 shortnameService.getMainShortname(card));
     }
 
-    @GetMapping("types")
+    @GetMapping("types") // TODO remove
     public List<CardTypeDTO> getAllTypes() {
         return cardTypeRepository.findAll().stream()
                 .map(t -> modelMapper.map(t, CardTypeDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("resume")
+    public ProfileDetailStructResponseDTO getAllResume(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
+        ProfileDetailStruct detailStruct = card.getDetailStruct();
+        return new ProfileDetailStructResponseDTO(
+                detailStruct.getEducation().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getExperience().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList()),
+                detailStruct.getSkills().stream()
+                        .filter(CardAttribute::isStatus)
+                        .map(detailResponseMapper::mapToResponse)
+                        .collect(Collectors.toList())
+        );
     }
 
 }

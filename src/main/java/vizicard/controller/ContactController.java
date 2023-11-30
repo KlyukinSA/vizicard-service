@@ -6,21 +6,19 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.contact.*;
 import vizicard.mapper.ContactMapper;
-import vizicard.model.Contact;
-import vizicard.model.ContactEnum;
-import vizicard.model.ContactGroup;
-import vizicard.model.ContactType;
+import vizicard.model.*;
 import vizicard.repository.CloudFileRepository;
 import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
 import vizicard.repository.CustomContactTypeRepository;
+import vizicard.service.CardAttributeService;
 import vizicard.service.ContactService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/contacts")
+@RequestMapping("cards/{cardAddress}/contacts")
 @RequiredArgsConstructor
 public class ContactController {
 
@@ -30,6 +28,8 @@ public class ContactController {
     private final CloudFileRepository cloudFileRepository;
 
     private final ContactService contactService;
+    private final CardAttributeService cardAttributeService;
+
     private final ModelMapper modelMapper;
     private final ContactMapper contactMapper;
 
@@ -69,29 +69,25 @@ public class ContactController {
                 .collect(Collectors.toList());
     }
 
-//    @PutMapping
-//    @PreAuthorize("isAuthenticated()")
-//    public void changeContacts(@RequestBody ChangeContactsDTO dto) {
-//        contactService.changeContacts(dto);
-//    }
-
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ContactResponse create(@RequestBody ContactCreateDTO dto) {
+    public ContactResponse create(@PathVariable String cardAddress, @RequestBody ContactCreateDTO dto) {
         ContactType contactType = contactTypeRepository.findByType(dto.getType());
         Contact contact = getMapFromContactRequest(dto);
         contact.setType(contactType);
 
-        contact = contactService.create(contact);
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        contact = contactService.create(card, contact);
 
         return contactMapper.mapToResponse(contact);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public FullContactResponse update(@RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
+    public FullContactResponse update(@PathVariable String cardAddress, @RequestBody ContactRequest dto, @PathVariable("id") Integer id) {
         Contact contact = getMapFromContactRequest(dto);
-        contact = contactService.update(contact, id);
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        contact = contactService.update(card, contact, id);
         return contactMapper.mapToResponse(contact);
     }
 
@@ -107,30 +103,32 @@ public class ContactController {
 
     @DeleteMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public void delete(@PathVariable("id") Integer id) {
-        contactService.delete(id);
+    public void delete(@PathVariable String cardAddress, @PathVariable("id") Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        contactService.delete(card, id);
     }
-
-//    @GetMapping
-//    @PreAuthorize("isAuthenticated()")
-//    List<ContactResponse> getMyContacts() {
-//        return contactService.getMyContacts().stream()
-//                .map((val) -> modelMapper.map(val, ContactResponse.class))
-//                .collect(Collectors.toList());
-//    }
 
     @PutMapping("order")
     @PreAuthorize("isAuthenticated()")
-    public List<FullContactResponse> reorder(@RequestBody List<ContactReorderDTO> dto) {
+    public List<FullContactResponse> reorder(@PathVariable String cardAddress, @RequestBody List<ContactReorderDTO> dto) {
         List<Integer> ids = dto.stream().map(ContactReorderDTO::getId).collect(Collectors.toList());
         List<Integer> orders = dto.stream().map(ContactReorderDTO::getOrder).collect(Collectors.toList());
-        return contactMapper.mapList(contactService.reorder(ids, orders));
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return contactMapper.mapList(contactService.reorder(card, ids, orders));
     }
 
-    @GetMapping("my")
-    @PreAuthorize("isAuthenticated()")
-    public List<FullContactResponse> getOfCurrentCard() {
-        return contactMapper.mapList(contactService.getOfCurrentCard());
+    @GetMapping
+    public List<FullContactResponse> getAllOfCard(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.CONTACTS, card);
+        return contactMapper.mapList(contactService.getAllOfCard(card));
+    }
+
+    @GetMapping("{id}")
+    public FullContactResponse getById(@PathVariable String cardAddress, @PathVariable Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.CONTACTS, card);
+        return contactMapper.mapToResponse(contactService.findById(card, id));
     }
 
 }

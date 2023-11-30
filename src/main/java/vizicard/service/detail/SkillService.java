@@ -7,10 +7,8 @@ import vizicard.model.Card;
 import vizicard.model.CardAttribute;
 import vizicard.model.detail.Skill;
 import vizicard.repository.detail.SkillRepository;
-import vizicard.utils.ProfileProvider;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,21 +18,18 @@ public class SkillService {
 
     private final SkillRepository repository;
 
-    private final ProfileProvider profileProvider;
-
-    public List<Skill> changeSkills(SkillDTO dto) {
-        Card user = profileProvider.getUserFromAuth().getCurrentCard();
+    public List<Skill> changeSkills(Card card, SkillDTO dto) {
         if (dto.getAdd() != null) {
             for (String s : dto.getAdd()) {
-                create(s);
+                create(card, s);
             }
         }
         if (dto.getDelete() != null) {
             for (Integer id : dto.getDelete()) {
-                delete(id);
+                delete(card, id);
             }
         }
-        return repository.findAllByCardOwner(user).stream()
+        return repository.findAllByCardOwner(card).stream()
                 .filter(Skill::isStatus)
                 .collect(Collectors.toList());
     }
@@ -45,13 +40,12 @@ public class SkillService {
                 .max().orElse(0) + 1;
     }
 
-    public Stream<Skill> getOfCurrentCard() {
-        return profileProvider.getUserFromAuth().getCurrentCard().getDetailStruct().getSkills().stream()
+    public Stream<Skill> getAllOfCard(Card card) {
+        return card.getDetailStruct().getSkills().stream()
                 .filter(Skill::isStatus);
     }
 
-    public Skill create(String s) {
-        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+    public Skill create(Card card, String s) {
         Skill skill = repository.findBySkillAndCardOwner(s, card);
         if (skill != null) {
             skill.setStatus(true);
@@ -62,13 +56,14 @@ public class SkillService {
         return repository.save(skill);
     }
 
-    public void delete(Integer id) {
-        Card card = profileProvider.getUserFromAuth().getCurrentCard();
+    public void delete(Card card, Integer id) {
         Skill detail = repository.findByCardOwnerAndIndividualId(card, id);
-        if (Objects.equals(detail.getCardOwner().getId(), card.getId())) {
-            detail.setStatus(false);
-            repository.save(detail);
-        }
+        detail.setStatus(false);
+        repository.save(detail);
+    }
+
+    public Skill findById(Card card, Integer id) {
+        return repository.findByCardOwnerAndIndividualId(card, id);
     }
 
 }

@@ -130,11 +130,10 @@ public class CardMapper {
         finishTabType(usedTypes, TabTypeEnum.RESUME, isCurrentCard, isResumeNotEmpty(detailStruct), res, i);
         i++;
 
-        Integer albumId = card.getAlbum().getId();
-        List<CloudFile> allMedia = albumService.getAllFiles(albumId, CloudFileType.MEDIA);
+        List<CloudFile> allMedia = albumService.getAllFiles(card, CloudFileType.MEDIA);
         finishTabType(usedTypes, TabTypeEnum.MEDIA, isCurrentCard, !allMedia.isEmpty(), res, i);
         i++;
-        List<CloudFile> allFiles = albumService.getAllFiles(albumId, CloudFileType.FILE);
+        List<CloudFile> allFiles = albumService.getAllFiles(card, CloudFileType.FILE);
         finishTabType(usedTypes, TabTypeEnum.FILES, isCurrentCard, !allFiles.isEmpty(), res, i);
         return res;
     }

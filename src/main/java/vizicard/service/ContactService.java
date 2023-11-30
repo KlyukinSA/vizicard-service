@@ -22,15 +22,13 @@ public class ContactService {
 
     private final ContactRepository contactRepository;
 
-    private final ProfileProvider profileProvider;
     private final RelationValidator relationValidator;
 
     private final ModelMapper modelMapper;
 
-    public Contact create(Contact contact) {
+    public Contact create(Card card, Contact contact) {
         stopInvalidContactUrl(contact);
 
-        Card card = profileProvider.getUserFromAuth().getCurrentCard();
         contact.setCardOwner(card);
         contact.setIndividualId(getNextIndividualId(card));
         contactRepository.save(contact);
@@ -51,34 +49,31 @@ public class ContactService {
         }
     }
 
-    public Contact update(Contact map, Integer id) {
-        Contact contact = contactRepository.findByCardOwnerAndIndividualId(
-                profileProvider.getUserFromAuth().getCurrentCard(), id);
+    public Contact update(Card card, Contact map, Integer id) {
+        Contact contact = contactRepository.findByCardOwnerAndIndividualId(card, id);
         modelMapper.map(map, contact);
         return contactRepository.save(contact);
     }
 
-    public void delete(Integer id) {
-        Contact contact = contactRepository.findByCardOwnerAndIndividualId(
-                profileProvider.getUserFromAuth().getCurrentCard(), id);
+    public void delete(Card card, Integer id) {
+        Contact contact = contactRepository.findByCardOwnerAndIndividualId(card, id);
         contact.setStatus(false);
         contactRepository.save(contact);
     }
 
-    public List<Contact> reorder(List<Integer> ids, List<Integer> orders) {
-        Card owner = profileProvider.getUserFromAuth().getCurrentCard();
-        Set<Integer> currents = ids.stream().map(id -> contactRepository.findByCardOwnerAndIndividualId(owner, id).getOrder()).collect(Collectors.toSet());
+    public List<Contact> reorder(Card card, List<Integer> ids, List<Integer> orders) {
+        Set<Integer> currents = ids.stream().map(id -> contactRepository.findByCardOwnerAndIndividualId(card, id).getOrder()).collect(Collectors.toSet());
         Set<Integer> news = new HashSet<>(orders);
         if (!Objects.equals(currents, news)) {
             throw new CustomException("set of orders must be equal to set of orders of contacts by ids", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         for (int i = 0; i < ids.size(); i++) {
-            Contact contact = contactRepository.findByCardOwnerAndIndividualId(owner, ids.get(i));
+            Contact contact = contactRepository.findByCardOwnerAndIndividualId(card, ids.get(i));
             relationValidator.stopNotOwnerOf(contact.getCardOwner());
             Integer order = orders.get(i);
             if (!Objects.equals(contact.getOrder(), order)) {
-                Contact conflict = contactRepository.findByCardOwnerAndOrder(owner, order);
+                Contact conflict = contactRepository.findByCardOwnerAndOrder(card, order);
                 conflict.setOrder(0);
                 contactRepository.save(conflict);
 
@@ -90,11 +85,15 @@ public class ContactService {
                 contactRepository.save(conflict);
             }
         }
-        return contactRepository.findAllByCardOwner(owner);
+        return contactRepository.findAllByCardOwner(card);
     }
 
-    public List<Contact> getOfCurrentCard() {
-        return contactRepository.findAllByCardOwner(profileProvider.getUserFromAuth().getCurrentCard());
+    public List<Contact> getAllOfCard(Card card) {
+        return contactRepository.findAllByCardOwner(card);
+    }
+
+    public Contact findById(Card card, Integer id) {
+        return contactRepository.findByCardOwnerAndIndividualId(card, id);
     }
 
 }

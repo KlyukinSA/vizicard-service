@@ -149,7 +149,7 @@ public class CardAttributeController {
 
     @GetMapping("/files")
     List<CloudFileDTO> getUsualFiles(@PathVariable String id) {
-        stopAccessToHiddenOrEmptyTab(TabTypeEnum.FILE, null, getCardByIdOrElseShortname(id));
+        stopAccessToHiddenOrEmptyTab(TabTypeEnum.FILES, null, getCardByIdOrElseShortname(id));
         return albumService.getAllFiles(getTargetCardAlbumId(id), CloudFileType.FILE).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());

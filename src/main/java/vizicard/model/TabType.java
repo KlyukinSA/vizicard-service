@@ -14,7 +14,7 @@ import java.util.List;
 public class TabType {
 
     @Id
-    @Column(columnDefinition = "ENUM('CONTACTS', 'RESUME', 'MEDIA', 'FILE')")
+    @Column(columnDefinition = "ENUM('CONTACTS', 'RESUME', 'MEDIA', 'FILES')")
     @Enumerated(EnumType.STRING)
     private TabTypeEnum type;
 

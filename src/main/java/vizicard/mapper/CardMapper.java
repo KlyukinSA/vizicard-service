@@ -4,21 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import vizicard.dto.*;
-import vizicard.dto.contact.FullContactResponse;
-import vizicard.dto.detail.EducationResponseDTO;
-import vizicard.dto.detail.ExperienceResponseDTO;
-import vizicard.dto.detail.ProfileDetailStructResponseDTO;
-import vizicard.dto.detail.SkillResponseDTO;
 import vizicard.dto.profile.response.BriefCardResponse;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.response.CompanyResponse;
 import vizicard.dto.profile.response.ParamCardResponse;
 import vizicard.dto.tab.TabResponseDTO;
 import vizicard.model.*;
-import vizicard.model.detail.Education;
-import vizicard.model.detail.Experience;
 import vizicard.model.detail.ProfileDetailStruct;
-import vizicard.model.detail.Skill;
 import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.TabRepository;
@@ -27,7 +19,6 @@ import vizicard.service.*;
 import vizicard.utils.ProfileProvider;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -144,7 +135,7 @@ public class CardMapper {
         finishTabType(usedTypes, TabTypeEnum.MEDIA, isCurrentCard, !allMedia.isEmpty(), res, i);
         i++;
         List<CloudFile> allFiles = albumService.getAllFiles(albumId, CloudFileType.FILE);
-        finishTabType(usedTypes, TabTypeEnum.FILE, isCurrentCard, !allFiles.isEmpty(), res, i);
+        finishTabType(usedTypes, TabTypeEnum.FILES, isCurrentCard, !allFiles.isEmpty(), res, i);
         return res;
     }
 

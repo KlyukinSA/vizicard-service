@@ -1,5 +1,5 @@
 package vizicard.model;
 
 public enum TabTypeEnum {
-    CONTACTS, RESUME, MEDIA, FILE;
+    CONTACTS, RESUME, MEDIA, FILES;
 }

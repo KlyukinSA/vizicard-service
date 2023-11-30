@@ -11,6 +11,7 @@ import vizicard.model.Card;
 import vizicard.model.Shortname;
 import vizicard.model.ShortnameType;
 import vizicard.repository.ShortnameRepository;
+import vizicard.service.CardAttributeService;
 import vizicard.service.QRService;
 import vizicard.service.ShortnameService;
 import vizicard.utils.ProfileProvider;
@@ -26,6 +27,7 @@ public class ShortnameController {
 
     private final ShortnameService shortnameService;
     private final QRService qrService;
+    private final CardAttributeService cardAttributeService;
 
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
@@ -75,8 +77,9 @@ public class ShortnameController {
 
     @GetMapping("qr")
     @PreAuthorize("isAuthenticated()")
-    public QRCodeResponse generateQRCodeForMainShortname() throws IOException, InterruptedException {
-        String mainShortname = shortnameService.getMainShortname(profileProvider.getUserFromAuth().getCurrentCard());
+    public QRCodeResponse generateQRCodeForMainShortname(@RequestParam String cardAddress) throws IOException, InterruptedException {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        String mainShortname = shortnameService.getMainShortname(card);
         return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
     }
 

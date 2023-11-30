@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 public class ContactController {
 
     private final ContactTypeRepository contactTypeRepository;
-    private final CustomContactTypeRepository customContactTypeRepository;
-    private final ContactGroupRepository contactGroupRepository;
     private final CloudFileRepository cloudFileRepository;
 
     private final ContactService contactService;
@@ -32,42 +30,6 @@ public class ContactController {
 
     private final ModelMapper modelMapper;
     private final ContactMapper contactMapper;
-
-    @GetMapping("types")
-    public List<ContactTypeResponse> getAllTypes() {
-        return contactTypeRepository.findAll().stream()
-                .map(contactMapper::mapToContactTypeResponse)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("types/{type}")
-    public ContactTypeResponse getTypeByType(@PathVariable ContactEnum type) {
-        return contactMapper.mapToContactTypeResponse(contactTypeRepository.findByType(type));
-    }
-
-    @GetMapping("types/search")
-    public List<ContactGroupResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
-        List<ContactType> types = customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting);
-        List<ContactGroup> groups = contactGroupRepository.findAll();
-        List<ContactGroupResponse> res = groups.stream()
-                .map(g -> new ContactGroupResponse(g.getType(), g.getWriting(), getTypeResponsesByGroup(g, types)))
-                .collect(Collectors.toList());
-        return res;
-    }
-
-    private List<ContactTypeResponse> getTypeResponsesByGroup(ContactGroup group, List<ContactType> types) {
-        return types.stream()
-                .filter(t -> t.getGroup().getId().equals(group.getId()))
-                .map(contactMapper::mapToContactTypeResponse)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("groups")
-    public List<ContactGroupResponse> getAllGroups() {
-        return contactGroupRepository.findAll().stream()
-                .map(contactMapper::mapToContactGroupResponse)
-                .collect(Collectors.toList());
-    }
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")

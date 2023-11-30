@@ -10,6 +10,7 @@ import vizicard.model.Card;
 import vizicard.model.CloudFile;
 import vizicard.model.CloudFileType;
 import vizicard.model.TabTypeEnum;
+import vizicard.repository.CardRepository;
 import vizicard.service.AlbumService;
 import vizicard.service.CardAttributeService;
 import vizicard.service.CloudFileService;
@@ -25,6 +26,7 @@ public class AlbumController {
     private final AlbumService albumService;
     private final CloudFileService cloudFileService;
     private final CardAttributeService cardAttributeService;
+    private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
 
     @PostMapping
@@ -89,6 +91,38 @@ public class AlbumController {
     @GetMapping("{id}")
     public CloudFileDTO getFileById(@PathVariable String cardAddress, @PathVariable Integer id) {
         return modelMapper.map(cloudFileService.findById(id), CloudFileDTO.class);
+    }
+
+    @PutMapping("avatar")
+    @PreAuthorize("isAuthenticated()")
+    public CloudFileDTO updateAvatar(@PathVariable String cardAddress, @RequestParam(required = false) String url) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        if (url == null) {
+            card.setAvatarId(null);
+            cardRepository.save(card);
+            return null;
+        } else {
+            CloudFile cloudFile = cloudFileService.saveExternal(url, card.getAlbum(), CloudFileType.MEDIA);
+            card.setAvatarId(cloudFile.getId());
+            cardRepository.save(card);
+            return modelMapper.map(cloudFile, CloudFileDTO.class);
+        }
+    }
+
+    @PutMapping("background")
+    @PreAuthorize("isAuthenticated()")
+    public CloudFileDTO updateBackground(@PathVariable String cardAddress, @RequestParam(required = false) String url) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        if (url == null) {
+            card.setBackgroundId(null);
+            cardRepository.save(card);
+            return null;
+        } else {
+            CloudFile cloudFile = cloudFileService.saveExternal(url, card.getAlbum(), CloudFileType.MEDIA);
+            card.setBackgroundId(cloudFile.getId());
+            cardRepository.save(card);
+            return modelMapper.map(cloudFile, CloudFileDTO.class);
+        }
     }
 
 }

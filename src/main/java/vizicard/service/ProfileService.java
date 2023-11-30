@@ -24,10 +24,9 @@ public class ProfileService {
   private final ProfileProvider profileProvider;
   private final AuthService authService;
   private final CompanyService companyService;
-  private final CloudFileService cloudFileService;
 
   public Card updateProfile(Card card, ProfileUpdateDTO dto) {
-    if (dto.getName() != null) { // TODO set modelMapper how to map contacts and cloudFiles
+    if (dto.getName() != null) {
       card.setName(dto.getName());
     }
     if (dto.getTitle() != null) {
@@ -41,23 +40,6 @@ public class ProfileService {
     }
     if (dto.getCardName() != null) {
       card.setCardName(dto.getCardName());
-    }
-
-    if (dto.getAvatarUrl() != null) {
-      if (dto.getAvatarUrl().isEmpty()) {
-        card.setAvatarId(null);
-      } else {
-        CloudFile cloudFile = cloudFileService.saveExternal(dto.getAvatarUrl(), card.getAlbum(), CloudFileType.MEDIA);
-        card.setAvatarId(cloudFile.getId());
-      }
-    }
-    if (dto.getBackgroundUrl() != null) {
-      if (dto.getBackgroundUrl().isEmpty()) {
-        card.setBackgroundId(null);
-      } else {
-        CloudFile cloudFile = cloudFileService.saveExternal(dto.getBackgroundUrl(), card.getAlbum(), CloudFileType.MEDIA);
-        card.setBackgroundId(cloudFile.getId());
-      }
     }
 
     if (dto.getCompanyName() != null) {

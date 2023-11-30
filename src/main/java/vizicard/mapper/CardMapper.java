@@ -211,7 +211,10 @@ public class CardMapper {
 
     public MainResponseDTO mapToMainResponse(Card card) {
         MainResponseDTO dto = modelMapper.map(card, MainResponseDTO.class);
-        dto.setCompanyName(companyService.getCompanyOf(card).getName());
+        Card company = companyService.getCompanyOf(card);
+        if (company != null) {
+            dto.setCompanyName(company.getName());
+        }
         dto.setAvatarUrl(getAvatarUrl(card, Optional.empty()));
         dto.setBackgroundUrl(getBackgroundUrl(card, Optional.empty()));
         return dto;

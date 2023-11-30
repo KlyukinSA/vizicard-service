@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CardTypeDTO;
+import vizicard.dto.QRCodeResponse;
 import vizicard.dto.detail.ResumeResponseDTO;
 import vizicard.dto.profile.response.CardResponse;
 import vizicard.dto.profile.request.ProfileCreateDTO;
@@ -25,6 +26,7 @@ import vizicard.service.*;
 import vizicard.mapper.CardMapper;
 import vizicard.utils.ProfileProvider;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ public class CardController {
     private final ProfileProvider profileProvider;
     private final CardTypeRepository cardTypeRepository;
     private final CardAttributeService cardAttributeService; // TODO create AddressService
+    private final QRService qrService;
 
     private final CardMapper cardMapper;
     private final ModelMapper modelMapper;
@@ -129,6 +132,14 @@ public class CardController {
     public MainResponseDTO getMainInfo(@PathVariable String cardAddress) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         return cardMapper.mapToMainResponse(card);
+    }
+
+    @GetMapping("qr")
+    @PreAuthorize("isAuthenticated()")
+    public QRCodeResponse generateQRCodeForMainShortname(@RequestParam String cardAddress) throws IOException, InterruptedException {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        String mainShortname = shortnameService.getMainShortname(card);
+        return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
     }
 
 }

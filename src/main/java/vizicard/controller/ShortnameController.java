@@ -26,9 +26,6 @@ import java.util.stream.Collectors;
 public class ShortnameController {
 
     private final ShortnameService shortnameService;
-    private final QRService qrService;
-    private final CardAttributeService cardAttributeService;
-
     private final ShortnameRepository shortnameRepository;
     private final ProfileProvider profileProvider;
     private final ModelMapper modelMapper;
@@ -73,14 +70,6 @@ public class ShortnameController {
     @PreAuthorize("isAuthenticated()")
     public ShortnameResponse assignToCardByIdOrMyAccount(@PathVariable Integer id, @RequestParam(required = false) Integer cardId) {
         return modelMapper.map(shortnameService.assignToCardByIdOrMyAccount(id, cardId), ShortnameResponse.class);
-    }
-
-    @GetMapping("qr")
-    @PreAuthorize("isAuthenticated()")
-    public QRCodeResponse generateQRCodeForMainShortname(@RequestParam String cardAddress) throws IOException, InterruptedException {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        String mainShortname = shortnameService.getMainShortname(card);
-        return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
     }
 
     @GetMapping("devices")

@@ -50,6 +50,10 @@ public class ProfileService {
         if (company != null) {
           company.setName(dto.getCompanyName());
           cardRepository.save(company);
+        } else {
+          company = new Card();
+          company.setName(dto.getName());
+          companyService.prepareToCreateOrUpdate(company);
         }
       }
     }

@@ -48,7 +48,6 @@ public class CardAttributeController {
 
 
     @GetMapping("contacts")
-    @PreAuthorize("isAuthenticated()")
     public List<FullContactResponse> getContacts(@PathVariable String id) {
         Card card = getCardByIdOrElseShortname(id);
         List<Contact> list = (List<Contact>) getListThroughOverlay(card, Card::getContacts);
@@ -57,10 +56,10 @@ public class CardAttributeController {
     }
 
     private Card getCardByIdOrElseShortname(String idOrSn) {
-        try {
-            Integer id = Integer.parseInt(idOrSn);
+        if (idOrSn.startsWith("id")) {
+            Integer id = Integer.parseInt(idOrSn.substring(2));
             return profileProvider.getTarget(id);
-        } catch (NumberFormatException nfe) {
+        } else {
             Shortname shortname = shortnameRepository.findByShortname(idOrSn);
             Card card = shortname.getCard();
             if (card == null) {

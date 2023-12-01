@@ -37,8 +37,8 @@ public class RelationController {
         relationService.unrelate(cardId);
     }
 
-    @PostMapping
-    public ResponseEntity<?> saveContact(@RequestParam Integer id) throws Exception {
+    @GetMapping("/save")
+    public ResponseEntity<?> saveContact(@RequestParam Integer id) {
         return relationService.saveContact(id);
     }
 

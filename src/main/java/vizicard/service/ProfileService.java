@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
   private final CardRepository cardRepository;
-  private final ContactRepository contactRepository;
+  private final ContactService contactService;
   private final ContactTypeRepository contactTypeRepository;
   private final ProfileProvider profileProvider;
   private final AuthService authService;
@@ -69,35 +69,23 @@ public class ProfileService {
   }
 
   public Card updateCardWithLeadGenCardCreationFields(Card card, LeadGenDTO dto) {
-    int i = 1;
     Contact phone = new Contact();
     phone.setValue(dto.getPhone());
     phone.setType(contactTypeRepository.findByType(ContactEnum.PHONE));
-    phone.setCardOwner(card);
-    phone.setOrder(i);
-    phone.setIndividualId(i);
-    contactRepository.save(phone);
 
-    i++;
     Contact email = new Contact();
     email.setValue(dto.getEmail());
     email.setType(contactTypeRepository.findByType(ContactEnum.MAIL));
-    email.setCardOwner(card);
-    email.setOrder(i);
-    email.setIndividualId(i);
-    contactRepository.save(email);
+    contactService.create(card, email);
 
-    i++;
     String link = dto.getLink();
-    String urlBase = link.substring(0, link.indexOf('/') + 1);
+    int i = link.indexOf('/') + 1;
+    String urlBase = link.substring(0, i);
     ContactType type = contactTypeRepository.findByUrlBase(urlBase);
     Contact linkContact = new Contact();
-    linkContact.setValue(link);
+    linkContact.setValue(link.substring(i));
     linkContact.setType(type);
-    linkContact.setCardOwner(card);
-    linkContact.setOrder(i);
-    linkContact.setIndividualId(i);
-    contactRepository.save(linkContact);
+    contactService.create(card, linkContact);
     return card;
   }
 

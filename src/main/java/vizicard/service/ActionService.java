@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class ActionService {
 
     private final ActionRepository actionRepository;
-    private final ContactRepository contactRepository;
+    private final ContactService contactService;
 
     private final ProfileProvider profileProvider;
     private final CashService cashService;
@@ -71,10 +71,10 @@ public class ActionService {
         actionRepository.save(new Action(owner, target, ActionType.SAVE, getIp()));
     }
 
-    public void addClickAction(Integer resourceId) {
-        Contact resource = contactRepository.findById(resourceId).get();
-        Card target = resource.getCardOwner();
-        Action click = new Action(profileProvider.getUserFromAuth(), target, ActionType.CLICK, getIp());
+    public void addClickAction(Integer cardId, Integer contactId) {
+        Card card = profileProvider.getTarget(cardId);
+        Contact resource = contactService.findById(card, contactId);
+        Action click = new Action(profileProvider.getUserFromAuth(), card, ActionType.CLICK, getIp());
         click.setResource(resource);
         actionRepository.save(click);
     }

@@ -26,14 +26,13 @@ import java.util.stream.Collectors;
 public class ActionController {
 
     private final ActionService actionService;
-
     private final RelationRepository relationRepository;
     private final ProfileProvider profileProvider;
     private final CardMapper cardMapper;
 
     @PostMapping("clicks")
-    void addClickAction(Integer resourceId) {
-        actionService.addClickAction(resourceId);
+    void addClickAction(Integer cardId, Integer resourceId) {
+        actionService.addClickAction(cardId, resourceId);
     }
 
     @GetMapping("me")

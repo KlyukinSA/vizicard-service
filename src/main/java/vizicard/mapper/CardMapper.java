@@ -25,7 +25,6 @@ public class CardMapper {
 
     private final ShortnameService shortnameService;
     private final RelationRepository relationRepository;
-    private final ContactRepository contactRepository;
     private final CloudFileService cloudFileService;
     private final ProfileProvider profileProvider;
     private final CompanyService companyService;
@@ -122,7 +121,7 @@ public class CardMapper {
             }
         }
         int i = tabs.stream().mapToInt(Tab::getOrder).max().orElse(0);
-        finishTabType(usedTypes, TabTypeEnum.CONTACTS, isCurrentCard, !contactRepository.findAllByCardOwner(card).isEmpty(), res, i);
+        finishTabType(usedTypes, TabTypeEnum.CONTACTS, isCurrentCard, !card.getContacts().isEmpty(), res, i);
         i++;
 
         ProfileDetailStruct detailStruct = card.getDetailStruct();

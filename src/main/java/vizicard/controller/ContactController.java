@@ -8,9 +8,7 @@ import vizicard.dto.contact.*;
 import vizicard.mapper.ContactMapper;
 import vizicard.model.*;
 import vizicard.repository.CloudFileRepository;
-import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
-import vizicard.repository.CustomContactTypeRepository;
 import vizicard.service.CardAttributeService;
 import vizicard.service.ContactService;
 

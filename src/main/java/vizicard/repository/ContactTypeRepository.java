@@ -10,4 +10,6 @@ public interface ContactTypeRepository extends JpaRepository<ContactType, Intege
     ContactType findByType(ContactEnum type);
 
     ContactType findByUrlBase(String urlBase);
+
+    List<ContactType> findAllByWritingLike(String writing);
 }

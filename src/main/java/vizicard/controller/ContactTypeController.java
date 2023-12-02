@@ -10,7 +10,6 @@ import vizicard.model.ContactGroup;
 import vizicard.model.ContactType;
 import vizicard.repository.ContactGroupRepository;
 import vizicard.repository.ContactTypeRepository;
-import vizicard.repository.CustomContactTypeRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ public class ContactTypeController {
 
     private final ContactTypeRepository contactTypeRepository;
     private final ContactMapper contactMapper;
-    private final CustomContactTypeRepository customContactTypeRepository;
     private final ContactGroupRepository contactGroupRepository;
 
     @GetMapping
@@ -38,17 +36,23 @@ public class ContactTypeController {
     }
 
     @GetMapping("search")
-    public List<ContactGroupResponse> searchTypeLike(@RequestParam(required = false) String contactType, @RequestParam(required = false) String groupType, @RequestParam(required = false) String theirWriting) {
-        List<ContactType> types = customContactTypeRepository.findAllByLikeContactTypeOrGroupTypeOrTheirWriting(contactType, groupType, theirWriting);
-        List<ContactGroup> groups = contactGroupRepository.findAll();
-        List<ContactGroupResponse> res = groups.stream()
-                .map(g -> new ContactGroupResponse(g.getType(), g.getWriting(), getTypeResponsesByGroup(g, types)))
-                .collect(Collectors.toList());
-        return res;
+    public List<ContactGroupResponse> searchLike(String typeOrGroupWriting) {
+        List<ContactType> types = contactTypeRepository.findAllByWritingLike("%" + typeOrGroupWriting + "%");
+        if (!types.isEmpty()) {
+            return contactGroupRepository.findAll().stream()
+                    .filter(g -> types.stream().anyMatch(t -> t.getGroups().stream().map(ContactGroup::getId).collect(Collectors.toSet()).contains(g.getId())))
+                    .map(g -> new ContactGroupResponse(g.getType(), g.getWriting(), getTypeResponsesByGroup(g, types)))
+                    .collect(Collectors.toList());
+        } else {
+            return contactGroupRepository.findAllByWritingLike("%" + typeOrGroupWriting + "%").stream()
+                    .map(contactMapper::mapToContactGroupResponse)
+                    .collect(Collectors.toList());
+        }
     }
 
     private List<ContactTypeResponse> getTypeResponsesByGroup(ContactGroup group, List<ContactType> types) {
         return types.stream()
+                .filter(t -> t.getGroups().stream().map(ContactGroup::getId).collect(Collectors.toSet()).contains(group.getId()))
                 .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
     }

@@ -13,5 +13,4 @@ public class ContactTypeResponse {
     private ContactEnum type;
     private String logoUrl;
     private String writing;
-    private Integer groupId;
 }

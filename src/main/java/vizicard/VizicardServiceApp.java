@@ -11,6 +11,8 @@ import vizicard.model.detail.EducationType;
 import vizicard.repository.*;
 import vizicard.repository.detail.EducationTypeRepository;
 
+import java.util.ArrayList;
+
 @SpringBootApplication
 @EnableScheduling
 @RequiredArgsConstructor
@@ -96,7 +98,7 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   void fillContactTypes() {
     Album album = albumRepository.save(new Album());
-    ContactGroup contactGroup = contactGroupRepository.save(new ContactGroup(1, ContactGroupEnum.MUSIC, "group", null));
+    ContactGroup contactGroup = contactGroupRepository.save(new ContactGroup(1, ContactGroupEnum.MUSIC, "music", null));
 
     for (ContactEnum contactEnum : ContactEnum.class.getEnumConstants())
     {
@@ -109,8 +111,9 @@ public class VizicardServiceApp implements CommandLineRunner {
     contactType.setType(contactEnum);
     contactType.setWriting(contactEnum.toString().toLowerCase());
     contactType.setLogo(createLogoFor(contactType.getWriting(), album));
-    contactType.setGroup(contactGroup);
     contactType.setUrlBase(contactEnum.name() + "UrlBase/");
+    contactType.setGroups(new ArrayList<>());
+    contactType.getGroups().add(contactGroup);
     contactTypeRepository.save(contactType);
   }
 

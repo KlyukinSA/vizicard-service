@@ -32,9 +32,9 @@ public class ContactType {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Contact> contacts;
 
-    @ManyToOne
+    @ManyToMany
     @JoinColumn(nullable = false)
-    private ContactGroup group;
+    private List<ContactGroup> groups;
 
     @Column(nullable = false)
     private String urlBase;

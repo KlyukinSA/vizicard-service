@@ -49,7 +49,6 @@ public class ContactTypeController {
 
     private List<ContactTypeResponse> getTypeResponsesByGroup(ContactGroup group, List<ContactType> types) {
         return types.stream()
-                .filter(t -> t.getGroup().getId().equals(group.getId()))
                 .map(contactMapper::mapToContactTypeResponse)
                 .collect(Collectors.toList());
     }

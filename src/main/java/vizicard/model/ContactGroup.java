@@ -26,7 +26,7 @@ public class ContactGroup {
     @Column(nullable = false)
     private String writing;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<ContactType> contactTypes;
 

@@ -95,34 +95,22 @@ public class AlbumController {
 
     @PutMapping("avatar")
     @PreAuthorize("isAuthenticated()")
-    public CloudFileDTO updateAvatar(@PathVariable String cardAddress, @RequestParam(required = false) String url) {
+    public CloudFileDTO updateAvatar(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        if (url == null) {
-            card.setAvatarId(null);
-            cardRepository.save(card);
-            return null;
-        } else {
-            CloudFile cloudFile = cloudFileService.saveExternal(url, card.getAlbum(), CloudFileType.MEDIA);
-            card.setAvatarId(cloudFile.getId());
-            cardRepository.save(card);
-            return modelMapper.map(cloudFile, CloudFileDTO.class);
-        }
+        CloudFile cloudFile = albumService.addFile(card, file, CloudFileType.MEDIA);
+        card.setAvatarId(cloudFile.getId());
+        cardRepository.save(card);
+        return modelMapper.map(cloudFile, CloudFileDTO.class);
     }
 
     @PutMapping("background")
     @PreAuthorize("isAuthenticated()")
-    public CloudFileDTO updateBackground(@PathVariable String cardAddress, @RequestParam(required = false) String url) {
+    public CloudFileDTO updateBackground(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        if (url == null) {
-            card.setBackgroundId(null);
-            cardRepository.save(card);
-            return null;
-        } else {
-            CloudFile cloudFile = cloudFileService.saveExternal(url, card.getAlbum(), CloudFileType.MEDIA);
-            card.setBackgroundId(cloudFile.getId());
-            cardRepository.save(card);
-            return modelMapper.map(cloudFile, CloudFileDTO.class);
-        }
+        CloudFile cloudFile = albumService.addFile(card, file, CloudFileType.MEDIA);
+        card.setBackgroundId(cloudFile.getId());
+        cardRepository.save(card);
+        return modelMapper.map(cloudFile, CloudFileDTO.class);
     }
 
 }

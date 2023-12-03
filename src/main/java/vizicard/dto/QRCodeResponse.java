@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QRCodeResponse {
 	private String pictureUrl;
-	private String shortname;
+	private String mainShortname;
 }

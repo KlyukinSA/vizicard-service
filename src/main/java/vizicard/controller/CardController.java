@@ -135,8 +135,7 @@ public class CardController {
     }
 
     @GetMapping("qr")
-    @PreAuthorize("isAuthenticated()")
-    public QRCodeResponse generateQRCodeForMainShortname(@RequestParam String cardAddress) throws IOException, InterruptedException {
+    public QRCodeResponse generateQRCodeForMainShortname(@PathVariable String cardAddress) throws IOException, InterruptedException {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         String mainShortname = shortnameService.getMainShortname(card);
         return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);

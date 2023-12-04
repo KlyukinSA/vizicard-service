@@ -66,7 +66,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private void fillTabTypes() {
     tabTypeRepository.save(new TabType(TabTypeEnum.CONTACTS, "Контакты"));
     tabTypeRepository.save(new TabType(TabTypeEnum.RESUME, "Резюме"));
-    tabTypeRepository.save(new TabType(TabTypeEnum.MEDIA, "Медиа"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.MEDIAS, "Медиа"));
     tabTypeRepository.save(new TabType(TabTypeEnum.FILES, "Файлы"));
   }
 

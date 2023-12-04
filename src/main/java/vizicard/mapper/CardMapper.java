@@ -9,7 +9,6 @@ import vizicard.dto.profile.response.*;
 import vizicard.dto.tab.TabResponseDTO;
 import vizicard.model.*;
 import vizicard.model.detail.ProfileDetailStruct;
-import vizicard.repository.ContactRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.repository.TabRepository;
 import vizicard.repository.TabTypeRepository;
@@ -129,7 +128,7 @@ public class CardMapper {
         i++;
 
         List<CloudFile> allMedia = albumService.getAllFiles(card, CloudFileType.MEDIA);
-        finishTabType(usedTypes, TabTypeEnum.MEDIA, isCurrentCard, !allMedia.isEmpty(), res, i);
+        finishTabType(usedTypes, TabTypeEnum.MEDIAS, isCurrentCard, !allMedia.isEmpty(), res, i);
         i++;
         List<CloudFile> allFiles = albumService.getAllFiles(card, CloudFileType.FILE);
         finishTabType(usedTypes, TabTypeEnum.FILES, isCurrentCard, !allFiles.isEmpty(), res, i);

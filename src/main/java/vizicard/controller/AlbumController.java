@@ -62,7 +62,7 @@ public class AlbumController {
     @GetMapping("media")
     List<CloudFileDTO> getAllMediaFiles(@PathVariable String cardAddress) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.MEDIA, card);
+        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.MEDIAS, card);
         return albumService.getAllFiles(card, CloudFileType.MEDIA).stream()
                 .map((val) -> modelMapper.map(val, CloudFileDTO.class))
                 .collect(Collectors.toList());

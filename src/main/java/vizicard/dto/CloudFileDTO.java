@@ -12,4 +12,7 @@ public class CloudFileDTO {
     private String url;
     private Integer albumId;
     private String description;
+    private long size;
+    private String extension;
+    private String color;
 }

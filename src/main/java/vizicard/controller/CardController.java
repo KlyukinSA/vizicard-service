@@ -128,12 +128,6 @@ public class CardController {
         return cardMapper.mapToResume(card);
     }
 
-    @GetMapping("main-info")
-    public MainResponseDTO getMainInfo(@PathVariable String cardAddress) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        return cardMapper.mapToMainResponse(card);
-    }
-
     @GetMapping("qr")
     public QRCodeResponse generateQRCodeForMainShortname(@PathVariable String cardAddress) throws IOException, InterruptedException {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);

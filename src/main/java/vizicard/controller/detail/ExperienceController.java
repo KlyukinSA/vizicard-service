@@ -44,20 +44,4 @@ public class ExperienceController {
         service.deleteExperience(card, id);
     }
 
-    @GetMapping
-    public List<ExperienceResponseDTO> getAllOfCard(@PathVariable String cardAddress) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return service.getAllOfCard(card)
-                .map(mapper::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("{id}")
-    public ExperienceResponseDTO getById(@PathVariable String cardAddress, @PathVariable Integer id) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return mapper.mapToResponse(service.findById(card, id));
-    }
-
 }

@@ -32,15 +32,6 @@ public class SkillController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping
-    public List<SkillResponseDTO> getAllOfCard(@PathVariable String cardAddress) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return service.getAllOfCard(card)
-                .map(mapper::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public SkillResponseDTO create(@PathVariable String cardAddress, @RequestBody String s) {
@@ -53,13 +44,6 @@ public class SkillController {
     public void delete(@PathVariable String cardAddress, @PathVariable Integer id) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         service.delete(card, id);
-    }
-
-    @GetMapping("{id}")
-    public SkillResponseDTO getById(@PathVariable String cardAddress, @PathVariable Integer id) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return mapper.mapToResponse(service.findById(card, id));
     }
 
 }

@@ -48,20 +48,4 @@ public class EducationController {
         return educationService.findAllTypes();
     }
 
-    @GetMapping
-    public List<EducationResponseDTO> getAllOfCard(@PathVariable String cardAddress) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return educationService.getAllOfCard(card)
-                .map(mapper::mapToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @GetMapping("{id}")
-    public EducationResponseDTO getById(@PathVariable String cardAddress, @PathVariable Integer id) {
-        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.RESUME, card);
-        return mapper.mapToResponse(educationService.findById(card, id));
-    }
-
 }

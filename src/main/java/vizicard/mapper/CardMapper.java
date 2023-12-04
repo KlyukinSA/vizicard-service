@@ -58,21 +58,12 @@ public class CardMapper {
     public CardResponse mapToResponse(Card card) {
         List<Tab> tabs = card.getTabs();
         card.setTabs(null);
-        CardResponse res = modelMapper.map(card, CardResponse.class); // TODO combine with mapToCompanyResponse
+        CardResponse res = modelMapper.map(mapToBigResponse(card), CardResponse.class);
         card.setTabs(tabs);
-        Optional<Card> overlay = findOverlay(card);
-        if (overlay.isPresent()) {
-            Integer id = res.getId();
-            Date createAt = res.getCreateAt();
-            modelMapper.map(overlay.get(), res);
-            res.setId(id);
-            res.setCreateAt(createAt);
-        }
+
+        res.setAccountId(card.getAccount().getId());
+        res.setCardName(card.getCardName());
         res.setRelation(getPossibleRelation(card));
-        res.setMainShortname(shortnameService.getMainShortname(card));
-        res.setAvatarUrl(getAvatarUrl(card, overlay));
-        res.setBackgroundUrl(getBackgroundUrl(card, overlay));
-        res.setLastVizit(getLastVizit(card));
         res.setTabs(getTabs(card));
         res.setDetails(getWeirdDetails(card));
         return res;
@@ -170,8 +161,12 @@ public class CardMapper {
     }
 
     public CompanyResponse mapToCompanyResponse(Card company) {
-        CompanyResponse res = modelMapper.map(company, CompanyResponse.class);
-        Optional<Card> overlay = findOverlay(company);
+        return modelMapper.map(mapToBigResponse(company), CompanyResponse.class);
+    }
+
+    private BigCardResponse mapToBigResponse(Card card) {
+        BigCardResponse res = modelMapper.map(card, BigCardResponse.class);
+        Optional<Card> overlay = findOverlay(card);
         if (overlay.isPresent()) {
             Integer id = res.getId();
             Date createAt = res.getCreateAt();
@@ -179,10 +174,10 @@ public class CardMapper {
             res.setId(id);
             res.setCreateAt(createAt);
         }
-        res.setMainShortname(shortnameService.getMainShortname(company));
-        res.setAvatarUrl(getAvatarUrl(company, overlay));
-        res.setBackgroundUrl(getBackgroundUrl(company, overlay));
-        res.setLastVizit(getLastVizit(company));
+        res.setMainShortname(shortnameService.getMainShortname(card));
+        res.setAvatarUrl(getAvatarUrl(card, overlay));
+        res.setBackgroundUrl(getBackgroundUrl(card, overlay));
+        res.setLastVizit(getLastVizit(card));
         return res;
     }
 

@@ -2,7 +2,6 @@ package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.profile.response.CardResponse;
@@ -33,13 +32,19 @@ public class RelationController {
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public void unrelate(@RequestParam Integer cardId) {
+    public List<RelationResponseDTO> unrelate(@RequestParam Integer cardId) {
         relationService.unrelate(cardId);
+        return relationService.getRelationsByAuth()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/save")
-    public ResponseEntity<?> saveContact(@RequestParam Integer id) {
-        return relationService.saveContact(id);
+    public List<RelationResponseDTO> saveContact(@RequestParam Integer id) {
+        relationService.saveContact(id);
+        return relationService.getRelationsByAuth()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/exchange")

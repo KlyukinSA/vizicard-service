@@ -63,7 +63,6 @@ public class CardMapper {
 
         res.setAccountId(card.getAccount().getId());
         res.setCardName(card.getCardName());
-        res.setRelation(getPossibleRelation(card));
         res.setTabs(getTabs(card));
         res.setDetails(getWeirdDetails(card));
         return res;
@@ -140,24 +139,6 @@ public class CardMapper {
 
     private String getAvatarUrl(Card card, Optional<Card> overlay) {
         return getCloudFileUrlByFileId(overlay.filter(c -> c.getAvatarId() != null).orElse(card).getAvatarId());
-    }
-
-    private BriefRelationResponseDTO getPossibleRelation(Card card) {
-        Account user = profileProvider.getUserFromAuth();
-        if (user == null) {
-            return null;
-        }
-        Relation relation = relationRepository.findByAccountOwnerAndCard(user, card);
-        if (relation == null) {
-            relation = relationRepository.findByAccountOwnerAndCard(card.getAccount(), user.getCurrentCard());
-            if (relation == null) {
-                return null;
-            }
-        }
-        if (Objects.equals(relation.getCard().getAccount().getId(), relation.getAccountOwner().getId())) {
-            return null;
-        }
-        return modelMapper.map(relation, BriefRelationResponseDTO.class);
     }
 
     public CompanyResponse mapToCompanyResponse(Card company) {

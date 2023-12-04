@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,6 @@ public class RelationService {
     public void unrelate(Integer cardId) {
         Card card = cardRepository.findById(cardId).get();
         Account owner = profileProvider.getUserFromAuth();
-        relationValidator.stopNotOwnerOf(card);
 
         Relation relation = relationRepository.findByAccountOwnerAndCard(owner, card);
         if (relation == null || !relation.isStatus()) {
@@ -164,6 +164,11 @@ public class RelationService {
         Account account = profileProvider.getUserFromAuth();
         relator.relate(account, account.getCurrentCard(), card, RelationType.OWNER);
         return card;
+    }
+
+    public Stream<Relation> getRelationsByAuth() {
+        return relationRepository.findAllByAccountOwner(profileProvider.getUserFromAuth()).stream()
+                .filter(Relation::isStatus);
     }
 
 }

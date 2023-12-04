@@ -178,6 +178,46 @@ public class CardMapper {
         res.setAvatarUrl(getAvatarUrl(card, overlay));
         res.setBackgroundUrl(getBackgroundUrl(card, overlay));
         res.setLastVizit(getLastVizit(card));
+        res.setDoings(getDoings(card));
+        return res;
+    }
+
+    private List<DoingDTO> getDoings(Card card) {
+        return getCurrentDoingTypes(card).stream()
+                .map(this::getDoingDTOByType)
+                .collect(Collectors.toList());
+    }
+
+    private DoingDTO getDoingDTOByType(DoingType type) {
+        if (type == DoingType.SETTING) {
+            return new DoingDTO(type, "Настройки", false);
+        } else if (type == DoingType.QR) {
+            return new DoingDTO(type, "QR-код", false);
+        } else if (type == DoingType.DOWNLOAD) {
+            return new DoingDTO(type, "Скачать", true);
+        } else if (type == DoingType.SAVE) {
+            return new DoingDTO(type, "Сохранить", true);
+        } else if (type == DoingType.DELETE) {
+            return new DoingDTO(type, "Удалить связь", false);
+        }
+        return null;
+    }
+
+    private ArrayList<DoingType> getCurrentDoingTypes(Card card) {
+        Account user = profileProvider.getUserFromAuth();
+        Relation relation = relationRepository.findByAccountOwnerAndCard(user, card);
+        ArrayList<DoingType> res = new ArrayList<>();
+        res.add(DoingType.QR);
+        if (user == null) {
+            res.add(DoingType.DOWNLOAD);
+        } else if (card.getAccount().getId().equals(user.getId())) {
+            res.add(DoingType.SETTING);
+        } else if (relation != null && relation.isStatus() && relation.getType() == RelationType.SAVE) {
+            res.add(DoingType.SETTING);
+            res.add(DoingType.DELETE);
+        } else {
+            res.add(DoingType.SAVE);
+        }
         return res;
     }
 

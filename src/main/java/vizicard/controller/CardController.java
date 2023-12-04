@@ -61,11 +61,11 @@ public class CardController {
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public CardResponse update(@PathVariable String cardAddress, @RequestBody ProfileUpdateDTO dto) {
+    public MainResponseDTO update(@PathVariable String cardAddress, @RequestBody ProfileUpdateDTO dto) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         cardService.prepareToUpdate(card);
         profileService.updateProfile(card, dto); //
-        return cardMapper.mapToResponse(profileProvider.getTarget(card.getId()));
+        return cardMapper.mapToMainResponse(profileProvider.getTarget(card.getId()));
     }
 
     @PostMapping // TODO move to AccountController

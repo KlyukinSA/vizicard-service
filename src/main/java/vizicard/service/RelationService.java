@@ -29,15 +29,11 @@ public class RelationService {
     private final CardRepository cardRepository;
 
     private final ProfileProvider profileProvider;
-    private final RelationValidator relationValidator;
-
     private final ActionService actionService;
     private final EmailService emailService;
-
     private final EntityManager entityManager;
     private final Relator relator;
     private final CardService cardService;
-    private final VcardFileService vcardFileService;
     private final CardTypeRepository cardTypeRepository;
 
     public void unrelate(Integer cardId) {
@@ -53,7 +49,7 @@ public class RelationService {
         relationRepository.save(relation);
     }
 
-    public ResponseEntity<?> saveContact(Integer targetId) {
+    public void saveContact(Integer targetId) {
         Card target = profileProvider.getTarget(targetId);
         Account owner = profileProvider.getUserFromAuth();
         if (owner != null && !Objects.equals(target.getAccount().getId(), owner.getId())) {
@@ -63,17 +59,6 @@ public class RelationService {
             exchange(target, owner.getCurrentCard());
         }
         actionService.addSaveAction(owner, target);
-        return getVcardResponse(target);
-    }
-
-    private ResponseEntity<?> getVcardResponse(Card target) {
-        byte[] text = vcardFileService.getText(target);
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("text/vcard"))
-                .header("Content-Disposition", "attachment; filename=\""
-                        + vcardFileService.getName(target) + '\"')
-                .contentLength(text.length)
-                .body(new InputStreamResource(new ByteArrayInputStream(text)));
     }
 
     public void leadGenerate(Integer targetId, Card leadCard, Card company, String email) {

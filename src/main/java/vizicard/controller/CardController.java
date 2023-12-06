@@ -2,7 +2,10 @@ package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vizicard.dto.CardTypeDTO;
@@ -26,6 +29,7 @@ import vizicard.service.*;
 import vizicard.mapper.CardMapper;
 import vizicard.utils.ProfileProvider;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +46,7 @@ public class CardController {
     private final CardTypeRepository cardTypeRepository;
     private final CardAttributeService cardAttributeService; // TODO create AddressService
     private final QRService qrService;
+    private final VcardFileService vcardFileService;
 
     private final CardMapper cardMapper;
     private final ModelMapper modelMapper;
@@ -133,6 +138,18 @@ public class CardController {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         String mainShortname = shortnameService.getMainShortname(card);
         return new QRCodeResponse(qrService.generate(mainShortname), mainShortname);
+    }
+
+    @GetMapping("vcard")
+    public ResponseEntity<?> getVcard(@PathVariable String cardAddress) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        byte[] text = vcardFileService.getText(card);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("text/vcard"))
+                .header("Content-Disposition", "attachment; filename=\""
+                        + vcardFileService.getName(card) + '\"')
+                .contentLength(text.length)
+                .body(new InputStreamResource(new ByteArrayInputStream(text)));
     }
 
 }

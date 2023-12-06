@@ -39,7 +39,8 @@ public class RelationController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/save")
+    @PostMapping("save")
+    @PreAuthorize("isAuthenticated()")
     public List<RelationResponseDTO> saveContact(@RequestParam Integer id) {
         relationService.saveContact(id);
         return relationService.getRelationsByAuth()
@@ -47,7 +48,7 @@ public class RelationController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/exchange")
+    @PostMapping("exchange")
     public void leadGenerate(@RequestParam Integer id, @RequestBody LeadGenDTO dto) {
         Card leadCard = new Card();
         leadCard.setName(dto.getName());

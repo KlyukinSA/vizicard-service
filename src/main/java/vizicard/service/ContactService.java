@@ -8,12 +8,11 @@ import vizicard.exception.CustomException;
 import vizicard.model.Card;
 import vizicard.model.CardAttribute;
 import vizicard.model.Contact;
-import vizicard.model.ContactEnum;
 import vizicard.repository.ContactRepository;
-import vizicard.utils.ProfileProvider;
 import vizicard.utils.RelationValidator;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,17 +22,22 @@ public class ContactService {
     private final ContactRepository contactRepository;
 
     private final RelationValidator relationValidator;
+    private final RegexpService regexpService;
 
     private final ModelMapper modelMapper;
 
     public Contact create(Card card, Contact contact) {
-        stopInvalidContactUrl(contact);
-
+        stopInvalidContactValue(contact);
+        cutContactValueUrlBase(contact);
         contact.setCardOwner(card);
         contact.setIndividualId(getNextIndividualId(card));
         contactRepository.save(contact);
         contact.setOrder(contact.getId());
         return contactRepository.save(contact);
+    }
+
+    private void cutContactValueUrlBase(Contact contact) {
+        contact.setValue(contact.getValue().substring(contact.getType().getUrlBase().length())); //contact.getValue().indexOf("/") + 1
     }
 
     private Integer getNextIndividualId(Card card) {
@@ -42,10 +46,12 @@ public class ContactService {
                 .max().orElse(0) + 1;
     }
 
-    private void stopInvalidContactUrl(Contact contact) {
-        if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL &&
-                contact.getValue().contains(".") && !contact.getValue().startsWith("http")) {
-            throw new CustomException("url should start with http", HttpStatus.BAD_REQUEST);
+    private void stopInvalidContactValue(Contact contact) {
+        boolean matches = Pattern.compile(regexpService.getRegexpBy(contact.getType())) // "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+                .matcher(contact.getValue())
+                .find();
+        if (!matches) {
+            throw new CustomException("contact value does not fit regexp of contact type", HttpStatus.BAD_REQUEST);
         }
     }
 

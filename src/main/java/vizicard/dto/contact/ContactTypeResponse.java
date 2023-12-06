@@ -13,4 +13,6 @@ public class ContactTypeResponse {
     private ContactEnum type;
     private String logoUrl;
     private String writing;
+    private String urlBase;
+    private String regexp;
 }

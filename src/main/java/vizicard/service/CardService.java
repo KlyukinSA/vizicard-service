@@ -33,11 +33,15 @@ public class CardService {
         shortnameRepository.save(new Shortname(card, getRandomString(), ShortnameType.MAIN));
 
         if (card.getType().getType() == CardTypeEnum.PERSON || card.getType().getType() == CardTypeEnum.COMPANY) {
-            Album album = new Album(card);
-            albumRepository.save(album);
-            card.setAlbum(album);
+            createAlbumFor(card);
         }
         return cardRepository.save(card);
+    }
+
+    private void createAlbumFor(Card card) {
+        Album album = new Album(card);
+        albumRepository.save(album);
+        card.setAlbum(album);
     }
 
     private String getRandomString() {
@@ -120,6 +124,7 @@ public class CardService {
                 cardRepository.save(overlay);
                 relation.setOverlay(overlay);
                 relationRepository.save(relation);
+                createAlbumFor(overlay);
             }
             return overlay;
         }

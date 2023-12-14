@@ -22,13 +22,11 @@ public class ContactService {
     private final ContactRepository contactRepository;
 
     private final RelationValidator relationValidator;
-    private final RegexpService regexpService;
 
     private final ModelMapper modelMapper;
 
     public Contact create(Card card, Contact contact) {
-        stopInvalidContactValue(contact);
-        cutContactValueUrlBase(contact);
+        completeValueUpdate(contact);
         contact.setCardOwner(card);
         contact.setIndividualId(getNextIndividualId(card));
         contactRepository.save(contact);
@@ -36,8 +34,19 @@ public class ContactService {
         return contactRepository.save(contact);
     }
 
-    private void cutContactValueUrlBase(Contact contact) {
-        contact.setValue(contact.getValue().substring(contact.getType().getUrlBase().length())); //contact.getValue().indexOf("/") + 1
+    private void completeValueUpdate(Contact contact) {
+        String value = contact.getValue();
+        String regexp = contact.getType().getRegex();
+        boolean matches = Pattern.compile(regexp).matcher(value).find();
+        if (matches) {
+            return;
+        }
+        value = contact.getType().getUrlBase() + value;
+        matches = Pattern.compile(regexp).matcher(value).find();
+        if (!matches) {
+            throw new CustomException("contact value does not fit regexp of contact type", HttpStatus.BAD_REQUEST);
+        }
+        contact.setValue(value);
     }
 
     private Integer getNextIndividualId(Card card) {
@@ -46,18 +55,10 @@ public class ContactService {
                 .max().orElse(0) + 1;
     }
 
-    private void stopInvalidContactValue(Contact contact) {
-        boolean matches = Pattern.compile(regexpService.getRegexpBy(contact.getType())) // "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
-                .matcher(contact.getValue())
-                .find();
-        if (!matches) {
-            throw new CustomException("contact value does not fit regexp of contact type", HttpStatus.BAD_REQUEST);
-        }
-    }
-
     public Contact update(Card card, Contact map, Integer id) {
         Contact contact = contactRepository.findByCardOwnerAndIndividualId(card, id);
         modelMapper.map(map, contact);
+        completeValueUpdate(contact);
         return contactRepository.save(contact);
     }
 

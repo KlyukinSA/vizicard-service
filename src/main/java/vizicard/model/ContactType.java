@@ -39,4 +39,7 @@ public class ContactType {
     @Column(nullable = false)
     private String urlBase;
 
+    @Column(nullable = false)
+    private String regex;
+
 }

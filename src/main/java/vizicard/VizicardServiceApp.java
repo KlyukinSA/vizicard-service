@@ -111,10 +111,31 @@ public class VizicardServiceApp implements CommandLineRunner {
     contactType.setType(contactEnum);
     contactType.setWriting(contactEnum.toString().toLowerCase());
     contactType.setLogo(createLogoFor(contactType.getWriting(), album));
-    contactType.setUrlBase(contactEnum.name() + "UrlBase/");
+    contactType.setUrlBase(getUrlBaseByType(contactEnum));
+    contactType.setRegex(getRegexpByType(contactEnum));
     contactType.setGroups(new ArrayList<>());
     contactType.getGroups().add(contactGroup);
     contactTypeRepository.save(contactType);
+  }
+
+  private String getRegexpByType(ContactEnum contactEnum) {
+    if (contactEnum == ContactEnum.PHONE) {
+      return "^" + getUrlBaseByType(contactEnum) + "[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$";
+    } else if (contactEnum == ContactEnum.MAIL) {
+      return "^" + getUrlBaseByType(contactEnum) + "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+    } else {
+      return "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$";
+    }
+  }
+
+  private String getUrlBaseByType(ContactEnum contactEnum) {
+    if (contactEnum == ContactEnum.PHONE) {
+      return "tel:";
+    } else if (contactEnum == ContactEnum.MAIL) {
+      return "mailto:";
+    } else {
+      return contactEnum.name() + "UrlBase/";
+    }
   }
 
   private CloudFile createLogoFor(String writing, Album album) {

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import vizicard.dto.contact.*;
 import vizicard.model.*;
 import vizicard.service.CloudFileService;
-import vizicard.service.RegexpService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 public class ContactMapper {
 
 	private final CloudFileService cloudFileService;
-	private final RegexpService regexpService;
 	private final ModelMapper modelMapper;
 
 	public List<FullContactResponse> mapList(List<Contact> contacts) {
@@ -43,24 +41,16 @@ public class ContactMapper {
 		return new ContactResponse(
 				contact.getIndividualId(),
 				contact.getType().getType(),
-				formContactUrl(contact),
+				contact.getValue(),
 				contact.getTitle(),
 				contact.getOrder(),
 				cloudFileService.findById(logoId).getUrl());
 	}
 
-	private String formContactUrl(Contact contact) {
-		String s = contact.getValue();
-		if (contact.getType().getType() != ContactEnum.PHONE && contact.getType().getType() != ContactEnum.MAIL && s.contains(".")) {
-			return s;
-		}
-		return contact.getType().getUrlBase() + contact.getValue();
-	}
-
 	public ContactTypeResponse mapToContactTypeResponse(ContactType contactType) {
 		ContactTypeResponse map = modelMapper.map(contactType, ContactTypeResponse.class);
 		map.setLogoUrl(cloudFileService.findById(contactType.getLogo().getId()).getUrl());
-		map.setRegexp(regexpService.getRegexpBy(contactType));
+		map.setRegexp(contactType.getRegex());
 		return map;
 	}
 

@@ -16,12 +16,11 @@ import java.util.List;
 @NoArgsConstructor
 public class CardType {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-
     @Id
-    @Column(columnDefinition = "ENUM('PERSON', 'COMPANY', 'COMMUNITY', 'GROUP')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(columnDefinition = "ENUM('PERSON', 'COMPANY', 'COMMUNITY', 'GROUP')", nullable = false)
     @Enumerated(EnumType.STRING)
     private CardTypeEnum type;
 

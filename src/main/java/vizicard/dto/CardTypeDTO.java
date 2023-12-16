@@ -9,6 +9,7 @@ import vizicard.model.CardTypeEnum;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardTypeDTO {
+    private Integer id;
     private CardTypeEnum type;
     private String writing;
 }

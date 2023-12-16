@@ -13,6 +13,6 @@ public class BriefCardResponse {
     private String title;
     private String avatarUrl;
     private String mainShortname;
-    private CardTypeEnum type;
+    private CardTypeDTO type;
     private boolean custom;
 }

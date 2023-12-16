@@ -30,6 +30,7 @@ public class CloudFile {
     private CloudFileType type;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Extension extension;
 
     @Column(length = 200)

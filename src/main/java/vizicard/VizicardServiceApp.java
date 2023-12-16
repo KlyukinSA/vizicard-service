@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import vizicard.model.detail.EducationType;
 import vizicard.repository.*;
 import vizicard.repository.detail.EducationTypeRepository;
+import vizicard.service.ExtensionService;
 
 import java.util.ArrayList;
 
@@ -28,6 +29,7 @@ public class VizicardServiceApp implements CommandLineRunner {
   private final AlbumRepository albumRepository;
   private final CardTypeRepository cardTypeRepository;
   private final ExtensionRepository extensionRepository;
+  private final ExtensionService extensionService;
   private final TabTypeRepository tabTypeRepository;
 
   public static void main(String[] args) {
@@ -140,9 +142,9 @@ public class VizicardServiceApp implements CommandLineRunner {
 
   private CloudFile createLogoFor(String writing, Album album) {
     String usedLogoExtension = "svg";
+    Extension extension = extensionService.getByName(usedLogoExtension);
     String keyName = "img_" + writing + "." + usedLogoExtension;
-    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA,
-            extensionRepository.findByName(usedLogoExtension.toUpperCase()), 0));
+    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA, extension, 0));
   }
 
 }

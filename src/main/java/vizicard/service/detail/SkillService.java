@@ -1,8 +1,10 @@
 package vizicard.service.detail;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.SkillDTO;
+import vizicard.exception.CustomException;
 import vizicard.model.Card;
 import vizicard.model.CardAttribute;
 import vizicard.model.detail.Skill;
@@ -48,7 +50,11 @@ public class SkillService {
     public Skill create(Card card, String value) {
         Skill skill = repository.findByValueAndCardOwner(value, card);
         if (skill != null) {
-            skill.setStatus(true);
+            if (!skill.isStatus()) {
+                skill.setStatus(true);
+            } else {
+                throw new CustomException("skill already exists", HttpStatus.BAD_REQUEST);
+            }
         } else {
             skill = new Skill(card, value);
             skill.setIndividualId(getNextIndividualId(card));

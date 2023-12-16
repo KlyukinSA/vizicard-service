@@ -45,12 +45,12 @@ public class SkillService {
                 .filter(Skill::isStatus);
     }
 
-    public Skill create(Card card, String s) {
-        Skill skill = repository.findBySkillAndCardOwner(s, card);
+    public Skill create(Card card, String value) {
+        Skill skill = repository.findByValueAndCardOwner(value, card);
         if (skill != null) {
             skill.setStatus(true);
         } else {
-            skill = new Skill(card, s);
+            skill = new Skill(card, value);
             skill.setIndividualId(getNextIndividualId(card));
         }
         return repository.save(skill);

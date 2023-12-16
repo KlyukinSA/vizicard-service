@@ -34,9 +34,9 @@ public class SkillController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public SkillResponseDTO create(@PathVariable String cardAddress, @RequestBody String s) {
+    public SkillResponseDTO create(@PathVariable String cardAddress, @RequestBody String value) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        return mapper.mapToResponse(service.create(card, s));
+        return mapper.mapToResponse(service.create(card, value));
     }
 
     @DeleteMapping("{id}")

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SkillResponseDTO {
     private Integer id;
-    private String skill;
+    private String value;
 }

@@ -14,6 +14,9 @@ import vizicard.service.AlbumService;
 import vizicard.service.CardAttributeService;
 import vizicard.service.CardService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("cards/{cardAddress}")
 @RequiredArgsConstructor
@@ -27,24 +30,28 @@ public class AvatarController {
 
     @PutMapping("avatar")
     @PreAuthorize("isAuthenticated()")
-    public CloudFileDTO updateAvatar(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
+    public List<String> updateAvatar(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         card = cardService.prepareToUpdate(card);
-        CloudFile cloudFile = albumService.addFile(card, file, CloudFileType.MEDIA);
-        card.setAvatarId(cloudFile.getId());
+        List<CloudFile> cloudFiles = albumService.addScaledPhotos(card, file, 3);
+        card.setAvatarId(cloudFiles.get(0).getId());
         cardRepository.save(card);
-        return cloudFileMapper.mapToDTO(cloudFile);
+        return cloudFiles.stream()
+                .map(CloudFile::getUrl)
+                .collect(Collectors.toList());
     }
 
     @PutMapping("background")
     @PreAuthorize("isAuthenticated()")
-    public CloudFileDTO updateBackground(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
+    public List<String> updateBackground(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
         card = cardService.prepareToUpdate(card);
-        CloudFile cloudFile = albumService.addFile(card, file, CloudFileType.MEDIA);
-        card.setBackgroundId(cloudFile.getId());
+        List<CloudFile> cloudFiles = albumService.addScaledPhotos(card, file, 3);
+        card.setBackgroundId(cloudFiles.get(0).getId());
         cardRepository.save(card);
-        return cloudFileMapper.mapToDTO(cloudFile);
+        return cloudFiles.stream()
+                .map(CloudFile::getUrl)
+                .collect(Collectors.toList());
     }
 
 }

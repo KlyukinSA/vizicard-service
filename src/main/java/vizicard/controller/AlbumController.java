@@ -33,9 +33,11 @@ public class AlbumController {
 
     @PostMapping("medias")
     @PreAuthorize("isAuthenticated()")
-    CloudFileDTO addMedia(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
+    List<String> addMedia(@PathVariable String cardAddress, @RequestPart MultipartFile file) {
         Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
-        return cloudFileMapper.mapToDTO(albumService.addFile(card, file, CloudFileType.MEDIA));
+        return albumService.addScaledPhotos(card, file, 2).stream()
+                .map(CloudFile::getUrl)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("links")

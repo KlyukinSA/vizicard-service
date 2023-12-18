@@ -11,6 +11,7 @@ import vizicard.model.CloudFileType;
 import vizicard.repository.AlbumRepository;
 import vizicard.utils.RelationValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,20 @@ public class AlbumService {
             throw new CustomException("can add only jpg and png in media", HttpStatus.FORBIDDEN);
         }
         return cloudFileService.saveFile(file, card.getAlbum(), type, extension);
+    }
+
+    public List<CloudFile> addScaledPhotos(Card card, MultipartFile file, int amount) {
+        String filename = file.getOriginalFilename();
+        String extension = filename.substring(filename.lastIndexOf(".") + 1);
+        if (!(extension.equalsIgnoreCase("jpg")
+                || extension.equalsIgnoreCase("png"))) {
+            throw new CustomException("can add only jpg and png in media", HttpStatus.FORBIDDEN);
+        }
+        List<CloudFile> res = new ArrayList<>();
+        for (int quality = 0; quality < amount; quality++) {
+            res.add(cloudFileService.saveScaledPhoto(file, card.getAlbum(), extension, quality));
+        }
+        return res;
     }
 
     public List<CloudFile> getAllFiles(Card card, CloudFileType type) {

@@ -22,14 +22,15 @@ public class CloudFileService {
     private final ExtensionService extensionService;
 
     public CloudFile saveFile(MultipartFile file, Album album, CloudFileType type, String extension) {
-        String key = s3Service.uploadFile(file);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, extensionService.getByName(extension), file.getSize())));
+        int quality = 0;
+        CloudFile cloudFile = s3Service.uploadFile(file, quality, extension);
+        return finishUrl(cloudFileRepository.save(new CloudFile(cloudFile.getUrl(), album, type, extensionService.getByName(extension), cloudFile.getSize(), quality)));
     }
 
     public CloudFile saveExternal(String url, Album album, CloudFileType type) {
         String key = s3Service.uploadExternal(url);
         String ext = url.substring(url.lastIndexOf(".") + 1);
-        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, extensionService.getByName(ext), 0)));
+        return finishUrl(cloudFileRepository.save(new CloudFile(key, album, type, extensionService.getByName(ext), 0, 0)));
     }
 
     public CloudFile findById(Integer id) {
@@ -62,7 +63,12 @@ public class CloudFileService {
     }
 
     public CloudFile saveLink(String url, Album album, String extension) {
-        return cloudFileRepository.save(new CloudFile(url, album, CloudFileType.LINK, extensionService.getByName(extension), 0));
+        return cloudFileRepository.save(new CloudFile(url, album, CloudFileType.LINK, extensionService.getByName(extension), 0, 0));
+    }
+
+    public CloudFile saveScaledPhoto(MultipartFile file, Album album, String extension, int quality) {
+        CloudFile cloudFile = s3Service.uploadFile(file, quality, extension);
+        return finishUrl(cloudFileRepository.save(new CloudFile(cloudFile.getUrl(), album, CloudFileType.MEDIA, extensionService.getByName(extension), cloudFile.getSize(), quality)));
     }
 
 }

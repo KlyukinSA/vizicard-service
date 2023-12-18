@@ -144,7 +144,7 @@ public class VizicardServiceApp implements CommandLineRunner {
     String usedLogoExtension = "svg";
     Extension extension = extensionService.getByName(usedLogoExtension);
     String keyName = "img_" + writing + "." + usedLogoExtension;
-    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA, extension, 0));
+    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA, extension, 0, 0));
   }
 
 }

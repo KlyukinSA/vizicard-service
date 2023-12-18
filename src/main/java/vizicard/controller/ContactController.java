@@ -91,4 +91,11 @@ public class ContactController {
         return contactMapper.mapToResponse(contactService.findById(card, id));
     }
 
+    @GetMapping("{id}/type")
+    public ContactTypeResponse getTypeById(@PathVariable String cardAddress, @PathVariable Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        cardAttributeService.stopAccessToHiddenTab(TabTypeEnum.CONTACTS, card);
+        return contactMapper.mapToContactTypeResponse(contactService.findById(card, id).getType());
+    }
+
 }

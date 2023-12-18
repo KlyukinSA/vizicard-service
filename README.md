@@ -29,21 +29,23 @@ see src/tests
 # Deploy
 
 1. build jar if you need
-```
-mvn package
-```
-
+    ```
+    mvn package
+    ```
 2. copy jar to server and ssh to server
-```
-scp target/vizicard-1.0.0.jar root@vizicard.ru:/root/back && 
-ssh root@vizicard.ru
-```
-
-3. kill prev. jar and launch new jar (`/root/back/deploy.sh`)
-```
-kill $(jps | grep vizicard-1.0.0.jar | awk '{print $1;}') &&
-java -jar -Dspring.profiles.active=prod /root/back/vizicard-1.0.0.jar &
-```
+    ```shell
+    version=16
+    scp target/vizicard-1.0.0.jar root@vizicard.ru:/root/back/yetap-3.$version.jar
+    ssh root@vizicard.ru
+    ```
+3. rm old jar, kill prev. jar and launch new jar
+    ```
+    version=14
+    cd back
+    rm yetap-3.$(($version-2)).jar
+    kill $(jps | grep yetap-3.$(($version-1)).jar | awk '{print $1;}')
+    java -jar -Dspring.profiles.active=pre_prod yetap-3.$version.jar &
+    ```
 
 All in one:
 ```

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContactReorderDTO {
-    private Integer id;
+    private Integer old;
     private Integer order;
 }

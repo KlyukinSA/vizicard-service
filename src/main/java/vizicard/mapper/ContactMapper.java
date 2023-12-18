@@ -43,7 +43,6 @@ public class ContactMapper {
 				contact.getType().getType(),
 				contact.getValue(),
 				contact.getTitle(),
-				contact.getOrder(),
 				cloudFileService.findById(logoId).getUrl());
 	}
 

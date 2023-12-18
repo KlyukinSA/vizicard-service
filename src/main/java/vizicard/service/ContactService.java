@@ -68,18 +68,18 @@ public class ContactService {
         contactRepository.save(contact);
     }
 
-    public List<Contact> reorder(Card card, List<Integer> ids, List<Integer> orders) {
-        Set<Integer> currents = ids.stream().map(id -> contactRepository.findByCardOwnerAndIndividualId(card, id).getOrder()).collect(Collectors.toSet());
+    public List<Contact> reorder(Card card, List<Integer> oldOrders, List<Integer> orders) {
+        Set<Integer> currents = new HashSet<>(oldOrders);
         Set<Integer> news = new HashSet<>(orders);
         if (!Objects.equals(currents, news)) {
-            throw new CustomException("set of orders must be equal to set of orders of contacts by ids", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("set of orders must be equal to set of old orders", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-
-        for (int i = 0; i < ids.size(); i++) {
-            Contact contact = contactRepository.findByCardOwnerAndIndividualId(card, ids.get(i));
+        Set<Integer> used = new HashSet<>();
+        for (int i = 0; i < oldOrders.size(); i++) {
+            Contact contact = contactRepository.findByCardOwnerAndOrder(card, oldOrders.get(i));
             relationValidator.stopNotOwnerOf(contact.getCardOwner());
             Integer order = orders.get(i);
-            if (!Objects.equals(contact.getOrder(), order)) {
+            if (!Objects.equals(contact.getOrder(), order) && !used.contains(contact.getOrder())) {
                 Contact conflict = contactRepository.findByCardOwnerAndOrder(card, order);
                 conflict.setOrder(0);
                 contactRepository.save(conflict);
@@ -90,6 +90,8 @@ public class ContactService {
 
                 conflict.setOrder(temp);
                 contactRepository.save(conflict);
+
+                used.add(order);
             }
         }
         return contactRepository.findAllByCardOwner(card);

@@ -2,8 +2,11 @@ package vizicard.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,7 +18,10 @@ public class Shortname {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Profile owner;
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Card card;
 
     @Column(nullable = false, unique = true)
     private String shortname;
@@ -24,8 +30,15 @@ public class Shortname {
     @Enumerated(EnumType.STRING)
     private ShortnameType type;
 
-    public Shortname(Profile owner, String shortname, ShortnameType shortnameType) {
-        this.owner = owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Card referrer;
+
+    @OneToMany(mappedBy = "shortname", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Action> visits;
+
+    public Shortname(Card card, String shortname, ShortnameType shortnameType) {
+        this.card = card;
         this.shortname = shortname;
         this.type = shortnameType;
     }

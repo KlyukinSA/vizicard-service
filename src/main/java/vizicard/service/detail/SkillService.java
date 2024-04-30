@@ -1,16 +1,18 @@
 package vizicard.service.detail;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import vizicard.dto.detail.SkillDTO;
-import vizicard.model.Profile;
+import vizicard.exception.CustomException;
+import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 import vizicard.model.detail.Skill;
 import vizicard.repository.detail.SkillRepository;
-import vizicard.utils.ProfileProvider;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -18,28 +20,56 @@ public class SkillService {
 
     private final SkillRepository repository;
 
-    private final ProfileProvider profileProvider;
-
-    public void changeSkills(SkillDTO dto) {
-        Profile user = profileProvider.getUserFromAuth();
+    public List<Skill> changeSkills(Card card, SkillDTO dto) {
         if (dto.getAdd() != null) {
             for (String s : dto.getAdd()) {
-                Skill detail = new Skill(user, s);
-                try {
-                    repository.save(detail);
-                } catch (Exception ignored) {
-                }
+                create(card, s);
             }
         }
         if (dto.getDelete() != null) {
             for (Integer id : dto.getDelete()) {
-                Skill detail = repository.findById(id).get();
-                if (Objects.equals(detail.getOwner().getId(), user.getId())) {
-                    detail.setStatus(false);
-                    repository.save(detail);
-                }
+                delete(card, id);
             }
         }
+        return repository.findAllByCardOwner(card).stream()
+                .filter(Skill::isStatus)
+                .collect(Collectors.toList());
+    }
+
+    private Integer getNextIndividualId(Card card) {
+        return repository.findAllByCardOwner(card).stream()
+                .mapToInt(CardAttribute::getIndividualId)
+                .max().orElse(0) + 1;
+    }
+
+    public Stream<Skill> getAllOfCard(Card card) {
+        return card.getDetailStruct().getSkills().stream()
+                .filter(Skill::isStatus);
+    }
+
+    public Skill create(Card card, String value) {
+        Skill skill = repository.findByValueAndCardOwner(value, card);
+        if (skill != null) {
+            if (!skill.isStatus()) {
+                skill.setStatus(true);
+            } else {
+                throw new CustomException("skill already exists", HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            skill = new Skill(card, value);
+            skill.setIndividualId(getNextIndividualId(card));
+        }
+        return repository.save(skill);
+    }
+
+    public void delete(Card card, Integer id) {
+        Skill detail = repository.findByCardOwnerAndIndividualId(card, id);
+        detail.setStatus(false);
+        repository.save(detail);
+    }
+
+    public Skill findById(Card card, Integer id) {
+        return repository.findByCardOwnerAndIndividualId(card, id);
     }
 
 }

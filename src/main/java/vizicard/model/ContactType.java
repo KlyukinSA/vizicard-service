@@ -19,13 +19,27 @@ public class ContactType {
 
     @Column(columnDefinition = "ENUM('PHONE', 'MAIL', 'SITE', 'FACEBOOK', 'INSTAGRAM', 'LINKEDIN', 'YOUTUBE', 'VK', 'TIKTOK', 'OK', 'TELEGRAM', 'WHATSAPP', 'VIBER')", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ContactEnum type; // TODO make as id
+    private ContactEnum type;
 
     @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private CloudFile logo;
+
+    @Column(nullable = false)
+    private String writing;
 
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Contact> contacts;
+
+    @ManyToMany
+    @JoinColumn(nullable = false)
+    private List<ContactGroup> groups;
+
+    @Column(nullable = false)
+    private String urlBase;
+
+    @Column(nullable = false)
+    private String regex;
 
 }

@@ -5,8 +5,7 @@ import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import vizicard.model.AppUserRole;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,8 +17,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import vizicard.exception.CustomException;
+import vizicard.model.Account;
+import vizicard.utils.TokenClaimsFiller;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
   /**
@@ -29,23 +31,20 @@ public class JwtTokenProvider {
   @Value("${security.jwt.token.secret-key:secret-key}")
   private String secretKey;
 
-  @Autowired
-  private MyUserDetails myUserDetails;
+  private final MyUserDetails myUserDetails;
+  private final TokenClaimsFiller tokenClaimsFiller;
 
   @PostConstruct
   protected void init() {
     secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
-  public String createToken(String id) {
+  public String createToken(Account account) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("id", id);
-
-    Date now = new Date();
-
+    tokenClaimsFiller.fill(claims, account);
     return Jwts.builder()
             .setClaims(claims)
-            .setIssuedAt(now)
+            .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
   }
@@ -55,8 +54,8 @@ public class JwtTokenProvider {
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getId(String token) {
-    return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("id");
+  private String getId(String token) {
+    return (String) Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("accountId");
   }
 
   public String resolveToken(HttpServletRequest req) {

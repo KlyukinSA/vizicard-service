@@ -1,38 +1,42 @@
 package vizicard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.PublicationDTO;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
+import vizicard.dto.publication.PublicationCreateDTO;
+import vizicard.dto.publication.PublicationResponse;
+import vizicard.mapper.PublicationCommentResponseMapper;
+import vizicard.model.Publication;
 import vizicard.service.PublicationService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/publications")
 @RequiredArgsConstructor
 public class PublicationController {
 
     private final PublicationService publicationService;
+    private final ModelMapper modelMapper;
+    private final PublicationCommentResponseMapper publicationCommentResponseMapper;
 
-    @PostMapping
+    @PostMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
-    public PublicationDTO createPublication(@RequestBody PublicationDTO dto) {
-        return publicationService.createPublication(dto);
+    public PublicationCreateDTO createPublication(@RequestBody PublicationCreateDTO dto, @PathVariable Integer id) {
+        Publication map = modelMapper.map(dto, Publication.class);
+        return modelMapper.map(publicationService.createPublication(map, id), PublicationCreateDTO.class);
     }
 
-    @GetMapping("my")
+    @GetMapping("publications/my")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationDTO> getAllMy() {
-        return publicationService.getAllMy();
+    public List<PublicationResponse> getAllMy() {
+        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getAllMy(), Publication::getCard, PublicationResponse.class);
     }
 
-    @GetMapping("my-on-page")
+    @GetMapping("profiles/{id}/publications")
     @PreAuthorize("isAuthenticated()")
-    public List<PublicationDTO> getAllMyOnPage(@RequestParam Integer id) {
-        return publicationService.getAllMyOnPage(id);
+    public List<PublicationResponse> getOnPage(@PathVariable Integer id) {
+        return (List<PublicationResponse>) publicationCommentResponseMapper.getResponse(publicationService.getOnPage(id), p -> p.getAccountOwner().getMainCard(), PublicationResponse.class);
     }
 
 }

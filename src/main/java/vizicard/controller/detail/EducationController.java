@@ -3,37 +3,44 @@ package vizicard.controller.detail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
-import vizicard.dto.detail.EducationTypeDTO;
+import vizicard.dto.detail.*;
+import vizicard.mapper.DetailResponseMapper;
+import vizicard.model.Card;
+import vizicard.model.TabTypeEnum;
+import vizicard.service.CardAttributeService;
 import vizicard.service.detail.EducationService;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("profiles/me/education")
+@RequestMapping("cards/{cardAddress}/educations")
 @RequiredArgsConstructor
 public class EducationController {
 
     private final EducationService educationService;
+    private final CardAttributeService cardAttributeService;
+    private final DetailResponseMapper mapper;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public EducationResponseDTO createEducation(@RequestBody EducationDTO dto) {
-        return educationService.createEducation(dto);
+    public EducationResponseDTO createEducation(@PathVariable String cardAddress, @RequestBody EducationDTO dto) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return mapper.mapToResponse(educationService.createEducation(card, dto));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public EducationResponseDTO updateEducation(@RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
-        return educationService.updateEducation(dto, id);
+    public EducationResponseDTO updateEducation(@PathVariable String cardAddress, @RequestBody EducationDTO dto, @PathVariable("id") Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return mapper.mapToResponse(educationService.updateEducation(card, dto, id));
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public void deleteEducation(@PathVariable("id") Integer id) {
-        educationService.deleteEducation(id);
+    public void deleteEducation(@PathVariable String cardAddress, @PathVariable("id") Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        educationService.deleteEducation(card, id);
     }
 
     @GetMapping("types")

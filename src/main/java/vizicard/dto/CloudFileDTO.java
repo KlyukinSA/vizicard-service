@@ -3,7 +3,6 @@ package vizicard.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vizicard.model.Profile;
 
 @Data
 @NoArgsConstructor
@@ -11,6 +10,9 @@ import vizicard.model.Profile;
 public class CloudFileDTO {
     private Integer id;
     private String url;
-    private Integer ownerId;
-
+    private Integer albumId;
+    private String description;
+    private long size;
+    private String extension;
+    private String color;
 }

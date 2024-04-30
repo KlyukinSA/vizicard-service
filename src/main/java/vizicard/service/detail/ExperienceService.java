@@ -3,19 +3,13 @@ package vizicard.service.detail;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceDTO;
-import vizicard.dto.detail.ExperienceResponseDTO;
-import vizicard.model.Profile;
-import vizicard.model.detail.Education;
+import vizicard.model.Card;
+import vizicard.model.CardAttribute;
 import vizicard.model.detail.Experience;
-import vizicard.model.detail.Skill;
-import vizicard.repository.detail.EducationRepository;
 import vizicard.repository.detail.ExperienceRepository;
-import vizicard.utils.ProfileProvider;
 
-import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -24,33 +18,41 @@ public class ExperienceService {
     private final ExperienceRepository repository;
 
     private final ModelMapper modelMapper;
-    private final ProfileProvider profileProvider;
 
-    public ExperienceResponseDTO createExperience(ExperienceDTO dto) {
-        Profile user = profileProvider.getUserFromAuth();
-        Experience detail = new Experience(user);
+    public Experience createExperience(Card card, ExperienceDTO dto) {
+        Experience detail = new Experience(card);
+        modelMapper.map(dto, detail);
+        detail.setIndividualId(getNextIndividualId(card));
+        repository.save(detail);
+        return detail;
+    }
+
+    public Experience updateExperience(Card card, ExperienceDTO dto, Integer id) {
+        Experience detail = repository.findByCardOwnerAndIndividualId(card, id);
         modelMapper.map(dto, detail);
         repository.save(detail);
-        return modelMapper.map(detail, ExperienceResponseDTO.class);
+        return detail;
     }
 
-    public ExperienceResponseDTO updateExperience(ExperienceDTO dto, Integer id) {
-        Profile user = profileProvider.getUserFromAuth();
-        Experience detail = repository.findById(id).get();
-        if (Objects.equals(detail.getOwner().getId(), user.getId())) {
-            modelMapper.map(dto, detail);
-            repository.save(detail);
-        }
-        return modelMapper.map(detail, ExperienceResponseDTO.class);
+    private Integer getNextIndividualId(Card card) {
+        return repository.findAllByCardOwner(card).stream()
+                .mapToInt(CardAttribute::getIndividualId)
+                .max().orElse(0) + 1;
     }
 
-    public void deleteExperience(Integer id) {
-        Profile user = profileProvider.getUserFromAuth();
-        Experience detail = repository.findById(id).get();
-        if (Objects.equals(detail.getOwner().getId(), user.getId())) {
-            detail.setStatus(false);
-            repository.save(detail);
-        }
+    public void deleteExperience(Card card, Integer id) {
+        Experience detail = repository.findByCardOwnerAndIndividualId(card, id);
+        detail.setStatus(false);
+        repository.save(detail);
+    }
+
+    public Stream<Experience> getAllOfCard(Card card) {
+        return card.getDetailStruct().getExperience().stream()
+                .filter(Experience::isStatus);
+    }
+
+    public Experience findById(Card card, Integer id) {
+        return repository.findByCardOwnerAndIndividualId(card, id);
     }
 
 }

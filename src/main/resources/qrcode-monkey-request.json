@@ -1,0 +1,31 @@
+{
+  "config":{
+    "bgColor": "#FFFFFF",
+    "body": "circular",
+    "bodyColor": "#000000",
+    "brf1": [],
+    "brf2": [],
+    "brf3": [],
+    "erf1": [],
+    "erf2": [],
+    "erf": [],
+    "eye": "frame13",
+    "eye1Color": "#000000",
+    "eye2Color": "#000000",
+    "eye3Color": "#000000",
+    "eyeBall": "ball15",
+    "eyeBall1Color": "#000000",
+    "eyeBall2Color": "#000000",
+    "eyeBall3Color": "#000000",
+    "gradientColor1": "",
+    "gradientColor2": "",
+    "gradientOnEyes": "true",
+    "gradientType": "linear",
+    "logo": "",
+    "logoMode": "default"
+  },
+  "data": "$1/$2?utm_source=qr",
+  "download": "imageUrl",
+  "file": "svg",
+  "size": 400
+}

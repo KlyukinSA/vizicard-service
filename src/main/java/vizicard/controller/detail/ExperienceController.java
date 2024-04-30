@@ -3,36 +3,45 @@ package vizicard.controller.detail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vizicard.dto.detail.EducationDTO;
-import vizicard.dto.detail.EducationResponseDTO;
 import vizicard.dto.detail.ExperienceDTO;
 import vizicard.dto.detail.ExperienceResponseDTO;
-import vizicard.service.detail.EducationService;
+import vizicard.mapper.DetailResponseMapper;
+import vizicard.model.Card;
+import vizicard.model.TabTypeEnum;
+import vizicard.service.CardAttributeService;
 import vizicard.service.detail.ExperienceService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("profiles/me/experience")
+@RequestMapping("cards/{cardAddress}/experiences")
 @RequiredArgsConstructor
 public class ExperienceController {
 
     private final ExperienceService service;
+    private final CardAttributeService cardAttributeService;
+    private final DetailResponseMapper mapper;
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ExperienceResponseDTO createEducation(@RequestBody ExperienceDTO dto) {
-        return service.createExperience(dto);
+    public ExperienceResponseDTO createExperience(@PathVariable String cardAddress, @RequestBody ExperienceDTO dto) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return mapper.mapToResponse(service.createExperience(card, dto));
     }
 
     @PutMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public ExperienceResponseDTO updateEducation(@RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
-        return service.updateExperience(dto, id);
+    public ExperienceResponseDTO updateExperience(@PathVariable String cardAddress, @RequestBody ExperienceDTO dto, @PathVariable("id") Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        return mapper.mapToResponse(service.updateExperience(card, dto, id));
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("isAuthenticated()")
-    public void deleteEducation(@PathVariable("id") Integer id) {
-        service.deleteExperience(id);
+    public void deleteExperience(@PathVariable String cardAddress, @PathVariable("id") Integer id) {
+        Card card = cardAttributeService.getCardByIdOrElseShortname(cardAddress);
+        service.deleteExperience(card, id);
     }
 
 }

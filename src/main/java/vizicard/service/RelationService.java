@@ -1,20 +1,15 @@
 package vizicard.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vizicard.dto.profile.LeadGenDTO;
-import vizicard.dto.profile.ProfileCreateDTO;
 import vizicard.exception.CustomException;
-import vizicard.model.Profile;
-import vizicard.model.ProfileType;
-import vizicard.model.Relation;
-import vizicard.model.RelationType;
-import vizicard.repository.ProfileRepository;
+import vizicard.model.*;
+import vizicard.repository.CardRepository;
+import vizicard.repository.CardTypeRepository;
 import vizicard.repository.RelationRepository;
 import vizicard.utils.*;
 
@@ -24,36 +19,28 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class RelationService {
 
     private final RelationRepository relationRepository;
-    private final ProfileRepository profileRepository;
+    private final CardRepository cardRepository;
 
     private final ProfileProvider profileProvider;
-    private final RelationValidator relationValidator;
-    private final ModelMapper modelMapper;
-
     private final ActionService actionService;
     private final EmailService emailService;
-    private final ProfileService profileService;
-
     private final EntityManager entityManager;
     private final Relator relator;
+    private final CardService cardService;
+    private final CardTypeRepository cardTypeRepository;
 
-    public void unrelate(Integer ownerId, Integer profileId) {
-        Profile owner;
-        if (ownerId == null) {
-            owner = profileProvider.getUserFromAuth();
-        } else {
-            owner = profileProvider.getTarget(ownerId);
-            relationValidator.stopNotOwnerOf(owner);
-        }
-        Profile target = profileProvider.getTarget(profileId);
+    public void unrelate(Integer cardId) {
+        Card card = cardRepository.findById(cardId).get();
+        Account owner = profileProvider.getUserFromAuth();
 
-        Relation relation = relationRepository.findByOwnerAndProfile(owner, target);
+        Relation relation = relationRepository.findByAccountOwnerAndCard(owner, card);
         if (relation == null || !relation.isStatus()) {
             throw new CustomException("No such relation", HttpStatus.CONFLICT);
         }
@@ -62,85 +49,56 @@ public class RelationService {
         relationRepository.save(relation);
     }
 
-    public ResponseEntity<?> saveContact(Integer targetProfileId) throws Exception {
-        Profile target = profileProvider.getTarget(targetProfileId);
-
-        Profile owner = profileProvider.getUserFromAuth();
-        if (owner != null && !Objects.equals(target.getId(), owner.getId())) {
+    public void saveContact(Integer targetId) {
+        Card target = profileProvider.getTarget(targetId);
+        Account owner = profileProvider.getUserFromAuth();
+        if (owner != null && !Objects.equals(target.getAccount().getId(), owner.getId())) {
             emailService.sendSaved(owner, target);
 
-            relator.relate(owner, target, RelationType.USUAL);
-
-            if (target.getCompany() != null && target.getCompany().isStatus()) {
-                relator.relate(owner, target.getCompany(), RelationType.USUAL);
-            }
+            relator.relate(owner, owner.getCurrentCard(), target, RelationType.SAVE);
+            exchange(target, owner.getCurrentCard());
         }
-
-        actionService.save(owner, target);
-
-        return getVcardResponse(new VcardFile(target));
+        actionService.addSaveAction(owner, target);
     }
 
-    private ResponseEntity<?> getVcardResponse(VcardFile vcardFile) {
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("text/vcard"))
-                .header("Content-Disposition", "attachment; filename=\"" + vcardFile.getName() + '\"')
-                .contentLength(vcardFile.getBytes().length)
-                .body(new InputStreamResource(new ByteArrayInputStream(vcardFile.getBytes())));
+    public void leadGenerate(Integer targetId, Card leadCard, Card company, String email) {
+        Card target = profileProvider.getTarget(targetId);
+
+        if (company.getName() != null) {
+            company.setType(cardTypeRepository.findByType(CardTypeEnum.COMPANY));
+            company.setCustom(true);
+            cardService.create(company);
+        }
+        leadCard.setType(cardTypeRepository.findByType(CardTypeEnum.PERSON));
+        leadCard.setCustom(true);
+        leadCard.setAccount(target.getAccount());
+        cardService.create(leadCard);
+        relationRepository.save(new Relation(target.getAccount(), leadCard, company, RelationType.EMPLOYEE));
+
+        emailService.sendSaved(email, target);
+        emailService.sendLead(target.getAccount(), leadCard);
+
+        exchange(target, leadCard);
     }
 
-    public void leadGenerate(Integer targetProfileId, LeadGenDTO dto) {
-        Profile target = profileProvider.getTarget(targetProfileId);
-        Profile company = null;
-        RelationType relationType;
-
-        Profile author = profileProvider.getUserFromAuth();
-        if (author != null) {
-            if (Objects.equals(target.getId(), author.getId())) {
-                return;
-            }
-            company = author.getCompany();
-            relationType = RelationType.USUAL;
-        } else {
-            ProfileCreateDTO dto1 = modelMapper.map(dto, ProfileCreateDTO.class);
-            dto1.setType(ProfileType.LEAD_USER);
-            author = profileService.createProfile(dto1, target, null, null);
-            if (dto.getCompanyName() != null) {
-                ProfileCreateDTO dto2 = new ProfileCreateDTO();
-                dto2.setName(dto.getCompanyName());
-                dto2.setType(ProfileType.LEAD_COMPANY);
-                company = profileService.createProfile(dto2, author, null, null);
-                author.setCompany(company);
-                profileRepository.save(author);
-            }
-            // guest `author` maybe gave his email in LeadGenDTO. now we can send `target` to him
-            emailService.sendSaved(author, target);
-            relationType = RelationType.OWNER;
-        }
-
-        relator.relate(target, author, relationType);
-
-        if (company != null && company.isStatus()) {
-            relator.relate(target, company, RelationType.USUAL);
-        }
-
-        emailService.sendLead(target, author);
+    private void exchange(Card target, Card actor) {
+        relator.relate(target.getAccount(), target, actor, RelationType.EXCHANGE);
     }
 
     public List<Relation> searchLike(String name, String type) {
-        Profile user = profileProvider.getUserFromAuth();
-        StringBuilder query = new StringBuilder(
-                "select relation.id from relation inner join profile on relation.profile_id=profile.id where owner_id=")
+        Account user = profileProvider.getUserFromAuth();
+        StringBuilder query = new StringBuilder( // should search as in Relator::relate
+                "select relation.id from relation inner join card on relation.card_id=card.id where account_owner_id=")
                 .append(user.getId());
 
         if (name != null) {
             for (String part : name.split(" ")) {
-                query.append(" and profile.name like '").append(surround(part)).append("'");
+                query.append(" and card.name like '").append(surround(part)).append("'");
             }
         }
 
         if (type != null) {
-            query.append(" and profile.type like '").append(surround(type)).append("'");
+            query.append(" and card.type like '").append(surround(type)).append("'");
         }
 
         query.append(" order by relation.id desc");
@@ -157,7 +115,7 @@ public class RelationService {
         return ids.stream()
                 .map((id) -> relationRepository.findById(id).get())
                 .filter(Relation::isStatus)
-                .filter((relation) -> relation.getProfile().isStatus())
+                .filter((relation) -> relation.getCard().isStatus())
                 .collect(Collectors.toList());
     }
 
@@ -169,6 +127,33 @@ public class RelationService {
             s = s + "%";
         }
         return s;
+    }
+
+    public List<Relation> getReferralsWithLevelOrAll(Integer level) {
+        Account user = profileProvider.getUserFromAuth();
+        List<Relation> level1s = relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER, user);
+        List<Relation> level2s = relationRepository.findAllByTypeAndAccountOwner(RelationType.REFERRER_LEVEL2, user);
+        if (level == null) {
+            level1s.addAll(level2s);
+            return  level1s;
+        } else if (level == 1) {
+            return level1s;
+        } else {
+            return level2s;
+        }
+    }
+
+    public Card createRelationCard(Card card) {
+        card.setCustom(true);
+        cardService.createMyCard(card);
+        Account account = profileProvider.getUserFromAuth();
+        relator.relate(account, account.getCurrentCard(), card, RelationType.OWNER);
+        return card;
+    }
+
+    public Stream<Relation> getRelationsByAuth() {
+        return relationRepository.findAllByAccountOwner(profileProvider.getUserFromAuth()).stream()
+                .filter(Relation::isStatus);
     }
 
 }

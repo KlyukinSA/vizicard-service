@@ -2,15 +2,13 @@ package vizicard.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import vizicard.exception.CustomException;
-import vizicard.model.Profile;
-import vizicard.repository.ProfileRepository;
+import vizicard.model.Account;
+import vizicard.model.Card;
+import vizicard.repository.CardRepository;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,22 +16,22 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class ProfileProvider {
 
-    private final ProfileRepository profileRepository;
+    private final CardRepository cardRepository;
 
-    public Profile getUserFromAuth() {
+    public Account getUserFromAuth() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        Profile user = (Profile) request.getAttribute("user");
-        return user;
+        return (Account) request.getAttribute("user");
     }
 
-    public Profile getTarget(Integer id) {
-        CustomException exception = new CustomException("The profile doesn't exist", HttpStatus.NOT_FOUND);
-        Profile profile = profileRepository.findById(id)
+    public Card getTarget(Integer id) {
+        CustomException exception = new CustomException("The card doesn't exist", HttpStatus.NOT_FOUND);
+        Card card = cardRepository.findById(id)
                 .orElseThrow(() -> exception);
-        if (!profile.isStatus()) {
+        if (!card.isStatus()) {
             throw exception;
         }
-        return profile;
+        return card;
+//        return cardRepository.findById(id).filter(Card::isStatus).get();
     }
 
 }

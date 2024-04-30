@@ -1,22 +1,27 @@
 package vizicard.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import vizicard.model.Profile;
-import vizicard.model.ProfileType;
-import vizicard.model.Relation;
-import vizicard.model.RelationType;
+import vizicard.model.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 public interface RelationRepository extends JpaRepository<Relation, Integer> {
-    Relation findByOwnerAndProfile(Profile owner, Profile target);
 
-    List<Relation> findAllByOwnerOrderByProfileNameAsc(Profile owner);
+    Relation findByAccountOwnerAndCard(Account account, Card card);
 
-    List<Relation> findAllByProfile(Profile target);
+    Relation findByTypeAndCard(RelationType relationType, Card card);
 
-    Relation findByTypeAndProfile(RelationType relationType, Profile group);
+    List<Relation> findAllByAccountOwnerAndCardTypeTypeAndType(Account owner, CardTypeEnum cardTypeEnum, RelationType relationType);
 
-    List<Relation> findAllByOwnerAndProfileType(Profile user, ProfileType profileType);
+    List<Relation> findAllByTypeAndAccountOwner(RelationType relationType, Account owner);
+
+    Relation findByCardOwnerAndCardTypeTypeAndType(Card card, CardTypeEnum cardTypeEnum, RelationType relationType);
+
+    List<Relation> findAllByCardAndType(Card group, RelationType relationType);
+
+    Relation findByCardOwnerAndCard(Card member, Card group);
+
+    List<Relation> findAllByCardAndTypeAndGroupStatus(Card group, RelationType relationType, GroupMemberStatus status);
+
+    List<Relation> findAllByAccountOwner(Account account);
 }

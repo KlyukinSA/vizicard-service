@@ -1,63 +1,150 @@
 package vizicard;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import vizicard.model.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import vizicard.model.detail.EducationLevel;
-import vizicard.repository.CloudFileRepository;
-import vizicard.repository.ContactTypeRepository;
+import vizicard.model.detail.EducationType;
+import vizicard.repository.*;
 import vizicard.repository.detail.EducationTypeRepository;
+import vizicard.service.ExtensionService;
+
+import java.util.ArrayList;
 
 @SpringBootApplication
+@EnableScheduling
 @RequiredArgsConstructor
 public class VizicardServiceApp implements CommandLineRunner {
-  @Value("${spring.profiles.active}")
-  private String activeProfile;
+//  @Value("${spring.profiles.active}")
+//  private String activeProfile;
 
   private final ContactTypeRepository contactTypeRepository;
+  private final ContactGroupRepository contactGroupRepository;
+
   private final EducationTypeRepository educationTypeRepository;
   private final CloudFileRepository cloudFileRepository;
+  private final AlbumRepository albumRepository;
+  private final CardTypeRepository cardTypeRepository;
+  private final ExtensionRepository extensionRepository;
+  private final ExtensionService extensionService;
+  private final TabTypeRepository tabTypeRepository;
 
   public static void main(String[] args) {
     SpringApplication.run(VizicardServiceApp.class, args);
   }
 
   @Override
-  public void run(String... params) throws Exception {
+  public void run(String... params) {
+    if (extensionRepository.findAll().size() < 20) {
+      System.out.println("WHERE are EXTENSIONS?");
+      System.out.println("adding...");
+      fillExtentions();
+    }
     if (contactTypeRepository.findAll().size() < ContactEnum.class.getEnumConstants().length) {
       System.out.println("WHERE ARE CONTACT TYPES?");
-      if (activeProfile.equals("dev")) {
-        System.out.println("adding...");
-        fillContactTypes();
-      }
+      System.out.println("adding...");
+      fillContactTypes();
     }
-    if (educationTypeRepository.findAll().size() < EducationLevel.class.getEnumConstants().length) {
+    if (educationTypeRepository.findAll().size() < 8) {
       System.out.println("WHERE ARE EDUCATION TYPES?");
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('1', 'PRIMARY', 'НАЧАЛЬНОЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('2', 'SECONDARY', 'СРЕДНЕЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('3', 'HIGHER', 'ВЫСШЕЕ');
-//INSERT INTO `dev`.`education_type` (`id`, `type`, `writing`) VALUES ('4', 'VOCATIONAL', 'ПРОФЕССИОНАЛЬНОЕ');
+      System.out.println("adding...");
+      fillEducationTypes();
     }
+    if (cardTypeRepository.findAll().size() < CardTypeEnum.class.getEnumConstants().length) {
+      System.out.println("WHERE ARE CARD TYPES?");
+      System.out.println("adding...");
+      fillCardTypes();
+    }
+    if (tabTypeRepository.findAll().size() < TabTypeEnum.values().length) {
+      System.out.println("WHERE ARE TAB TYPES?");
+      System.out.println("adding...");
+      fillTabTypes();
+    }
+  }
+
+  private void fillTabTypes() {
+    tabTypeRepository.save(new TabType(TabTypeEnum.CONTACTS, "Контакты"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.RESUME, "Резюме"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.MEDIAS, "Медиа"));
+    tabTypeRepository.save(new TabType(TabTypeEnum.FILES, "Файлы"));
+  }
+
+  private void fillExtentions() {
+    String src = "EPS - E4C62D, JPG - D03132, PNG - A166AA, IND - C13E7A, FLA - D03034, MP3 - 176AA9, MOV - 156BA9, HTML - 8DC27A, PHP - E1B221, CSS - DC7F1C, GIF - D82F2F, DOC - 104F7A, DOCX - 104F7A, PDF - D03034, PPT - DC7F1C, XLS - 0D683E, XLSX - 0D683E, CSV - 0D683E, ZIP - E1B31F, OTHER - 536471";
+    String[] pairs = src.split(",");
+    for (String pair : pairs) {
+      String[] els = pair.split("-");
+      extensionRepository.save(new Extension(els[0].trim(), els[1].trim()));
+    }
+  }
+
+  private void fillCardTypes() {
+    for (CardTypeEnum type : CardTypeEnum.class.getEnumConstants()) {
+      cardTypeRepository.save(new CardType(type, type.toString().toLowerCase()));
+    }
+  }
+
+  private void fillEducationTypes() {
+    educationTypeRepository.save(new EducationType("Среднее"));
+    educationTypeRepository.save(new EducationType("Среднее специальное"));
+    educationTypeRepository.save(new EducationType("Неоконченное высшее"));
+    educationTypeRepository.save(new EducationType("Высшее"));
+    educationTypeRepository.save(new EducationType("Бакалавр"));
+    educationTypeRepository.save(new EducationType("Магистр"));
+    educationTypeRepository.save(new EducationType("Кандидат наук"));
+    educationTypeRepository.save(new EducationType("Доктор наук"));
   }
 
   void fillContactTypes() {
-    CloudFile cloudFile = cloudFileRepository.save(new CloudFile("empty", null));
+    Album album = albumRepository.save(new Album());
+    ContactGroup contactGroup = contactGroupRepository.save(new ContactGroup(1, ContactGroupEnum.MUSIC, "music", null));
 
     for (ContactEnum contactEnum : ContactEnum.class.getEnumConstants())
     {
-      save(cloudFile, contactEnum);
+      save(album, contactEnum, contactGroup);
     }
   }
 
-  void save(CloudFile cloudFile, ContactEnum contactEnum) {
+  void save(Album album, ContactEnum contactEnum, ContactGroup contactGroup) {
     ContactType contactType = new ContactType();
     contactType.setType(contactEnum);
-    contactType.setLogo(cloudFile);
+    contactType.setWriting(contactEnum.toString().toLowerCase());
+    contactType.setLogo(createLogoFor(contactType.getWriting(), album));
+    contactType.setUrlBase(getUrlBaseByType(contactEnum));
+    contactType.setRegex(getRegexpByType(contactEnum));
+    contactType.setGroups(new ArrayList<>());
+    contactType.getGroups().add(contactGroup);
     contactTypeRepository.save(contactType);
+  }
+
+  private String getRegexpByType(ContactEnum contactEnum) {
+    if (contactEnum == ContactEnum.PHONE) {
+      return "^" + getUrlBaseByType(contactEnum) + "[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$";
+    } else if (contactEnum == ContactEnum.MAIL) {
+      return "^" + getUrlBaseByType(contactEnum) + "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+    } else {
+      return "^https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$";
+    }
+  }
+
+  private String getUrlBaseByType(ContactEnum contactEnum) {
+    if (contactEnum == ContactEnum.PHONE) {
+      return "tel:";
+    } else if (contactEnum == ContactEnum.MAIL) {
+      return "mailto:";
+    } else {
+      return contactEnum.name() + "UrlBase/";
+    }
+  }
+
+  private CloudFile createLogoFor(String writing, Album album) {
+    String usedLogoExtension = "svg";
+    Extension extension = extensionService.getByName(usedLogoExtension);
+    String keyName = "img_" + writing + "." + usedLogoExtension;
+    return cloudFileRepository.save(new CloudFile(keyName, album, CloudFileType.MEDIA, extension, 0, 0));
   }
 
 }

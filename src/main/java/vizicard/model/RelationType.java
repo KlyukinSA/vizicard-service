@@ -1,5 +1,5 @@
 package vizicard.model;
 
 public enum RelationType {
-    OWNER, EDITOR, USUAL;
+    EMPLOYEE, OWNER, SAVE, EXCHANGE, REFERRAL, REFERRER, REFERRER_LEVEL2, MEMBER;
 }

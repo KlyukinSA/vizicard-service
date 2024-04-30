@@ -2,7 +2,8 @@ package vizicard.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vizicard.model.Profile;
+import vizicard.model.Account;
+import vizicard.model.Card;
 import vizicard.model.Relation;
 import vizicard.model.RelationType;
 import vizicard.repository.RelationRepository;
@@ -13,10 +14,10 @@ public class Relator {
 
     private final RelationRepository relationRepository;
 
-    public Relation relate(Profile owner, Profile profile, RelationType relationType) {
-        Relation relation = relationRepository.findByOwnerAndProfile(owner, profile);
+    public Relation relate(Account owner, Card cardOwner, Card card, RelationType relationType) {
+        Relation relation = relationRepository.findByAccountOwnerAndCard(owner, card);
         if (relation == null) {
-            return relationRepository.save(new Relation(owner, profile, relationType));
+            return relationRepository.save(new Relation(owner, cardOwner, card, relationType));
         } else {
             if (!relation.isStatus()) {
                 relation.setStatus(true);
@@ -25,4 +26,5 @@ public class Relator {
             return relationRepository.save(relation);
         }
     }
+
 }
